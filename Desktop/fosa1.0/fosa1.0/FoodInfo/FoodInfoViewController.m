@@ -27,7 +27,7 @@
     Boolean isRemind;
     //标示是否可编辑
     Boolean _CanEdit;
-   
+
    }
 @property(nonatomic,assign) NSString *storagePath;;
 @property(nonatomic,assign) sqlite3 *database;
@@ -358,6 +358,9 @@
     [self presentViewController:alert animated:YES completion:nil];
 }
 -(void)openPhotoLibrary{
+    
+}
+-(void)openCamera{
     
 }
 
