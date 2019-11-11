@@ -10,6 +10,15 @@
 
 @implementation MenuModel
 
++ (instancetype)modelWithName:(NSString *)category{
+    return [[self alloc]initWithName:category];
+}
+- (instancetype)initWithName:(NSString *)category{
+   if(self == [super init]){
+      self.categoryName = category;
+    }
+    return self;
+}
 /*
 // Only override drawRect: if you perform custom drawing.
 // An empty implementation adversely affects performance during animation.

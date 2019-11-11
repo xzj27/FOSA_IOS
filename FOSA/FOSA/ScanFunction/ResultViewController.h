@@ -11,7 +11,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface ResultViewController : UIViewController
-
+@property (nonatomic,strong) UILabel *resultLabel;
 @end
 
 NS_ASSUME_NONNULL_END

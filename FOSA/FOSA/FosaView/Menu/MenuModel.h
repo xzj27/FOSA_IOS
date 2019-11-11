@@ -12,6 +12,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MenuModel : UIView
 
+@property (nonatomic,copy) NSString *color,*categoryName;
+
++ (instancetype)modelWithName:(NSString *) category;
+- (instancetype)initWithName:(NSString *) category;
+
 @end
 
 NS_ASSUME_NONNULL_END

@@ -7,8 +7,33 @@
 //
 
 #import "FosaMainViewController.h"
+#import "ScanOneCodeViewController.h"
+#import "PhotoViewController.h"
+#import "FoodCollectionViewCell.h"
+#import "MenuModel.h"
+#import "FosaMenu.h"
+#import "FoodInfoViewController.h"
+#import "CellModel.h"
 
-@interface FosaMainViewController ()
+#import <UserNotifications/UserNotifications.h>
+#import <WebKit/WebKit.h>
+#import <sqlite3.h>
+
+@interface FosaMainViewController ()<WKNavigationDelegate,UIScrollViewDelegate,UICollectionViewDataSource, UICollectionViewDelegateFlowLayout,UICollectionViewDelegate,UIGestureRecognizerDelegate>{
+    int i;
+    NSString *ID;
+    Boolean isEdit;
+}
+//@property (strong,nonatomic) IBOutlet WKWebView *webview;
+@property (nonatomic,strong) UIView *CategoryMenu;  //菜单视图
+@property(nonatomic,assign)sqlite3 *database;
+//结果集定义
+@property(nonatomic,assign)sqlite3_stmt *stmt;
+@property (nonatomic,assign) int count;
+@property (nonatomic,assign) Boolean LeftOrRight;
+@property (nonatomic,strong) NSMutableArray<CellModel *> *storageArray;
+@property (nonatomic,strong) UIRefreshControl *refresh;
+@property (nonatomic, strong) UILongPressGestureRecognizer *longPress;//长按手势
 
 @end
 
@@ -17,16 +42,330 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
+    //self.view.backgroundColor = [UIColor whiteColor];
+    
+    self.QRscan = [[UIButton alloc]initWithFrame:CGRectMake(0,0,40,40)];
+    [self.QRscan setImage:[UIImage imageNamed:@"icon_scan"] forState:UIControlStateNormal];
+    self.QRscan.showsTouchWhenHighlighted = YES;
+    [self.QRscan addTarget:self action:@selector(Scan) forControlEvents:UIControlEventTouchUpInside];
+    UIBarButtonItem *rightItem = [[UIBarButtonItem alloc]initWithCustomView:self.QRscan];
+    self.navigationItem.rightBarButtonItem= rightItem;
+
+    [self InitView];
+   
+}
+- (void)viewWillAppear:(BOOL)animated{
+    [super viewWillAppear:animated];
 }
 
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
+- (void)InitView{
+    ID = @"FosaCell";
+    isEdit = false;
+    _LeftOrRight = true;    //true mean that the view is folded
+    _count = 0;
+    self.storageArray = [[NSMutableArray alloc]init];
+    self.mainWidth = [UIScreen mainScreen].bounds.size.width;
+    self.mainHeight = [UIScreen mainScreen].bounds.size.height;
+    self.navHeight = self.navigationController.navigationBar.frame.size.height;
+    //初始化layout
+    UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc]init];
+    //setting the rolling direction of the collectionViw
+    [layout setScrollDirection:(UICollectionViewScrollDirectionVertical)];
+    layout.itemSize = CGSizeMake((self.mainWidth*11/12-15)/2,self.mainWidth/3-5);
+    layout.minimumLineSpacing = 5;
+    layout.minimumInteritemSpacing = 5;
+    layout.sectionInset = UIEdgeInsetsMake(5, 5, 0, 5);
+    
+    self.StorageItemView = [[UICollectionView alloc]initWithFrame:CGRectMake(self.mainWidth*1/12, _navHeight, _mainWidth*11/12, _mainHeight) collectionViewLayout:layout];
+    _StorageItemView.backgroundColor = [UIColor whiteColor];
+    _StorageItemView.showsVerticalScrollIndicator = NO;
+    //regist the user-defined collctioncell
+    [_StorageItemView registerClass:[FoodCollectionViewCell class] forCellWithReuseIdentifier:ID];
+    
+    if ([NSProcessInfo.processInfo isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion){10,0,0}])
+    {
+        //CGRect fresh = CGRectMake(0, 0, self.StorageItemView.frame.size.width,50);
+    //创建刷新控件
+    _refresh = [[UIRefreshControl alloc]init];
+        //refresh.frame = fresh;
+    //配置控件
+    _refresh.tintColor = [UIColor grayColor];
+    NSDictionary *attributes = @{NSForegroundColorAttributeName : [UIColor redColor]};
+    _refresh.attributedTitle = [[NSAttributedString alloc]initWithString:@"正在刷新界面" attributes:attributes];
+    //添加事件
+     [_refresh addTarget:self action:@selector(refresh:) forControlEvents:UIControlEventValueChanged];
+    _StorageItemView.refreshControl = _refresh;
+    }
+    
+    _StorageItemView.delegate = self;
+    _StorageItemView.dataSource = self;
+    [self.view addSubview:_StorageItemView];
+    
+    [self CreatMenu];
 }
-*/
+
+//创建菜单视图
+- (void)CreatMenu{
+    _CategoryMenu = [[UIView alloc]initWithFrame:CGRectMake(-self.mainWidth/4, self.navHeight,self.mainWidth/3,self.mainHeight)];
+    //_CategoryMenu.backgroundColor = [UIColor greenColor];
+    //[self.rootScrollview addSubview:_CategoryMenu];
+    [self.view insertSubview:_CategoryMenu atIndex:10];
+    
+    self.CategoryScrollview = [[UIScrollView alloc]initWithFrame:CGRectMake(0,0, self.CategoryMenu.frame.size.width,self.CategoryMenu.frame.size.height)];
+    
+    self.CategoryScrollview.backgroundColor = [UIColor whiteColor];
+    self.CategoryScrollview.contentSize = CGSizeMake(self.CategoryMenu.frame.size.width,self.CategoryMenu.frame.size.height*1.5);
+    self.CategoryScrollview.showsVerticalScrollIndicator = false;
+    self.CategoryScrollview.showsHorizontalScrollIndicator = false;
+    self.CategoryScrollview.bounces = NO;
+    [self.CategoryMenu addSubview:self.CategoryScrollview];
+    //添加滑动手势
+    UISwipeGestureRecognizer *swipeGestureRight = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(swipeGestureRight:)];
+     [swipeGestureRight setDirection:UISwipeGestureRecognizerDirectionRight];
+     [_CategoryScrollview addGestureRecognizer:swipeGestureRight];
+         
+     UISwipeGestureRecognizer *swipeGestureLeft = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(swipeGestureLeft:)];
+     [swipeGestureLeft setDirection:UISwipeGestureRecognizerDirectionLeft];
+     [_CategoryScrollview addGestureRecognizer:swipeGestureLeft];
+    
+     NSArray *color = @[[UIColor redColor],[UIColor blueColor],[UIColor greenColor],[UIColor yellowColor],[UIColor orangeColor],[UIColor purpleColor]];
+    NSArray *Item = @[@"谷物/面条",@"果汁",@"肉类",@"蔬菜",@"香料",@"咖啡/茶"];
+    for (i = 0; i < 6; i++) {
+        FosaMenu *food = [[FosaMenu alloc]initWithFrame:CGRectMake(0,i*self.CategoryMenu.frame.size.height/6, self.CategoryMenu.frame.size.width, self.CategoryMenu.frame.size.height/6)];
+        MenuModel *model = [[MenuModel alloc]initWithName:Item[i]];
+        food.model = model;
+        food.backgroundColor = color[i];
+        food.layer.borderWidth = 0.5;
+        [self.CategoryScrollview addSubview:food];
+    }
+    UIView *add = [[UIView alloc]initWithFrame:CGRectMake(0, self.CategoryMenu.frame.size.height, self.CategoryMenu.frame.size.width, self.CategoryMenu.frame.size.height/6)];
+    add.layer.borderWidth = 1;
+    add.backgroundColor = [UIColor grayColor];
+    UIImageView *add_icon = [[UIImageView alloc]initWithFrame:CGRectMake(add.frame.size.width/6, add.frame.size.width/8, add.frame.size.width*2/3, add.frame.size.width*2/3)];
+        add_icon.image = [UIImage imageNamed:@"ic_add_category"];
+    [add addSubview:add_icon];
+    [self.CategoryScrollview addSubview:add];
+}
+- (void)refresh:(UIRefreshControl *)sender
+{
+    [self.storageArray removeAllObjects];
+    [self.StorageItemView reloadData];
+    // 停止刷新
+    [sender endRefreshing];
+}
+//滑动手势事件
+- (void)swipeGestureRight:(UISwipeGestureRecognizer *)swipeGestureRecognizer{
+    NSLog(@"向右滑动");
+    if (_LeftOrRight) {//view 折叠
+        _LeftOrRight = false;
+        //view 向左移动
+       _CategoryMenu.center = CGPointMake(self.CategoryMenu.frame.size.width/2, (self.CategoryMenu.frame.size.height)/2+self.navHeight);
+    }
+}
+- (void)swipeGestureLeft:(UISwipeGestureRecognizer *)swipeGestureRecognizer{
+    NSLog(@"向左滑动");
+    if (!_LeftOrRight) {//view 展开
+        _LeftOrRight = true;
+        //向右移动
+         _CategoryMenu.center = CGPointMake(-self.mainWidth/12,(self.CategoryMenu.frame.size.height)/2+self.navHeight);
+    }
+}
+
+//跳转到扫码界面
+- (void)Scan{
+    
+    ScanOneCodeViewController *fosa_scan = [[ScanOneCodeViewController alloc]init];
+    fosa_scan.hidesBottomBarWhenPushed = YES;
+    [self.navigationController pushViewController:fosa_scan animated:YES];
+}
+//创建或打开数据库
+- (void)creatOrOpensql
+{
+    NSString *path = [self getPath];
+    int sqlStatus = sqlite3_open_v2([path UTF8String], &_database,SQLITE_OPEN_CREATE|SQLITE_OPEN_READWRITE,NULL);
+    if (sqlStatus == SQLITE_OK) {
+        NSLog(@"数据库打开成功");
+    }else{
+        int close = sqlite3_close_v2(_database);
+        if (close == SQLITE_OK) {
+            _database = nil;
+        }else{
+            NSLog(@"数据库关闭异常");
+        }
+    }
+}
+- (void) SelectDataFromSqlite{
+    //查询数据库添加的食物
+    NSString *sql = [NSString stringWithFormat:@"select foodName,deviceName,aboutFood,expireDate,remindDate,photoPath from Fosa2"];
+    const char *selsql = (char *)[sql UTF8String];
+    int selresult = sqlite3_prepare_v2(self.database, selsql, -1, &_stmt, NULL);
+    if(selresult != SQLITE_OK){
+        NSLog(@"查询失败");
+    }else{
+        while (sqlite3_step(_stmt) == SQLITE_ROW) {
+            const char *food_name = (const char *)sqlite3_column_text(_stmt, 0);
+            const char *device_name = (const char*)sqlite3_column_text(_stmt,1);
+            const char *expired_date = (const char *)sqlite3_column_text(_stmt,3);
+            const char *photo_path = (const char *)sqlite3_column_text(_stmt,5);
+
+//            NSLog(@"查询到数据%@",[NSString stringWithUTF8String:food_name]);
+//            NSLog(@"查询到数据%@",[NSString stringWithUTF8String:expired_date]);
+//            NSLog(@"查询到数据%@",[NSString stringWithUTF8String:photo_path]);
+//            NSLog(@"********************************");
+            [self CreatFoodViewWithName:[NSString stringWithUTF8String:food_name] fdevice:[NSString stringWithUTF8String:device_name] expireDate:[NSString stringWithUTF8String:expired_date] foodPhoto:[NSString stringWithUTF8String:photo_path]] ;
+        }
+    }
+}
+//获取DB数据库所在的document路径
+- (NSString *)getPath
+{
+    NSString *filename = @"Fosa.db";
+    NSString *doc = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
+    NSString *filePath = [doc stringByAppendingPathComponent:filename];
+    NSLog(@"%@",filePath);
+    return filePath;
+}
+
+- (void)CreatFoodViewWithName:(NSString *)foodname fdevice:(NSString *)device expireDate:(NSString *)expireDate foodPhoto:(NSString *)photo{
+    //创建食物模型
+    CellModel *model = [[CellModel alloc]initWithName:foodname foodIcon:photo expire_date:expireDate fdevice:device];
+    [self.storageArray addObject:model];
+}
+//点击通知项的方法
+- (void)ClickNotification:(FoodCollectionViewCell *)cell{
+    if (!isEdit) {
+        FoodInfoViewController *info = [[FoodInfoViewController alloc]init];
+        info.hidesBottomBarWhenPushed = YES;
+        info.deviceID = cell.model.device;
+        [self.navigationController pushViewController:info animated:YES];
+    }else{
+        NSLog(@"正处于编辑状态无法跳转");
+    }
+}
+//点击种类选项
+- (void)ClickCategory:(UIGestureRecognizer *)recognizer{
+    NSLog(@"%@",recognizer.accessibilityValue);
+}
+#pragma mark - UICollectionView 长按事件
+- (void)lonePressMoving:(UILongPressGestureRecognizer *)longPress
+{
+    NSLog(@"长按了item");
+    isEdit = true;
+    CGPoint touchPoint = [longPress locationInView:self.StorageItemView];//获取长按的点
+    if (longPress.state == UIGestureRecognizerStateBegan) {
+        NSIndexPath *indexPath = [self.StorageItemView indexPathForItemAtPoint:touchPoint];//根据长按的点的坐标获取对应cell的位置索引
+        if(indexPath == nil){
+            NSLog(@"此处没有cell");
+        }else{
+            FoodCollectionViewCell *cell = (FoodCollectionViewCell *)longPress.view;
+            NSLog(@"%@",cell.model.foodName);
+            [cell becomeFirstResponder];
+            UIMenuItem *item1 = [[UIMenuItem alloc]initWithTitle:@"删除"action:@selector(DeleteCell:)];
+            UIMenuItem *item2 = [[UIMenuItem alloc]initWithTitle:@"取消"action:@selector(CancelEdit:)];
+             UIMenuController *menu = [UIMenuController sharedMenuController];
+            [menu setMenuItems:@[item1,item2]];
+            [menu setTargetRect:cell.frame inView:self.StorageItemView];
+            menu.accessibilityValue = cell.model.device;
+            [menu setMenuVisible:YES animated:YES];
+        }
+    }
+//    if (longPress.state == UIGestureRecognizerStateEnded) {
+//        isEdit = false;
+//    }
+}
+- (void)DeleteCell:(UIMenuController *)menu
+{
+    isEdit = false;
+    NSLog(@"%@",menu.accessibilityValue);
+    NSLog(@"点击了删除");
+    NSString *sql = [NSString stringWithFormat:@"delete from Fosa2 where deviceName = '%@';",menu.accessibilityValue];
+    char * errmsg;
+    sqlite3_exec(_database, sql.UTF8String, NULL, NULL, &errmsg);
+    if (errmsg) {
+        NSLog(@"删除失败--%s",errmsg);
+    }else{
+        NSLog(@"删除成功");
+        [self.storageArray removeAllObjects];
+        [self.StorageItemView reloadData];
+    }
+    
+}
+- (void)CancelEdit:(UIMenuController *)menu
+{
+    NSLog(@"点击了取消");
+    
+    isEdit = false;
+}
+- (BOOL)canBecomeFirstResponder
+{
+    return YES;
+}
+#pragma mark - UICollectionViewDataSource
+//每个section有几个item
+- (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
+    return 2;
+}
+//collectionView有几个section
+- (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView {
+    [self creatOrOpensql];
+    [self SelectDataFromSqlite];
+    NSLog(@"%ld",_storageArray.count);
+    return self.storageArray.count/2;
+}
+//返回这个UICollectionViewCell是否可以被选择
+- ( BOOL )collectionView:( UICollectionView *)collectionView shouldSelectItemAtIndexPath:( NSIndexPath *)indexPath{
+    return YES ;
+}
+//每个cell的具体内容
+- (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:( NSIndexPath *)indexPath {
+    FoodCollectionViewCell *cell = [self.StorageItemView dequeueReusableCellWithReuseIdentifier:ID forIndexPath:indexPath];
+    //给自定义cell的model传值
+    cell.model = self.storageArray[indexPath.section*2+indexPath.row];
+    [cell setModel:cell.model];
+    cell.backgroundColor = [UIColor colorWithRed:arc4random()%255/255.0 green:arc4random()%255/255.0 blue:arc4random()%255/255.0 alpha:1];
+    cell.layer.cornerRadius = 10;
+    cell.userInteractionEnabled = YES;
+    //给每一个cell添加长按手势
+    //添加一个长按手势
+    _longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(lonePressMoving:)];
+    _longPress.minimumPressDuration = 1.5;
+    [cell addGestureRecognizer:_longPress];
+    return cell;
+}
+//点击item方法
+- (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath{
+    NSLog(@"&&&&&&&&&&&");
+    //获取点击的cell
+    FoodCollectionViewCell *cell = (FoodCollectionViewCell *)[self collectionView:_StorageItemView cellForItemAtIndexPath:indexPath];
+    [self ClickNotification:cell];
+}
+
+- (BOOL)collectionView:(UICollectionView *)collectionView shouldHighlightItemAtIndexPath:(NSIndexPath *)indexPath{
+    return YES;
+}
+
+//点击效果
+- (void)collectionView:(UICollectionView *)collectionView didHighlightItemAtIndexPath:(NSIndexPath *)indexPath{
+    FoodCollectionViewCell *cell = (FoodCollectionViewCell *)[_StorageItemView cellForItemAtIndexPath:indexPath];
+    cell.backgroundColor = [UIColor lightGrayColor];
+    NSLog(@"%@",cell.model.device);
+}
+- (void)collectionView:(UICollectionView *)collectionView didUnhighlightItemAtIndexPath:(NSIndexPath *)indexPath{
+    FoodCollectionViewCell *cell = (FoodCollectionViewCell *)[_StorageItemView cellForItemAtIndexPath:indexPath];
+      cell.backgroundColor = [UIColor colorWithRed:arc4random()%255/255.0 green:arc4random()%255/255.0 blue:arc4random()%255/255.0 alpha:1];
+}
+
+//可以移动cell
+- (BOOL)collectionView:(UICollectionView *)collectionView canMoveItemAtIndexPath:(NSIndexPath *)indexPath{
+    return YES;
+}
+- (void)viewWillDisappear:(BOOL)animated{
+    int close = sqlite3_close_v2(_database);
+    if (close == SQLITE_OK) {
+            _database = nil;
+    }else{
+            NSLog(@"数据库关闭异常");
+    }
+}
 
 @end

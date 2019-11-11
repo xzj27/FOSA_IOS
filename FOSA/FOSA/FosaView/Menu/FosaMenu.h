@@ -7,10 +7,11 @@
 //
 
 #import <UIKit/UIKit.h>
-
+@class MenuModel;
 NS_ASSUME_NONNULL_BEGIN
 
 @interface FosaMenu : UIView
+@property (nonatomic,strong) MenuModel *model;
 
 @end
 

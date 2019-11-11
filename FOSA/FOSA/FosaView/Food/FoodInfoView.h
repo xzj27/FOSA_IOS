@@ -8,10 +8,9 @@
 
 #import <UIKit/UIKit.h>
 
-NS_ASSUME_NONNULL_BEGIN
-
+@class FoodModel;
 @interface FoodInfoView : UIView
 
+@property (nonatomic,strong)FoodModel *model;
+@property (nonatomic,weak) UIButton *edited;
 @end
-
-NS_ASSUME_NONNULL_END
