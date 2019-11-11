@@ -17,6 +17,33 @@
 		4551FDBB2378EA51007A2EFB /* FOSATests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4551FDBA2378EA51007A2EFB /* FOSATests.m */; };
 		4551FDC62378EA51007A2EFB /* FOSAUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4551FDC52378EA51007A2EFB /* FOSAUITests.m */; };
 		4551FDD62378EC91007A2EFB /* RootTabBarViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4551FDD52378EC91007A2EFB /* RootTabBarViewController.m */; };
+		4551FDD92378ED96007A2EFB /* FosaMainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4551FDD82378ED96007A2EFB /* FosaMainViewController.m */; };
+		4551FDDC2378EDBB007A2EFB /* FosaProductViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4551FDDB2378EDBB007A2EFB /* FosaProductViewController.m */; };
+		4551FDDF2378EEB3007A2EFB /* FosaUserViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4551FDDE2378EEB3007A2EFB /* FosaUserViewController.m */; };
+		4551FDE22378EECA007A2EFB /* FosaPoundViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4551FDE12378EECA007A2EFB /* FosaPoundViewController.m */; };
+		4551FDE72378F17E007A2EFB /* Fosa_QRCode_Queue.m in Sources */ = {isa = PBXBuildFile; fileRef = 4551FDE62378F17E007A2EFB /* Fosa_QRCode_Queue.m */; };
+		4551FDEB2378F1A6007A2EFB /* Fosa_NSString_Queue.m in Sources */ = {isa = PBXBuildFile; fileRef = 4551FDEA2378F1A6007A2EFB /* Fosa_NSString_Queue.m */; };
+		4551FDF62378F37D007A2EFB /* 启动图2.png in Resources */ = {isa = PBXBuildFile; fileRef = 4551FDF52378F37D007A2EFB /* 启动图2.png */; };
+		4551FDF82378F4EC007A2EFB /* ding.wav in Resources */ = {isa = PBXBuildFile; fileRef = 4551FDF72378F4EC007A2EFB /* ding.wav */; };
+		4551FDFA2378F4F2007A2EFB /* shanguangdeng-liang.png in Resources */ = {isa = PBXBuildFile; fileRef = 4551FDF92378F4F2007A2EFB /* shanguangdeng-liang.png */; };
+		4551FDFC2378F4FC007A2EFB /* shanguangdeng-an.png in Resources */ = {isa = PBXBuildFile; fileRef = 4551FDFB2378F4FC007A2EFB /* shanguangdeng-an.png */; };
+		4551FDFE2378F504007A2EFB /* saoyisao@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 4551FDFD2378F504007A2EFB /* saoyisao@3x.png */; };
+		4551FE002378F508007A2EFB /* saoyisao-3@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 4551FDFF2378F508007A2EFB /* saoyisao-3@3x.png */; };
+		4551FE032378F54D007A2EFB /* ScanOneCodeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4551FE022378F54D007A2EFB /* ScanOneCodeViewController.m */; };
+		4551FE062378F55E007A2EFB /* ScanMoreCodeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4551FE052378F55E007A2EFB /* ScanMoreCodeViewController.m */; };
+		4551FE092378F57C007A2EFB /* ResultViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4551FE082378F57C007A2EFB /* ResultViewController.m */; };
+		4551FE0C2378F60E007A2EFB /* MenuModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 4551FE0B2378F60E007A2EFB /* MenuModel.m */; };
+		4551FE102378F6A7007A2EFB /* FosaMenu.m in Sources */ = {isa = PBXBuildFile; fileRef = 4551FE0F2378F6A7007A2EFB /* FosaMenu.m */; };
+		4551FE142378F75F007A2EFB /* FoodInfoView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4551FE132378F75F007A2EFB /* FoodInfoView.m */; };
+		4551FE172378F7A1007A2EFB /* FoodMoreInfoView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4551FE162378F7A1007A2EFB /* FoodMoreInfoView.m */; };
+		4551FE1A2378F7FF007A2EFB /* FoodModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 4551FE192378F7FF007A2EFB /* FoodModel.m */; };
+		4551FE1E2378F971007A2EFB /* CellModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 4551FE1D2378F971007A2EFB /* CellModel.m */; };
+		4551FE212378F9B1007A2EFB /* FoodCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4551FE202378F9B1007A2EFB /* FoodCollectionViewCell.m */; };
+		4551FE242378F9FC007A2EFB /* PhotoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4551FE232378F9FC007A2EFB /* PhotoViewController.m */; };
+		4551FE272378FA14007A2EFB /* LoginViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4551FE262378FA14007A2EFB /* LoginViewController.m */; };
+		4551FE2A2378FA46007A2EFB /* RegisterViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4551FE292378FA46007A2EFB /* RegisterViewController.m */; };
+		4551FE302378FB0F007A2EFB /* AddViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4551FE2F2378FB0F007A2EFB /* AddViewController.m */; };
+		4551FE332378FB22007A2EFB /* FoodInfoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4551FE322378FB22007A2EFB /* FoodInfoViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -57,6 +84,55 @@
 		4551FDC72378EA51007A2EFB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4551FDD42378EC91007A2EFB /* RootTabBarViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = RootTabBarViewController.h; path = FOSA/RootTabBarViewController.h; sourceTree = SOURCE_ROOT; };
 		4551FDD52378EC91007A2EFB /* RootTabBarViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = RootTabBarViewController.m; path = FOSA/RootTabBarViewController.m; sourceTree = SOURCE_ROOT; };
+		4551FDD72378ED96007A2EFB /* FosaMainViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FosaMainViewController.h; sourceTree = "<group>"; };
+		4551FDD82378ED96007A2EFB /* FosaMainViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FosaMainViewController.m; sourceTree = "<group>"; };
+		4551FDDA2378EDBB007A2EFB /* FosaProductViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FosaProductViewController.h; sourceTree = "<group>"; };
+		4551FDDB2378EDBB007A2EFB /* FosaProductViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FosaProductViewController.m; sourceTree = "<group>"; };
+		4551FDDD2378EEB3007A2EFB /* FosaUserViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FosaUserViewController.h; sourceTree = "<group>"; };
+		4551FDDE2378EEB3007A2EFB /* FosaUserViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FosaUserViewController.m; sourceTree = "<group>"; };
+		4551FDE02378EECA007A2EFB /* FosaPoundViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FosaPoundViewController.h; sourceTree = "<group>"; };
+		4551FDE12378EECA007A2EFB /* FosaPoundViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FosaPoundViewController.m; sourceTree = "<group>"; };
+		4551FDE52378F17E007A2EFB /* Fosa_QRCode_Queue.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Fosa_QRCode_Queue.h; sourceTree = "<group>"; };
+		4551FDE62378F17E007A2EFB /* Fosa_QRCode_Queue.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Fosa_QRCode_Queue.m; sourceTree = "<group>"; };
+		4551FDE92378F1A6007A2EFB /* Fosa_NSString_Queue.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Fosa_NSString_Queue.h; sourceTree = "<group>"; };
+		4551FDEA2378F1A6007A2EFB /* Fosa_NSString_Queue.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Fosa_NSString_Queue.m; sourceTree = "<group>"; };
+		4551FDF52378F37D007A2EFB /* 启动图2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "启动图2.png"; sourceTree = "<group>"; };
+		4551FDF72378F4EC007A2EFB /* ding.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = ding.wav; sourceTree = "<group>"; };
+		4551FDF92378F4F2007A2EFB /* shanguangdeng-liang.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "shanguangdeng-liang.png"; sourceTree = "<group>"; };
+		4551FDFB2378F4FC007A2EFB /* shanguangdeng-an.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "shanguangdeng-an.png"; sourceTree = "<group>"; };
+		4551FDFD2378F504007A2EFB /* saoyisao@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "saoyisao@3x.png"; sourceTree = "<group>"; };
+		4551FDFF2378F508007A2EFB /* saoyisao-3@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "saoyisao-3@3x.png"; sourceTree = "<group>"; };
+		4551FE012378F54D007A2EFB /* ScanOneCodeViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ScanOneCodeViewController.h; sourceTree = "<group>"; };
+		4551FE022378F54D007A2EFB /* ScanOneCodeViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ScanOneCodeViewController.m; sourceTree = "<group>"; };
+		4551FE042378F55E007A2EFB /* ScanMoreCodeViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ScanMoreCodeViewController.h; sourceTree = "<group>"; };
+		4551FE052378F55E007A2EFB /* ScanMoreCodeViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ScanMoreCodeViewController.m; sourceTree = "<group>"; };
+		4551FE072378F57C007A2EFB /* ResultViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ResultViewController.h; sourceTree = "<group>"; };
+		4551FE082378F57C007A2EFB /* ResultViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ResultViewController.m; sourceTree = "<group>"; };
+		4551FE0A2378F60E007A2EFB /* MenuModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MenuModel.h; sourceTree = "<group>"; };
+		4551FE0B2378F60E007A2EFB /* MenuModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MenuModel.m; sourceTree = "<group>"; };
+		4551FE0E2378F6A7007A2EFB /* FosaMenu.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FosaMenu.h; sourceTree = "<group>"; };
+		4551FE0F2378F6A7007A2EFB /* FosaMenu.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FosaMenu.m; sourceTree = "<group>"; };
+		4551FE122378F75F007A2EFB /* FoodInfoView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FoodInfoView.h; sourceTree = "<group>"; };
+		4551FE132378F75F007A2EFB /* FoodInfoView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FoodInfoView.m; sourceTree = "<group>"; };
+		4551FE152378F7A1007A2EFB /* FoodMoreInfoView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FoodMoreInfoView.h; sourceTree = "<group>"; };
+		4551FE162378F7A1007A2EFB /* FoodMoreInfoView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FoodMoreInfoView.m; sourceTree = "<group>"; };
+		4551FE182378F7FF007A2EFB /* FoodModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FoodModel.h; sourceTree = "<group>"; };
+		4551FE192378F7FF007A2EFB /* FoodModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FoodModel.m; sourceTree = "<group>"; };
+		4551FE1C2378F971007A2EFB /* CellModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CellModel.h; sourceTree = "<group>"; };
+		4551FE1D2378F971007A2EFB /* CellModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CellModel.m; sourceTree = "<group>"; };
+		4551FE1F2378F9B1007A2EFB /* FoodCollectionViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FoodCollectionViewCell.h; sourceTree = "<group>"; };
+		4551FE202378F9B1007A2EFB /* FoodCollectionViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FoodCollectionViewCell.m; sourceTree = "<group>"; };
+		4551FE222378F9FC007A2EFB /* PhotoViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PhotoViewController.h; sourceTree = "<group>"; };
+		4551FE232378F9FC007A2EFB /* PhotoViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PhotoViewController.m; sourceTree = "<group>"; };
+		4551FE252378FA14007A2EFB /* LoginViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LoginViewController.h; sourceTree = "<group>"; };
+		4551FE262378FA14007A2EFB /* LoginViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LoginViewController.m; sourceTree = "<group>"; };
+		4551FE282378FA46007A2EFB /* RegisterViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RegisterViewController.h; sourceTree = "<group>"; };
+		4551FE292378FA46007A2EFB /* RegisterViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RegisterViewController.m; sourceTree = "<group>"; };
+		4551FE2B2378FA9A007A2EFB /* PassValueDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PassValueDelegate.h; sourceTree = "<group>"; };
+		4551FE2E2378FB0F007A2EFB /* AddViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AddViewController.h; sourceTree = "<group>"; };
+		4551FE2F2378FB0F007A2EFB /* AddViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AddViewController.m; sourceTree = "<group>"; };
+		4551FE312378FB22007A2EFB /* FoodInfoViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FoodInfoViewController.h; sourceTree = "<group>"; };
+		4551FE322378FB22007A2EFB /* FoodInfoViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FoodInfoViewController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -107,6 +183,12 @@
 		4551FD9D2378EA50007A2EFB /* FOSA */ = {
 			isa = PBXGroup;
 			children = (
+				4551FDF22378F29E007A2EFB /* AddProductFunction */,
+				4551FDF12378F28E007A2EFB /* ScanFunction */,
+				4551FDF42378F2D6007A2EFB /* PhotoFuction */,
+				4551FDF32378F2AF007A2EFB /* Login&&Regist */,
+				4551FDF02378F283007A2EFB /* FosaView */,
+				4551FDE42378F11B007A2EFB /* DataStruct */,
 				4551FDD32378EBDE007A2EFB /* RootFunctionFramework */,
 				4551FD9E2378EA50007A2EFB /* AppDelegate.h */,
 				4551FD9F2378EA50007A2EFB /* AppDelegate.m */,
@@ -116,6 +198,7 @@
 				4551FDA52378EA50007A2EFB /* ViewController.m */,
 				4551FDA72378EA50007A2EFB /* Main.storyboard */,
 				4551FDAA2378EA51007A2EFB /* Assets.xcassets */,
+				4551FDF52378F37D007A2EFB /* 启动图2.png */,
 				4551FDAC2378EA51007A2EFB /* LaunchScreen.storyboard */,
 				4551FDAF2378EA51007A2EFB /* Info.plist */,
 				4551FDB02378EA51007A2EFB /* main.m */,
@@ -146,8 +229,122 @@
 			children = (
 				4551FDD42378EC91007A2EFB /* RootTabBarViewController.h */,
 				4551FDD52378EC91007A2EFB /* RootTabBarViewController.m */,
+				4551FDD72378ED96007A2EFB /* FosaMainViewController.h */,
+				4551FDD82378ED96007A2EFB /* FosaMainViewController.m */,
+				4551FDDA2378EDBB007A2EFB /* FosaProductViewController.h */,
+				4551FDDB2378EDBB007A2EFB /* FosaProductViewController.m */,
+				4551FDDD2378EEB3007A2EFB /* FosaUserViewController.h */,
+				4551FDDE2378EEB3007A2EFB /* FosaUserViewController.m */,
+				4551FDE02378EECA007A2EFB /* FosaPoundViewController.h */,
+				4551FDE12378EECA007A2EFB /* FosaPoundViewController.m */,
 			);
 			path = RootFunctionFramework;
+			sourceTree = "<group>";
+		};
+		4551FDE42378F11B007A2EFB /* DataStruct */ = {
+			isa = PBXGroup;
+			children = (
+				4551FDE52378F17E007A2EFB /* Fosa_QRCode_Queue.h */,
+				4551FDE62378F17E007A2EFB /* Fosa_QRCode_Queue.m */,
+				4551FDE92378F1A6007A2EFB /* Fosa_NSString_Queue.h */,
+				4551FDEA2378F1A6007A2EFB /* Fosa_NSString_Queue.m */,
+			);
+			path = DataStruct;
+			sourceTree = "<group>";
+		};
+		4551FDF02378F283007A2EFB /* FosaView */ = {
+			isa = PBXGroup;
+			children = (
+				4551FE1B2378F937007A2EFB /* FoodCell */,
+				4551FE112378F6B9007A2EFB /* Food */,
+				4551FE0D2378F67A007A2EFB /* Menu */,
+			);
+			path = FosaView;
+			sourceTree = "<group>";
+		};
+		4551FDF12378F28E007A2EFB /* ScanFunction */ = {
+			isa = PBXGroup;
+			children = (
+				4551FDF72378F4EC007A2EFB /* ding.wav */,
+				4551FDF92378F4F2007A2EFB /* shanguangdeng-liang.png */,
+				4551FDFB2378F4FC007A2EFB /* shanguangdeng-an.png */,
+				4551FDFD2378F504007A2EFB /* saoyisao@3x.png */,
+				4551FDFF2378F508007A2EFB /* saoyisao-3@3x.png */,
+				4551FE012378F54D007A2EFB /* ScanOneCodeViewController.h */,
+				4551FE022378F54D007A2EFB /* ScanOneCodeViewController.m */,
+				4551FE042378F55E007A2EFB /* ScanMoreCodeViewController.h */,
+				4551FE052378F55E007A2EFB /* ScanMoreCodeViewController.m */,
+				4551FE072378F57C007A2EFB /* ResultViewController.h */,
+				4551FE082378F57C007A2EFB /* ResultViewController.m */,
+			);
+			path = ScanFunction;
+			sourceTree = "<group>";
+		};
+		4551FDF22378F29E007A2EFB /* AddProductFunction */ = {
+			isa = PBXGroup;
+			children = (
+				4551FE2E2378FB0F007A2EFB /* AddViewController.h */,
+				4551FE2F2378FB0F007A2EFB /* AddViewController.m */,
+				4551FE312378FB22007A2EFB /* FoodInfoViewController.h */,
+				4551FE322378FB22007A2EFB /* FoodInfoViewController.m */,
+			);
+			path = AddProductFunction;
+			sourceTree = "<group>";
+		};
+		4551FDF32378F2AF007A2EFB /* Login&&Regist */ = {
+			isa = PBXGroup;
+			children = (
+				4551FE252378FA14007A2EFB /* LoginViewController.h */,
+				4551FE262378FA14007A2EFB /* LoginViewController.m */,
+				4551FE282378FA46007A2EFB /* RegisterViewController.h */,
+				4551FE292378FA46007A2EFB /* RegisterViewController.m */,
+				4551FE2B2378FA9A007A2EFB /* PassValueDelegate.h */,
+			);
+			path = "Login&&Regist";
+			sourceTree = "<group>";
+		};
+		4551FDF42378F2D6007A2EFB /* PhotoFuction */ = {
+			isa = PBXGroup;
+			children = (
+				4551FE222378F9FC007A2EFB /* PhotoViewController.h */,
+				4551FE232378F9FC007A2EFB /* PhotoViewController.m */,
+			);
+			path = PhotoFuction;
+			sourceTree = "<group>";
+		};
+		4551FE0D2378F67A007A2EFB /* Menu */ = {
+			isa = PBXGroup;
+			children = (
+				4551FE0A2378F60E007A2EFB /* MenuModel.h */,
+				4551FE0B2378F60E007A2EFB /* MenuModel.m */,
+				4551FE0E2378F6A7007A2EFB /* FosaMenu.h */,
+				4551FE0F2378F6A7007A2EFB /* FosaMenu.m */,
+			);
+			path = Menu;
+			sourceTree = "<group>";
+		};
+		4551FE112378F6B9007A2EFB /* Food */ = {
+			isa = PBXGroup;
+			children = (
+				4551FE122378F75F007A2EFB /* FoodInfoView.h */,
+				4551FE132378F75F007A2EFB /* FoodInfoView.m */,
+				4551FE152378F7A1007A2EFB /* FoodMoreInfoView.h */,
+				4551FE162378F7A1007A2EFB /* FoodMoreInfoView.m */,
+				4551FE182378F7FF007A2EFB /* FoodModel.h */,
+				4551FE192378F7FF007A2EFB /* FoodModel.m */,
+			);
+			path = Food;
+			sourceTree = "<group>";
+		};
+		4551FE1B2378F937007A2EFB /* FoodCell */ = {
+			isa = PBXGroup;
+			children = (
+				4551FE1C2378F971007A2EFB /* CellModel.h */,
+				4551FE1D2378F971007A2EFB /* CellModel.m */,
+				4551FE1F2378F9B1007A2EFB /* FoodCollectionViewCell.h */,
+				4551FE202378F9B1007A2EFB /* FoodCollectionViewCell.m */,
+			);
+			path = FoodCell;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -253,8 +450,14 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4551FDFA2378F4F2007A2EFB /* shanguangdeng-liang.png in Resources */,
+				4551FE002378F508007A2EFB /* saoyisao-3@3x.png in Resources */,
+				4551FDF82378F4EC007A2EFB /* ding.wav in Resources */,
 				4551FDAE2378EA51007A2EFB /* LaunchScreen.storyboard in Resources */,
 				4551FDAB2378EA51007A2EFB /* Assets.xcassets in Resources */,
+				4551FDF62378F37D007A2EFB /* 启动图2.png in Resources */,
+				4551FDFE2378F504007A2EFB /* saoyisao@3x.png in Resources */,
+				4551FDFC2378F4FC007A2EFB /* shanguangdeng-an.png in Resources */,
 				4551FDA92378EA50007A2EFB /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -280,11 +483,32 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4551FDE72378F17E007A2EFB /* Fosa_QRCode_Queue.m in Sources */,
+				4551FE272378FA14007A2EFB /* LoginViewController.m in Sources */,
+				4551FE332378FB22007A2EFB /* FoodInfoViewController.m in Sources */,
+				4551FE092378F57C007A2EFB /* ResultViewController.m in Sources */,
+				4551FDD92378ED96007A2EFB /* FosaMainViewController.m in Sources */,
+				4551FE1E2378F971007A2EFB /* CellModel.m in Sources */,
+				4551FE102378F6A7007A2EFB /* FosaMenu.m in Sources */,
+				4551FDE22378EECA007A2EFB /* FosaPoundViewController.m in Sources */,
+				4551FE2A2378FA46007A2EFB /* RegisterViewController.m in Sources */,
 				4551FDA62378EA50007A2EFB /* ViewController.m in Sources */,
+				4551FE212378F9B1007A2EFB /* FoodCollectionViewCell.m in Sources */,
+				4551FE302378FB0F007A2EFB /* AddViewController.m in Sources */,
+				4551FDDF2378EEB3007A2EFB /* FosaUserViewController.m in Sources */,
+				4551FE242378F9FC007A2EFB /* PhotoViewController.m in Sources */,
+				4551FDEB2378F1A6007A2EFB /* Fosa_NSString_Queue.m in Sources */,
+				4551FE0C2378F60E007A2EFB /* MenuModel.m in Sources */,
 				4551FDD62378EC91007A2EFB /* RootTabBarViewController.m in Sources */,
+				4551FE032378F54D007A2EFB /* ScanOneCodeViewController.m in Sources */,
+				4551FE062378F55E007A2EFB /* ScanMoreCodeViewController.m in Sources */,
+				4551FDDC2378EDBB007A2EFB /* FosaProductViewController.m in Sources */,
+				4551FE172378F7A1007A2EFB /* FoodMoreInfoView.m in Sources */,
+				4551FE1A2378F7FF007A2EFB /* FoodModel.m in Sources */,
 				4551FDA02378EA50007A2EFB /* AppDelegate.m in Sources */,
 				4551FDB12378EA51007A2EFB /* main.m in Sources */,
 				4551FDA32378EA50007A2EFB /* SceneDelegate.m in Sources */,
+				4551FE142378F75F007A2EFB /* FoodInfoView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
