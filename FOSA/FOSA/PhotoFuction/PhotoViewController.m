@@ -115,9 +115,9 @@
     imgView.clipsToBounds = YES;
     [self.view addSubview:imgView];
     _imgView = imgView;
-
 }
 
+#pragma mark - 进入扫码界面
 -(void)ScanEvent{
     ScanOneCodeViewController *scan = [[ScanOneCodeViewController alloc]init];
     scan.food_photo = [[UIImage alloc]init];
@@ -142,8 +142,6 @@
     if ([_captureSession canSetSessionPreset:AVCaptureSessionPreset1280x720]) {
         _captureSession.sessionPreset = AVCaptureSessionPreset1280x720;
     }
-    
-
     //获得输入设备,取得后置摄像头
     AVCaptureDevice *captureDevice = [self getCameraDeviceWithPosition:AVCaptureDevicePositionBack];
     if (!captureDevice) {
@@ -239,11 +237,8 @@
         if (imageDataSampleBuffer) {
             NSData *imageData = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageDataSampleBuffer];
             self.image = [UIImage imageWithData:imageData];
-            //想保存图片到相册的方法由于权限问题没有解决
-           // UIImageWriteToSavedPhotosAlbum(image, self, @selector(imageSavedToPhotosAlbum:didFinishSavingWithError:contextInfo:),nil);
-           // [self Savephoto:self.image];
-            //照片存储的方向问题
-            UIImageWriteToSavedPhotosAlbum(self.image, self,@selector(image:didFinishSavingWithError:contextInfo:),nil);
+ 
+           // UIImageWriteToSavedPhotosAlbum(self.image, self,@selector(image:didFinishSavingWithError:contextInfo:),nil);
             //self.imgView.image = [self getImage];
             self.imgView.image = self.image;
             [self DetectQRcode:self.image];

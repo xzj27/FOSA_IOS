@@ -759,7 +759,7 @@
     CGFloat headerWidth = [UIScreen mainScreen].bounds.size.width-20;
     CGFloat headerheight = [UIScreen mainScreen].bounds.size.height/3;
     
-    add.imageView1 = [[UIImageView alloc]initWithFrame:CGRectMake(15, headerheight/4-5,headerWidth*2/3,headerheight*3/4-5)];
+    add.imageView1 = [[UIImageView alloc]initWithFrame:CGRectMake(15, headerheight/4-5,headerheight*3/4-5,headerheight*3/4-5)];
     add.imageView1.image = self.food_photo;
     add.imageView1.backgroundColor = [UIColor redColor];
     add.food_image = [[UIImage alloc]init];

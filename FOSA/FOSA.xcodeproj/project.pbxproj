@@ -44,6 +44,7 @@
 		4551FE2A2378FA46007A2EFB /* RegisterViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4551FE292378FA46007A2EFB /* RegisterViewController.m */; };
 		4551FE302378FB0F007A2EFB /* AddViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4551FE2F2378FB0F007A2EFB /* AddViewController.m */; };
 		4551FE332378FB22007A2EFB /* FoodInfoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4551FE322378FB22007A2EFB /* FoodInfoViewController.m */; };
+		4551FE3B2379605E007A2EFB /* SqliteManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4551FE3A2379605E007A2EFB /* SqliteManager.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -133,6 +134,8 @@
 		4551FE2F2378FB0F007A2EFB /* AddViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AddViewController.m; sourceTree = "<group>"; };
 		4551FE312378FB22007A2EFB /* FoodInfoViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FoodInfoViewController.h; sourceTree = "<group>"; };
 		4551FE322378FB22007A2EFB /* FoodInfoViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FoodInfoViewController.m; sourceTree = "<group>"; };
+		4551FE392379605E007A2EFB /* SqliteManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SqliteManager.h; sourceTree = "<group>"; };
+		4551FE3A2379605E007A2EFB /* SqliteManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SqliteManager.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -183,6 +186,7 @@
 		4551FD9D2378EA50007A2EFB /* FOSA */ = {
 			isa = PBXGroup;
 			children = (
+				4551FE382379602E007A2EFB /* SqliteFunction */,
 				4551FDF22378F29E007A2EFB /* AddProductFunction */,
 				4551FDF12378F28E007A2EFB /* ScanFunction */,
 				4551FDF42378F2D6007A2EFB /* PhotoFuction */,
@@ -347,6 +351,15 @@
 			path = FoodCell;
 			sourceTree = "<group>";
 		};
+		4551FE382379602E007A2EFB /* SqliteFunction */ = {
+			isa = PBXGroup;
+			children = (
+				4551FE392379605E007A2EFB /* SqliteManager.h */,
+				4551FE3A2379605E007A2EFB /* SqliteManager.m */,
+			);
+			name = SqliteFunction;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -492,6 +505,7 @@
 				4551FE102378F6A7007A2EFB /* FosaMenu.m in Sources */,
 				4551FDE22378EECA007A2EFB /* FosaPoundViewController.m in Sources */,
 				4551FE2A2378FA46007A2EFB /* RegisterViewController.m in Sources */,
+				4551FE3B2379605E007A2EFB /* SqliteManager.m in Sources */,
 				4551FDA62378EA50007A2EFB /* ViewController.m in Sources */,
 				4551FE212378F9B1007A2EFB /* FoodCollectionViewCell.m in Sources */,
 				4551FE302378FB0F007A2EFB /* AddViewController.m in Sources */,

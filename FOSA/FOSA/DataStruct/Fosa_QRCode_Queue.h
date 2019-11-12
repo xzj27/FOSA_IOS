@@ -14,8 +14,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (instancetype) arrayQueue;
 + (instancetype) arrayQueueWithCapacity:(NSInteger)capacity;
-- (instancetype) initWithCapacity:(NSInteger)capacity;
 
+- (instancetype) initWithCapacity:(NSInteger)capacity;
 - (void)enqueue:(AVMetadataMachineReadableCodeObject *)obj; ///入队列
 - (id) dequeue; ///出队列
 - (void) removeAllObjects; ///移除队列里边所有元素
