@@ -50,14 +50,14 @@
     [self.QRscan addTarget:self action:@selector(Scan) forControlEvents:UIControlEventTouchUpInside];
     UIBarButtonItem *rightItem = [[UIBarButtonItem alloc]initWithCustomView:self.QRscan];
     self.navigationItem.rightBarButtonItem= rightItem;
-
     [self InitView];
    
 }
 - (void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
+    [self creatOrOpensql];
+    //[self SelectDataFromSqlite];
 }
-
 - (void)InitView{
     ID = @"FosaCell";
     isEdit = false;
@@ -146,13 +146,6 @@
     [add addSubview:add_icon];
     [self.CategoryScrollview addSubview:add];
 }
-- (void)refresh:(UIRefreshControl *)sender
-{
-    [self.storageArray removeAllObjects];
-    [self.StorageItemView reloadData];
-    // 停止刷新
-    [sender endRefreshing];
-}
 //滑动手势事件
 - (void)swipeGestureRight:(UISwipeGestureRecognizer *)swipeGestureRecognizer{
     NSLog(@"向右滑动");
@@ -178,7 +171,8 @@
     fosa_scan.hidesBottomBarWhenPushed = YES;
     [self.navigationController pushViewController:fosa_scan animated:YES];
 }
-//创建或打开数据库
+
+#pragma mark - 数据库操作
 - (void)creatOrOpensql
 {
     NSString *path = [self getPath];
@@ -208,10 +202,10 @@
             const char *expired_date = (const char *)sqlite3_column_text(_stmt,3);
             const char *photo_path = (const char *)sqlite3_column_text(_stmt,5);
 
-//            NSLog(@"查询到数据%@",[NSString stringWithUTF8String:food_name]);
-//            NSLog(@"查询到数据%@",[NSString stringWithUTF8String:expired_date]);
-//            NSLog(@"查询到数据%@",[NSString stringWithUTF8String:photo_path]);
-//            NSLog(@"********************************");
+            NSLog(@"查询到数据%@",[NSString stringWithUTF8String:food_name]);
+            NSLog(@"查询到数据%@",[NSString stringWithUTF8String:expired_date]);
+            NSLog(@"查询到数据%@",[NSString stringWithUTF8String:photo_path]);
+            NSLog(@"********************************");
             [self CreatFoodViewWithName:[NSString stringWithUTF8String:food_name] fdevice:[NSString stringWithUTF8String:device_name] expireDate:[NSString stringWithUTF8String:expired_date] foodPhoto:[NSString stringWithUTF8String:photo_path]] ;
         }
     }
@@ -226,6 +220,7 @@
     return filePath;
 }
 
+#pragma mark - cell相关的方法
 - (void)CreatFoodViewWithName:(NSString *)foodname fdevice:(NSString *)device expireDate:(NSString *)expireDate foodPhoto:(NSString *)photo{
     //创建食物模型
     CellModel *model = [[CellModel alloc]initWithName:foodname foodIcon:photo expire_date:expireDate fdevice:device];
@@ -265,20 +260,27 @@
              UIMenuController *menu = [UIMenuController sharedMenuController];
             [menu setMenuItems:@[item1,item2]];
             [menu setTargetRect:cell.frame inView:self.StorageItemView];
-            menu.accessibilityValue = cell.model.device;
+            menu.accessibilityValue = cell.model.foodName;
             [menu setMenuVisible:YES animated:YES];
         }
     }
-//    if (longPress.state == UIGestureRecognizerStateEnded) {
-//        isEdit = false;
-//    }
 }
+#pragma mark - 刷新事件与menu事件
+- (void)refresh:(UIRefreshControl *)sender
+{
+    [self.storageArray removeAllObjects];
+    [self.StorageItemView reloadData];
+    // 停止刷新
+    [sender endRefreshing];
+}
+
 - (void)DeleteCell:(UIMenuController *)menu
 {
     isEdit = false;
     NSLog(@"%@",menu.accessibilityValue);
     NSLog(@"点击了删除");
-    NSString *sql = [NSString stringWithFormat:@"delete from Fosa2 where deviceName = '%@';",menu.accessibilityValue];
+    NSString *sql = [NSString stringWithFormat:@"delete from Fosa2 where foodName = '%@'",menu.accessibilityValue];
+    [self deleteFile:menu.accessibilityValue];//删除存储在沙盒下下的同名的食物图片
     char * errmsg;
     sqlite3_exec(_database, sql.UTF8String, NULL, NULL, &errmsg);
     if (errmsg) {
@@ -288,14 +290,33 @@
         [self.storageArray removeAllObjects];
         [self.StorageItemView reloadData];
     }
-    
 }
+- (void)deleteFile:(NSString *)photoName {
+    NSArray *paths =NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask,YES);
+    NSString *photo = [NSString stringWithFormat:@"%@.png",photoName];
+    NSString *filePath = [[paths objectAtIndex:0]stringByAppendingPathComponent: photo];
+    NSFileManager* fileManager=[NSFileManager defaultManager];
+    BOOL blHave=[[NSFileManager defaultManager] fileExistsAtPath:filePath];
+    if (!blHave) {
+        NSLog(@"no  have");
+    }else {
+        NSLog(@" have");
+        BOOL blDele= [fileManager removeItemAtPath:filePath error:nil];
+        if (blDele) {
+            NSLog(@"dele success");
+        }else {
+            NSLog(@"dele fail");
+        }
+    }
+}
+
 - (void)CancelEdit:(UIMenuController *)menu
 {
     NSLog(@"点击了取消");
     
     isEdit = false;
 }
+
 - (BOOL)canBecomeFirstResponder
 {
     return YES;
@@ -303,14 +324,20 @@
 #pragma mark - UICollectionViewDataSource
 //每个section有几个item
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
-    return 2;
+    [self SelectDataFromSqlite];
+    return self.storageArray.count;
 }
 //collectionView有几个section
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView {
-    [self creatOrOpensql];
-    [self SelectDataFromSqlite];
-    NSLog(@"%ld",_storageArray.count);
-    return self.storageArray.count/2;
+    return 1;
+//    [self SelectDataFromSqlite];
+//    if (self.storageArray.count <= 1) {
+//        NSLog(@"====%ld",_storageArray.count);
+//        return self.storageArray.count;
+//    }else{
+//        NSLog(@">>>>>%ld",_storageArray.count);
+//        return self.storageArray.count/2;
+//    }
 }
 //返回这个UICollectionViewCell是否可以被选择
 - ( BOOL )collectionView:( UICollectionView *)collectionView shouldSelectItemAtIndexPath:( NSIndexPath *)indexPath{
@@ -320,17 +347,21 @@
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:( NSIndexPath *)indexPath {
     FoodCollectionViewCell *cell = [self.StorageItemView dequeueReusableCellWithReuseIdentifier:ID forIndexPath:indexPath];
     //给自定义cell的model传值
-    cell.model = self.storageArray[indexPath.section*2+indexPath.row];
-    [cell setModel:cell.model];
-    cell.backgroundColor = [UIColor colorWithRed:arc4random()%255/255.0 green:arc4random()%255/255.0 blue:arc4random()%255/255.0 alpha:1];
-    cell.layer.cornerRadius = 10;
-    cell.userInteractionEnabled = YES;
-    //给每一个cell添加长按手势
-    //添加一个长按手势
-    _longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(lonePressMoving:)];
-    _longPress.minimumPressDuration = 1.5;
-    [cell addGestureRecognizer:_longPress];
-    return cell;
+    //NSLog(@"<<<<<<<<<<%ld",indexPath.section*2+indexPath.row);
+    long int index = indexPath.section*2+indexPath.row;
+    //if (index+1 <= self.storageArray.count) {
+        cell.model = self.storageArray[index];
+        [cell setModel:cell.model];
+        cell.backgroundColor = [UIColor colorWithRed:arc4random()%255/255.0 green:arc4random()%255/255.0 blue:arc4random()%255/255.0 alpha:1];
+        cell.layer.cornerRadius = 10;
+        cell.userInteractionEnabled = YES;
+        //给每一个cell添加长按手势
+        //添加一个长按手势
+        _longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(lonePressMoving:)];
+        _longPress.minimumPressDuration = 2.0;
+        [cell addGestureRecognizer:_longPress];
+        return cell;
+    //}
 }
 //点击item方法
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath{
@@ -355,11 +386,7 @@
       cell.backgroundColor = [UIColor colorWithRed:arc4random()%255/255.0 green:arc4random()%255/255.0 blue:arc4random()%255/255.0 alpha:1];
 }
 
-//可以移动cell
-- (BOOL)collectionView:(UICollectionView *)collectionView canMoveItemAtIndexPath:(NSIndexPath *)indexPath{
-    return YES;
-}
-- (void)viewWillDisappear:(BOOL)animated{
+- (void)viewDidDisappear:(BOOL)animated{
     int close = sqlite3_close_v2(_database);
     if (close == SQLITE_OK) {
             _database = nil;

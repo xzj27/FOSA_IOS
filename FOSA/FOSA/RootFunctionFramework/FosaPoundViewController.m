@@ -106,7 +106,6 @@ completionHandler(UNNotificationPresentationOptionBadge|UNNotificationPresentati
 }
 -(void)sendNotification{
        UNMutableNotificationContent *content = [[UNMutableNotificationContent alloc] init];
-    
            content.title = @"\"Reminding\"";
            content.subtitle = @"by Fosa";
            content.body = @"your food will expire";
@@ -127,7 +126,7 @@ completionHandler(UNNotificationPresentationOptionBadge|UNNotificationPresentati
             //格式化时间
           NSDateFormatter * formatter = [[NSDateFormatter alloc]init];
           [formatter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
-          NSDate * date = [formatter dateFromString:@"2019-11-07 15:16:00"];
+          NSDate * date = [formatter dateFromString:@"2019-11-12 15:36:00"];
           NSDateComponents * components = [[NSCalendar currentCalendar]
                                              components:NSCalendarUnitYear |
                                              NSCalendarUnitMonth |

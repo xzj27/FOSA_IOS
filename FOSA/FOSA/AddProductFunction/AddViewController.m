@@ -352,22 +352,22 @@
         
     }
     //查询数据库新添加的食物
-    const char *selsql = "select foodName,deviceName,aboutFood,expireDate,remindDate from Fosa2";
+    const char *selsql = "select foodName,deviceName,aboutFood,expireDate,remindDate,photoPath from Fosa2";
     int selresult = sqlite3_prepare_v2(self.database, selsql, -1,&_stmt, NULL);
     if(selresult != SQLITE_OK){
         NSLog(@"查询失败");
     }else{
         while (sqlite3_step(_stmt) == SQLITE_ROW) {
-            const char *food_name   = (const char*)sqlite3_column_text(_stmt, 0);
+            const char *food_name   = (const char*)sqlite3_column_text(_stmt, 5);
             NSLog(@"查询到数据:%@",[NSString stringWithUTF8String:food_name]);
-            const char *device_name = (const char*)sqlite3_column_text(_stmt,1);
-            NSLog(@"查询到数据:%@",[NSString stringWithUTF8String:device_name]);
-            const char *about_food  = (const char*)sqlite3_column_text(_stmt,2);
-            NSLog(@"查询到数据:%@",[NSString stringWithUTF8String:about_food]);
-            const char *expire_date = (const char*)sqlite3_column_text(_stmt,3);
-            NSLog(@"查询到数据:%@",[NSString stringWithUTF8String:expire_date]);
-            const char *remind_date = (const char*)sqlite3_column_text(_stmt,4);
-            NSLog(@"查询到数据:%@",[NSString stringWithUTF8String:remind_date]);
+//            const char *device_name = (const char*)sqlite3_column_text(_stmt,1);
+//            NSLog(@"查询到数据:%@",[NSString stringWithUTF8String:device_name]);
+//            const char *about_food  = (const char*)sqlite3_column_text(_stmt,2);
+//            NSLog(@"查询到数据:%@",[NSString stringWithUTF8String:about_food]);
+//            const char *expire_date = (const char*)sqlite3_column_text(_stmt,3);
+//            NSLog(@"查询到数据:%@",[NSString stringWithUTF8String:expire_date]);
+//            const char *remind_date = (const char*)sqlite3_column_text(_stmt,4);
+//            NSLog(@"查询到数据:%@",[NSString stringWithUTF8String:remind_date]);
         }
     }
 }
@@ -385,16 +385,34 @@
 -(void)finish{
     [self creatOrOpensql];
     [self InsertDataIntoSqlite];
+    
+    [self SavePhotoIntoLibrary:self.imageView1.image];
+    
     [self initNotification];
     //格式化时间
     NSDateFormatter * formatter = [[NSDateFormatter alloc]init];
     [formatter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
     NSDate *Edate = [formatter dateFromString:[NSString stringWithFormat:@"%@ 14:00:00",expire_Date]];
     NSDate *Rdate = [formatter dateFromString:[NSString stringWithFormat:@"%@ 13:30:00",remind_Date]];
-    [self sendNotification:Edate idertifier:@"EXPIRE" body:@"Your food have expired"];
-    [self sendNotification:Rdate idertifier:@"REMIND" body:[NSString stringWithFormat:@"Your food will expire on %@",expire_Date]];
+    //[self sendNotification:Edate idertifier:@"EXPIRE" body:@"Your food have expired"];
+    //[self sendNotification:Rdate idertifier:@"REMIND" body:[NSString stringWithFormat:@"Your food will expire on %@",expire_Date]];
     
     [self.navigationController popToRootViewControllerAnimated:YES];
+}
+
+#pragma mark - 保存照片到相册
+- (void)SavePhotoIntoLibrary:(UIImage *)image{
+    UIImageWriteToSavedPhotosAlbum(image, self,@selector(image:didFinishSavingWithError:contextInfo:),nil);
+}
+- (void)image:(UIImage *)image didFinishSavingWithError:(NSError *)error contextInfo:(void *)contextInfo {
+    NSString *msg = nil ;
+    if(error){
+        msg = @"保存图片失败" ;
+    }else{
+        msg = @"保存图片成功" ;
+        //将保存在相册的图片再存到沙盒中
+        [self Savephoto:image];
+    }
 }
 #pragma mark - 保存照片到沙盒
 -(NSString *)Savephoto:(UIImage *)image{
@@ -500,7 +518,7 @@ completionHandler(UNNotificationPresentationOptionBadge|UNNotificationPresentati
         content.badge = @0;
         if (self.food_image != NULL) {
         //保存图片到沙盒
-            NSString *path = [self Savephoto:self.food_image];
+            NSString *path = [[NSBundle mainBundle] pathForResource:@"启动图2" ofType:@"png"];
             NSError *error = nil;
             //将本地图片的路径形成一个图片附件，加入到content中
             UNNotificationAttachment *img_attachment = [UNNotificationAttachment attachmentWithIdentifier:@"att1" URL:[NSURL fileURLWithPath:path] options:nil error:&error];

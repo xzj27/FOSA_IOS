@@ -375,6 +375,7 @@
     [self presentViewController:imagePicker animated:YES completion:nil];
 }
 -(void)openCamera{
+    NSLog(@"打开相机");
     
 }
 /// 返回一张不超过屏幕尺寸的 image
