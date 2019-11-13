@@ -7,8 +7,14 @@
 //
 
 #import "AppDelegate.h"
+
+#ifdef NSFoundationVersionNumber_iOS_9_x_Max
+#import <UserNotifications/UserNotifications.h>
+#endif
+
 #import "RootTabBarViewController.h"
-@interface AppDelegate ()
+
+@interface AppDelegate ()<UNUserNotificationCenterDelegate>
 
 @end
 
@@ -17,6 +23,36 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
+    // 注册通知
+//    if ([[UIDevice currentDevice].systemVersion floatValue] >= 10.0) {
+//        //iOS10特有
+//        UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
+//        // 必须写代理，不然无法监听通知的接收与点击
+//        center.delegate = self;
+//        [center requestAuthorizationWithOptions:(UNAuthorizationOptionAlert | UNAuthorizationOptionBadge | UNAuthorizationOptionSound) completionHandler:^(BOOL granted, NSError * _Nullable error) {
+//            if (granted) {
+//                // 点击允许
+//                NSLog(@"注册成功");
+//                [center getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings * _Nonnull settings) {
+//                    NSLog(@"%@", settings);
+//                }];
+//            } else {
+//                // 点击不允许
+//                NSLog(@"注册失败");
+//            }
+//        }];
+//    }else if ([[UIDevice currentDevice].systemVersion floatValue] >8.0){
+//        //iOS8 - iOS10
+//        [application registerUserNotificationSettings:[UIUserNotificationSettings settingsForTypes:UIUserNotificationTypeAlert | UIUserNotificationTypeSound | UIUserNotificationTypeBadge categories:nil]];
+//
+//    }else if ([[UIDevice currentDevice].systemVersion floatValue] < 8.0) {
+//        //iOS8系统以下
+//        [application registerForRemoteNotificationTypes:UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeAlert | UIRemoteNotificationTypeSound];
+//    }
+//    // 注册获得device Token
+//    [[UIApplication sharedApplication] registerForRemoteNotifications];
+//
+//
     if (@available(iOS 13,*)) {
            return YES;
        }else{
@@ -29,8 +65,19 @@
        [NSThread sleepForTimeInterval:3];
        return YES;
        }
+    
 }
-
+//
+//// 获得Device Token
+// - (void)application:(UIApplication *)application
+//didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
+//    NSLog(@"%@", [NSString stringWithFormat:@"Device Token: %@", deviceToken]);
+//}
+//// 获得Device Token失败
+//- (void)application:(UIApplication *)application
+//didFailToRegisterForRemoteNotificationsWithError:(NSError *)error {
+//    NSLog(@"did Fail To Register For Remote Notifications With Error: %@", error);
+//}
 
 #pragma mark - UISceneSession lifecycle
 
