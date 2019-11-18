@@ -21,7 +21,7 @@
     //日期选择器的容器
     UIView *dateView;
     UIButton *sure,*cancel;
-    
+    NSString *picturePath;
     //选择的日期
     NSString *expire_Date,*remind_Date;
     
@@ -77,9 +77,11 @@
     //添加响应
     [sure addTarget:self action:@selector(selected) forControlEvents:UIControlEventTouchUpInside];
     [cancel addTarget:self action:@selector(noSelect) forControlEvents:UIControlEventTouchUpInside];
+    
     //初始化日期选择器
     datePicker = [[UIDatePicker alloc]initWithFrame: CGRectMake(0, 50, self.view.frame.size.width, self.view.frame.size.height/3)];
-    datePicker.backgroundColor = [UIColor whiteColor];
+    
+    datePicker.backgroundColor = [UIColor grayColor];
     
     NSLocale *locale = [[NSLocale alloc]initWithLocaleIdentifier:@"zw"];
     datePicker.locale = locale;
@@ -145,6 +147,7 @@
     _foodName.font = [UIFont fontWithName:@"Arial" size:15.0f];
     [self.rootScrollview addSubview:_foodNameView];
     self.foodName = [[UITextField alloc]initWithFrame:CGRectMake(10, 5, headerWidth, 40)];
+    _foodName.textColor = [UIColor blackColor];
     _foodName.placeholder = @"输入食品名称";
     _foodName.delegate = self;
     _foodName.returnKeyType = UIReturnKeyDone;
@@ -156,6 +159,7 @@
     _aboutFood.layer.borderColor = [[UIColor grayColor] CGColor];
     _aboutFood.placeholder = @"您可以在这里输入一些说明!";
     _aboutFood.font = [UIFont fontWithName:@"Arial" size:15.0f];
+    _aboutFood.textColor = [UIColor blackColor];
     //_aboutFood.textAlignment = UITextAlignmentLeft;
     _aboutFood.delegate = self;
     _aboutFood.returnKeyType = UIReturnKeyDone;
@@ -171,6 +175,7 @@
     _expireDate.textColor = [UIColor blackColor];
     _expireDate.text = @"Expire Date";
     _expireDate.backgroundColor = [UIColor clearColor];
+    _expireDate.userInteractionEnabled = NO;
     [self.expireView addSubview:_expireDate];
     self.expireBtn = [[UIButton alloc]initWithFrame:CGRectMake(headerWidth-45, 5, 40, 40)];
     [_expireBtn setImage:[UIImage imageNamed:@"icon_date"] forState:UIControlStateNormal];
@@ -187,6 +192,7 @@
     _remindDate.textColor = [UIColor blackColor];
     _remindDate.text = @"Remind Date";
     _remindDate.backgroundColor = [UIColor clearColor];
+    _remindDate.userInteractionEnabled = NO;
     [self.remindView addSubview:_remindDate];
     
     self.remindBtn = [[UIButton alloc]initWithFrame:CGRectMake(headerWidth-45, 5, 40, 40)];
@@ -239,7 +245,6 @@
     NSLog(@"select reminding date");
     [self.view addSubview:dateView];
 }
-
 #pragma mark - 选择日期
 -(void)selected{
     NSDate *selectdate = datePicker.date;
@@ -335,13 +340,13 @@
         return NO;
     }
 }
--(void) InsertDataIntoSqlite{
+-(void) InsertDataIntoSqlite:(NSString *)ExpireDate remind:(NSString *)remindDate{
     
     //错误信息定义
     char *erro = 0;
     if(self.foodName.text != nil){
     //插入语句
-    NSString *insertSql =[NSString stringWithFormat:@"insert into Fosa2(foodName,deviceName,aboutFood,expireDate,remindDate,photoPath)values('%@','%@','%@','%@','%@','%@')",_foodName.text,_deviceName.text,_aboutFood.text,_expireDate.text,_remindDate.text,self.foodName.text];
+    NSString *insertSql =[NSString stringWithFormat:@"insert into Fosa2(foodName,deviceName,aboutFood,expireDate,remindDate,photoPath)values('%@','%@','%@','%@','%@','%@')",_foodName.text,_deviceName.text,_aboutFood.text,ExpireDate,remindDate,self.foodName.text];
         int insertResult = sqlite3_exec(self.database, insertSql.UTF8String,NULL, NULL,&erro);
         if(insertResult == SQLITE_OK){
             NSLog(@"添加数据成功");
@@ -384,16 +389,19 @@
 #pragma mark - 完成输入，将数据写入数据库
 -(void)finish{
     [self creatOrOpensql];
-    [self InsertDataIntoSqlite];
+    [self InsertDataIntoSqlite:expire_Date remind:remind_Date];
     
-    [self SavePhotoIntoLibrary:self.imageView1.image];
+    //[self SavePhotoIntoLibrary:self.imageView1.image];
+    picturePath = [self Savephoto:self.imageView1.image];
     
     [self initNotification];
     //格式化时间
     NSDateFormatter * formatter = [[NSDateFormatter alloc]init];
     [formatter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
     NSDate *Edate = [formatter dateFromString:[NSString stringWithFormat:@"%@ 14:00:00",expire_Date]];
+    NSLog(@"%@",[formatter stringFromDate:Edate]);
     NSDate *Rdate = [formatter dateFromString:[NSString stringWithFormat:@"%@ 13:30:00",remind_Date]];
+    NSLog(@"%@",[formatter stringFromDate:Rdate]);
     //[self sendNotification:Edate idertifier:@"EXPIRE" body:@"Your food have expired"];
     //[self sendNotification:Rdate idertifier:@"REMIND" body:[NSString stringWithFormat:@"Your food will expire on %@",expire_Date]];
     
@@ -508,7 +516,7 @@ completionHandler(UNNotificationPresentationOptionBadge|UNNotificationPresentati
 //在此，可判断response的种类和request的触发器是什么，可根据远程通知和本地通知分别处理，再根据action进行后续回调
 }
 #pragma mark - 编辑通知内容与发送
--(void)sendNotification:(NSDate *)date idertifier:(NSString *)RequestIdentifier body:(NSString *)body{
+-(void)sendNotification:(NSDate *)date idertifier:(NSString *)RequestIdentifier body:(NSString *)body picture:(NSString *)path{
         
        UNMutableNotificationContent *content = [[UNMutableNotificationContent alloc] init];
     
@@ -517,8 +525,8 @@ completionHandler(UNNotificationPresentationOptionBadge|UNNotificationPresentati
         content.body = body;
         content.badge = @0;
         if (self.food_image != NULL) {
-        //保存图片到沙盒
-            NSString *path = [[NSBundle mainBundle] pathForResource:@"启动图2" ofType:@"png"];
+        
+           // NSString *path = [[NSBundle mainBundle] pathForResource:@"启动图2" ofType:@"png"];
             NSError *error = nil;
             //将本地图片的路径形成一个图片附件，加入到content中
             UNNotificationAttachment *img_attachment = [UNNotificationAttachment attachmentWithIdentifier:@"att1" URL:[NSURL fileURLWithPath:path] options:nil error:&error];

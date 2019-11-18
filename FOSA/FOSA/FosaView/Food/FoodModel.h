@@ -33,6 +33,10 @@ NS_ASSUME_NONNULL_BEGIN
  */
 + (instancetype)modelWithName:(NSString *) food_name device_name:(NSString *) device_name icon:(NSString *)icon expire_date:(NSString *) expire_date remind_date:(NSString *)remind_date;
 - (instancetype)initWithName: (NSString *) food_name device_name:(NSString *) device_name icon:(NSString *)icon expire_date:(NSString *) expire_date remind_date:(NSString *)remind_date;
+
++ (instancetype)modelWithName:(NSString *) food_name icon:(NSString *)icon expire_date:(NSString *)expire_date;
+- (instancetype)initWithName:(NSString *)food_name icon:(NSString *)icon expire_date:(NSString *)expire_date;
+
 @end
 
 NS_ASSUME_NONNULL_END

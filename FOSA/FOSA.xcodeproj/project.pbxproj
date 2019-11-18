@@ -45,6 +45,11 @@
 		4551FE302378FB0F007A2EFB /* AddViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4551FE2F2378FB0F007A2EFB /* AddViewController.m */; };
 		4551FE332378FB22007A2EFB /* FoodInfoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4551FE322378FB22007A2EFB /* FoodInfoViewController.m */; };
 		4551FE3B2379605E007A2EFB /* SqliteManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4551FE3A2379605E007A2EFB /* SqliteManager.m */; };
+		459E0089237E43A4006D0E59 /* MyDeviceViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 459E0088237E43A4006D0E59 /* MyDeviceViewController.m */; };
+		459E008C237E43BA006D0E59 /* OtherViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 459E008B237E43BA006D0E59 /* OtherViewController.m */; };
+		459E009C237E5417006D0E59 /* ContentViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 459E009B237E5417006D0E59 /* ContentViewController.m */; };
+		45D94513237BD41A000E2550 /* logo.png in Resources */ = {isa = PBXBuildFile; fileRef = 45D94512237BD419000E2550 /* logo.png */; };
+		45FA9D24237D0749007A8E55 /* FosaNotification.m in Sources */ = {isa = PBXBuildFile; fileRef = 45FA9D23237D0749007A8E55 /* FosaNotification.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -63,6 +68,19 @@
 			remoteInfo = FOSA;
 		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		45D944FC237B8AD1000E2550 /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		4551FD9B2378EA50007A2EFB /* FOSA.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FOSA.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -136,6 +154,17 @@
 		4551FE322378FB22007A2EFB /* FoodInfoViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FoodInfoViewController.m; sourceTree = "<group>"; };
 		4551FE392379605E007A2EFB /* SqliteManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SqliteManager.h; sourceTree = "<group>"; };
 		4551FE3A2379605E007A2EFB /* SqliteManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SqliteManager.m; sourceTree = "<group>"; };
+		459E0087237E43A4006D0E59 /* MyDeviceViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MyDeviceViewController.h; sourceTree = "<group>"; };
+		459E0088237E43A4006D0E59 /* MyDeviceViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MyDeviceViewController.m; sourceTree = "<group>"; };
+		459E008A237E43BA006D0E59 /* OtherViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OtherViewController.h; sourceTree = "<group>"; };
+		459E008B237E43BA006D0E59 /* OtherViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OtherViewController.m; sourceTree = "<group>"; };
+		459E009A237E5417006D0E59 /* ContentViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ContentViewController.h; sourceTree = "<group>"; };
+		459E009B237E5417006D0E59 /* ContentViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ContentViewController.m; sourceTree = "<group>"; };
+		45D944ED237B8AD1000E2550 /* UserNotifications.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotifications.framework; path = System/Library/Frameworks/UserNotifications.framework; sourceTree = SDKROOT; };
+		45D944EF237B8AD1000E2550 /* UserNotificationsUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotificationsUI.framework; path = System/Library/Frameworks/UserNotificationsUI.framework; sourceTree = SDKROOT; };
+		45D94512237BD419000E2550 /* logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = logo.png; sourceTree = "<group>"; };
+		45FA9D22237D0749007A8E55 /* FosaNotification.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FosaNotification.h; sourceTree = "<group>"; };
+		45FA9D23237D0749007A8E55 /* FosaNotification.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FosaNotification.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -169,6 +198,7 @@
 				4551FD9D2378EA50007A2EFB /* FOSA */,
 				4551FDB92378EA51007A2EFB /* FOSATests */,
 				4551FDC42378EA51007A2EFB /* FOSAUITests */,
+				45D944EC237B8AD1000E2550 /* Frameworks */,
 				4551FD9C2378EA50007A2EFB /* Products */,
 			);
 			sourceTree = "<group>";
@@ -186,13 +216,15 @@
 		4551FD9D2378EA50007A2EFB /* FOSA */ = {
 			isa = PBXGroup;
 			children = (
+				4551FDE42378F11B007A2EFB /* DataStruct */,
+				45FA9D21237D0723007A8E55 /* Notification */,
 				4551FE382379602E007A2EFB /* SqliteFunction */,
 				4551FDF22378F29E007A2EFB /* AddProductFunction */,
 				4551FDF12378F28E007A2EFB /* ScanFunction */,
 				4551FDF42378F2D6007A2EFB /* PhotoFuction */,
 				4551FDF32378F2AF007A2EFB /* Login&&Regist */,
 				4551FDF02378F283007A2EFB /* FosaView */,
-				4551FDE42378F11B007A2EFB /* DataStruct */,
+				459E0086237E4360006D0E59 /* Product */,
 				4551FDD32378EBDE007A2EFB /* RootFunctionFramework */,
 				4551FD9E2378EA50007A2EFB /* AppDelegate.h */,
 				4551FD9F2378EA50007A2EFB /* AppDelegate.m */,
@@ -202,6 +234,7 @@
 				4551FDA52378EA50007A2EFB /* ViewController.m */,
 				4551FDA72378EA50007A2EFB /* Main.storyboard */,
 				4551FDAA2378EA51007A2EFB /* Assets.xcassets */,
+				45D94512237BD419000E2550 /* logo.png */,
 				4551FDF52378F37D007A2EFB /* 启动图2.png */,
 				4551FDAC2378EA51007A2EFB /* LaunchScreen.storyboard */,
 				4551FDAF2378EA51007A2EFB /* Info.plist */,
@@ -360,6 +393,37 @@
 			name = SqliteFunction;
 			sourceTree = "<group>";
 		};
+		459E0086237E4360006D0E59 /* Product */ = {
+			isa = PBXGroup;
+			children = (
+				459E0087237E43A4006D0E59 /* MyDeviceViewController.h */,
+				459E0088237E43A4006D0E59 /* MyDeviceViewController.m */,
+				459E008A237E43BA006D0E59 /* OtherViewController.h */,
+				459E008B237E43BA006D0E59 /* OtherViewController.m */,
+				459E009A237E5417006D0E59 /* ContentViewController.h */,
+				459E009B237E5417006D0E59 /* ContentViewController.m */,
+			);
+			path = Product;
+			sourceTree = "<group>";
+		};
+		45D944EC237B8AD1000E2550 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				45D944ED237B8AD1000E2550 /* UserNotifications.framework */,
+				45D944EF237B8AD1000E2550 /* UserNotificationsUI.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		45FA9D21237D0723007A8E55 /* Notification */ = {
+			isa = PBXGroup;
+			children = (
+				45FA9D22237D0749007A8E55 /* FosaNotification.h */,
+				45FA9D23237D0749007A8E55 /* FosaNotification.m */,
+			);
+			path = Notification;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -370,6 +434,7 @@
 				4551FD972378EA50007A2EFB /* Sources */,
 				4551FD982378EA50007A2EFB /* Frameworks */,
 				4551FD992378EA50007A2EFB /* Resources */,
+				45D944FC237B8AD1000E2550 /* Embed App Extensions */,
 			);
 			buildRules = (
 			);
@@ -469,6 +534,7 @@
 				4551FDAE2378EA51007A2EFB /* LaunchScreen.storyboard in Resources */,
 				4551FDAB2378EA51007A2EFB /* Assets.xcassets in Resources */,
 				4551FDF62378F37D007A2EFB /* 启动图2.png in Resources */,
+				45D94513237BD41A000E2550 /* logo.png in Resources */,
 				4551FDFE2378F504007A2EFB /* saoyisao@3x.png in Resources */,
 				4551FDFC2378F4FC007A2EFB /* shanguangdeng-an.png in Resources */,
 				4551FDA92378EA50007A2EFB /* Main.storyboard in Resources */,
@@ -501,20 +567,24 @@
 				4551FE332378FB22007A2EFB /* FoodInfoViewController.m in Sources */,
 				4551FE092378F57C007A2EFB /* ResultViewController.m in Sources */,
 				4551FDD92378ED96007A2EFB /* FosaMainViewController.m in Sources */,
+				45FA9D24237D0749007A8E55 /* FosaNotification.m in Sources */,
 				4551FE1E2378F971007A2EFB /* CellModel.m in Sources */,
 				4551FE102378F6A7007A2EFB /* FosaMenu.m in Sources */,
 				4551FDE22378EECA007A2EFB /* FosaPoundViewController.m in Sources */,
 				4551FE2A2378FA46007A2EFB /* RegisterViewController.m in Sources */,
 				4551FE3B2379605E007A2EFB /* SqliteManager.m in Sources */,
+				459E009C237E5417006D0E59 /* ContentViewController.m in Sources */,
 				4551FDA62378EA50007A2EFB /* ViewController.m in Sources */,
 				4551FE212378F9B1007A2EFB /* FoodCollectionViewCell.m in Sources */,
 				4551FE302378FB0F007A2EFB /* AddViewController.m in Sources */,
 				4551FDDF2378EEB3007A2EFB /* FosaUserViewController.m in Sources */,
 				4551FE242378F9FC007A2EFB /* PhotoViewController.m in Sources */,
 				4551FDEB2378F1A6007A2EFB /* Fosa_NSString_Queue.m in Sources */,
+				459E0089237E43A4006D0E59 /* MyDeviceViewController.m in Sources */,
 				4551FE0C2378F60E007A2EFB /* MenuModel.m in Sources */,
 				4551FDD62378EC91007A2EFB /* RootTabBarViewController.m in Sources */,
 				4551FE032378F54D007A2EFB /* ScanOneCodeViewController.m in Sources */,
+				459E008C237E43BA006D0E59 /* OtherViewController.m in Sources */,
 				4551FE062378F55E007A2EFB /* ScanMoreCodeViewController.m in Sources */,
 				4551FDDC2378EDBB007A2EFB /* FosaProductViewController.m in Sources */,
 				4551FE172378F7A1007A2EFB /* FoodMoreInfoView.m in Sources */,

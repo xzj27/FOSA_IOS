@@ -257,7 +257,8 @@
 }
 //取出保存在本地的图片
 -(UIImage*)getImage {
-    NSArray *paths =NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask,YES);NSString*filePath = [[paths objectAtIndex:0]stringByAppendingPathComponent:[NSString stringWithFormat:@"demo.png"]];
+    NSArray *paths =NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask,YES);
+    NSString*filePath = [[paths objectAtIndex:0]stringByAppendingPathComponent:[NSString stringWithFormat:@"demo.png"]];
 // 保存文件的名称
     UIImage *img = [UIImage imageWithContentsOfFile:filePath];
     NSLog(@"=== %@", img);

@@ -39,18 +39,16 @@
         _deleteIcon.backgroundColor = [UIColor clearColor];
         _deleteIcon.hidden = YES;
         [self addSubview:self.deleteIcon];
-        
-        
+
         self.cancelIcon = [[UIImageView alloc]initWithFrame:CGRectMake(self.bounds.size.width/2, 0, self.bounds.size.width/2, self.bounds.size.height)];
         _cancelIcon.backgroundColor = [UIColor clearColor];
         _cancelIcon.hidden = YES;
         _cancelIcon.image = [UIImage imageNamed:@"icon_cancel"];
         [self addSubview:self.deleteIcon];
-        
+    
     }
     return self;
 }
-
 -(void)setModel:(CellModel *)model
 {
     _model = model;

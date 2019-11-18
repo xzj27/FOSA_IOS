@@ -12,6 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface FosaPoundViewController : ViewController
 
+@property (nonatomic,assign) CGFloat mainWidth,mainHeight,navheight;
 @end
 
 NS_ASSUME_NONNULL_END

@@ -19,11 +19,11 @@
 @interface ScanOneCodeViewController ()<AVCaptureMetadataOutputObjectsDelegate,UINavigationControllerDelegate,AVCaptureVideoDataOutputSampleBufferDelegate,UIImagePickerControllerDelegate>{
     //用于初始化数据模型的数据
     NSString *food,*fdevice,*expire,*remind,*photoPath;
-    
     //GCD定时器
     dispatch_source_t _timer;
     
     Boolean isJump;
+    int AlertCount;
 }
 @property (nonatomic, strong) AVCaptureDevice * device;
 @property (nonatomic, strong) AVCaptureDeviceInput * input;
@@ -37,7 +37,7 @@
 @property (nonatomic, weak)  UIImageView *activeImage;       //扫描框
 @property (nonatomic,strong) UIImageView *scanImage;         //扫描线
 @property (nonatomic,strong) UIView *maskView;               //扫描面板
-@property (nonatomic,strong) UIImageView *focusCursor,*focusCursor1,*focusCursor2;       //标记二维码的位置
+@property (nonatomic,strong) UIImageView *focusCursor,*focusCursor1,*focusCursor2,*focusCursor3;       //标记二维码的位置
 @property (nonatomic ,strong) UILabel *label,*myQrcode;      //提示信息，选取我的二维码
 @property (nonatomic,strong) UIButton *flashBtn;             //闪光灯
 @property (nonatomic,strong) UISlider *ZoomSlider;           //用于放大缩小视图
@@ -48,8 +48,7 @@
 
 //扫描结果
 @property(nonatomic,strong)NSMutableArray<NSString *> *array;   //save the content of the qrcode
-//@property(nonatomic,strong)NSMutableArray<AVMetadataMachineReadableCodeObject *> *AlertCodeArray; //save the object of the qrcode
-//@property(nonatomic,strong)NSMutableArray<AVMetadataMachineReadableCodeObject *> *QRcode; //存储所有识别过的二维码
+
 //队列
 @property (nonatomic,strong) Fosa_QRCode_Queue *codeQueue;
 @property (nonatomic,strong) Fosa_NSString_Queue *QRcode;
@@ -152,6 +151,8 @@
     //设备输出 初始化，并设置代理和回调，当设备扫描到数据时通过该代理输出队列，一般输出队列都设置为主队列，也是设置了回调方法执行所在的队列环境
     dispatch_queue_t queue = dispatch_queue_create("myqueue", NULL);
     [self.output setMetadataObjectsDelegate:self queue:queue];
+    //视频流输出
+     [self.VideoOutput setSampleBufferDelegate:self queue:dispatch_get_main_queue()];
     //添加预览图层
     self.previewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
     self.previewLayer.frame = self.view.bounds;
@@ -181,6 +182,7 @@
 }
 #pragma mark - 初始化二维码扫描相关数据设置
 -(void) initScanning{
+    AlertCount = 0;  //当前没有正在展示通知
     //存储结果
     self.array = [[NSMutableArray alloc]init];
     //用于存储可读码的队列
@@ -277,10 +279,30 @@
      //聚焦图片
     UIImageView *focusCursor = [[UIImageView alloc] initWithFrame:CGRectMake(50, 50, 50, 50)];
     focusCursor.alpha = 0;
-    focusCursor.image = [UIImage imageNamed:@"camera_focus_red"];
+    focusCursor.image = [UIImage imageNamed:@"icon_focusBlue"];
+    
+    self.focusCursor1 = [[UIImageView alloc] initWithFrame:CGRectMake(50, 50, 50, 50)];
+    focusCursor.alpha = 0;
+    focusCursor.image = [UIImage imageNamed:@"icon_focusRed"];
+    
+   self.focusCursor2 = [[UIImageView alloc] initWithFrame:CGRectMake(50, 50, 50, 50)];
+    focusCursor.alpha = 0;
+    focusCursor.image = [UIImage imageNamed:@"icon_focusGreen"];
+    
+    self.focusCursor3 = [[UIImageView alloc] initWithFrame:CGRectMake(50, 50, 50, 50)];
+    focusCursor.alpha = 0;
+    focusCursor.image = [UIImage imageNamed:@"icon_focusBlue"];
 
     [self.view addSubview:focusCursor];
+    [self.view addSubview:self.focusCursor1];
+    [self.view addSubview:self.focusCursor2];
+    [self.view addSubview:self.focusCursor3];
     _focusCursor = focusCursor;
+    
+    //self.focusCursor1 = focusCursor1;
+    //self.focusCursor2 = focusCursor2;
+    //self.focusCursor3 = focusCursor3;
+    
     [self setScanScale:0];
 }
 #pragma mark - this fuction for setting the scanning scale
@@ -369,6 +391,7 @@
     _flashBtn.clipsToBounds = YES;
     [_flashBtn setBackgroundImage:[UIImage imageNamed:@"shanguangdeng-an.png"] forState:(UIControlStateNormal)];
     [_flashBtn addTarget:self action:@selector(openFlash:) forControlEvents:UIControlEventTouchUpInside];
+    //[self.view addSubview:self.flashBtn];
     
     //设置有效扫描区域
     CGRect intertRect = [_previewLayer metadataOutputRectOfInterestForRect:CGRectMake(imageX, imageY, self.view.frame.size.width*0.7, self.view.frame.size.width*0.7)];
@@ -565,131 +588,120 @@
 -(void)captureOutput:(AVCaptureOutput *)output didOutputMetadataObjects:(NSArray<__kindof AVMetadataObject *> *)metadataObjects fromConnection:(AVCaptureConnection *)connection{
     //用于标志每次捕获是否识别到新的二维码
     _flag = 0;
-    NSInteger count = 3;
     if(metadataObjects.count > 0) {
-       NSString *content;
         AVMetadataMachineReadableCodeObject *mobject = metadataObjects.firstObject;
         NSString *result = mobject.stringValue;
-        if([[mobject type] isEqualToString:AVMetadataObjectTypeQRCode]){
-            //[self performSelectorOnMainThread:@selector(setFocusCursorWithPoint:) withObject:mobject waitUntilDone:NO];      //在主线程中标记二维码的位置（还不够准确）
-            self.isGetResult = true;
-            if (_ScanModel == 0) {
-                if (self.food_photo == nil){//UIImage对象为空说明并不是在添加过程进行扫码
-                     [self performSelectorOnMainThread:@selector(setFocusCursorWithPoint:) withObject:(AVMetadataMachineReadableCodeObject *) mobject waitUntilDone:NO];      //在主线程中标记二维码的位置（还不够准确）
-                    if([result hasPrefix:@"http://"]){
-                                        //打开这个链接
-                        [self performSelectorOnMainThread:@selector(OpenURL:) withObject:result waitUntilDone:NO];
-                    }else if([result hasPrefix:@"Fosa"]||[result hasPrefix:@"FS9"]){
-                                [self performSelectorOnMainThread:@selector(showOneMessage:) withObject:result waitUntilDone:NO]; //在主线程中
-                    }else{
-                        if (!isJump) {
-                            [self performSelectorOnMainThread:@selector(JumpToResult:) withObject:result waitUntilDone:NO];
-                            isJump = true;
-                        }
-                    }
-                }else{  //UIImage不为空则说明现在正处于添加功能中拍照完成后的扫码阶段
-                    if([result hasPrefix:@"FS9"]||[result hasPrefix:@"Fosa"]){
-                        //判断所扫描的二维码属于fosa产品
-                        [self.session stopRunning];
-                        if (!isJump) {
-                             [self performSelectorOnMainThread:@selector(JumpToAdd:) withObject:result waitUntilDone:NO];
-                            isJump = true;
-                        }
-                        
-                    }else{
-                        NSString *message = [NSString stringWithFormat:@"this QRcode does not belong to FOSA.  Its content is %@",result];
-                        [self performSelectorOnMainThread:@selector(SystemAlert:) withObject:message waitUntilDone:NO];
+        if (_ScanModel == 0) {//当前是单个扫码模式，对每一个二维码进行逐个处理
+            [self OperationOfOneCode:result code:(AVMetadataMachineReadableCodeObject *)mobject];
+        }else if(_ScanModel == 1){//当前是多个扫码模式
+            [self OperationOfMoreCode:metadataObjects];
+        }
+    }
+}
+
+
+//扫一个二维码的处理
+- (void)OperationOfOneCode:(NSString *)result code:(AVMetadataMachineReadableCodeObject *)mobject
+{
+    if([[mobject type] isEqualToString:AVMetadataObjectTypeQRCode]){//如果是一个可读二维码对象
+        self.isGetResult = true;                                    //修改标志，不再自动放大镜头
+        [self ScanSuccess:@"ding.wav"];
+            if (self.food_photo == nil){//UIImage对象为空说明并不是在添加食物的过程进行扫码
+                [self performSelectorOnMainThread:@selector(setFocusCursorWithPoint:) withObject:(AVMetadataMachineReadableCodeObject *) mobject waitUntilDone:NO];      //在主线程中标记二维码的位置（还不够准确）
+                if([result hasPrefix:@"http://"]){//若是一个网站，就打开这个链接
+                    [self performSelectorOnMainThread:@selector(OpenURL:) withObject:result waitUntilDone:NO];
+                }else if([result hasPrefix:@"Fosa"]||[result hasPrefix:@"FS9"]){
+                    [self performSelectorOnMainThread:@selector(showOneMessage:) withObject:result waitUntilDone:NO]; //在主线程中展示这个物品的通知
+                }else{
+                    if (!isJump) {//当前还没有发生跳转
+                        [self performSelectorOnMainThread:@selector(JumpToResult:) withObject:result waitUntilDone:NO];
+                        isJump = true;  //不再处理其他跳转
                     }
                 }
+            }else{  //UIImage不为空则说明现在正处于添加功能中拍照完成后的扫码阶段
+                if([result hasPrefix:@"FS9"]||[result hasPrefix:@"Fosa"]){//判断所扫描的二维码属于fosa产品
+                    [self.session stopRunning];
+                    if (!isJump) {
+                         [self performSelectorOnMainThread:@selector(JumpToAdd:) withObject:result waitUntilDone:NO];
+                        isJump = true;
+                    }
+                }else{
+                    NSString *message = [NSString stringWithFormat:@"this QRcode does not belong to FOSA.  Its content is %@",result];
+                    [self performSelectorOnMainThread:@selector(SystemAlert:) withObject:message waitUntilDone:NO];
+                }
             }
-        }else{
-            if (!isJump) {
-                [self performSelectorOnMainThread:@selector(JumpToResult:) withObject:result waitUntilDone:NO];
-                isJump = true;
+    }else{
+        if (!isJump) {//不属于二维码对象，则将内容在另一个页面展示
+            [self performSelectorOnMainThread:@selector(JumpToResult:) withObject:result waitUntilDone:NO];
+            isJump = true;
+        }
+    }
+}
+
+//扫多个二维码的处理
+- (void)OperationOfMoreCode:(NSArray<__kindof AVMetadataObject *> *)metadataObjects{
+    self.isGetResult = true;
+    NSInteger count = 3;    //展示通知上限
+    NSString *content;
+    // 识别多个码的信息，并将每一个二维码的内容存放在不重复的数组中
+    for(AVMetadataObject *object in metadataObjects){
+        //如果是可读的码的对象
+        if ([object isKindOfClass:[AVMetadataMachineReadableCodeObject class]]){
+            content = [(AVMetadataMachineReadableCodeObject *) object stringValue];
+            //检查二维码信息是否已经被记录，否的话则添加记录
+            if([self.QRcode isContainObject:content]){
+                
+//                if ([_array containsObject:content]==0) {
+//                    [_array addObject:content]; //二维码内容添加
+//                }
+                [self ScanSuccess:@"ding.wav"];
+                if (self.QRcode.size < 4) {
+                    [self.QRcode enqueue:content];
+                }else if (self.QRcode.size == 4){
+                    [self.QRcode dequeue];
+                    [self.QRcode enqueue:content];
+                }
+                _flag++;
+                //队列操作
+                if (_codeQueue.size < 3 ) {
+                    [_codeQueue enqueue:(AVMetadataMachineReadableCodeObject *) object];
+                    NSLog(@"*****--%@",content);
+                }else if(_codeQueue.size == 3){
+                    [_codeQueue dequeue];
+                    [_codeQueue enqueue:(AVMetadataMachineReadableCodeObject *) object];
+                    NSLog(@"%@",_codeQueue.firstObject.stringValue);
+                }
+
             }
         }
-       // 识别多个码的信息，并将每一个二维码的内容存放在不重复的数组中
-            for(AVMetadataObject *object in metadataObjects){
-                //如果是可读的码的对象
-                if ([object isKindOfClass:[AVMetadataMachineReadableCodeObject class]]){
-                    content = [(AVMetadataMachineReadableCodeObject *) object stringValue];
-                    //检查二维码信息是否已经被记录，否的话则添加记录
-                    if([self.QRcode isContainObject:content]){
-                        
-                        if ([_array containsObject:content]==0) {
-                            [_array addObject:content]; //二维码内容添加
-                        }
-                        [self ScanSuccess:@"ding.wav"];
-                        if (self.QRcode.size < 4) {
-                            [self.QRcode enqueue:content];
-                        }else if (self.QRcode.size == 4){
-                            [self.QRcode dequeue];
-                            [self.QRcode enqueue:content];
-                        }
-                        _flag++;
-                        //队列操作
-                        if (_codeQueue.size < 3 ) {
-                            [_codeQueue enqueue:(AVMetadataMachineReadableCodeObject *) object];
-                            NSLog(@"*****--%@",content);
-                        }else if(_codeQueue.size == 3){
-                            [_codeQueue dequeue];
-                            [_codeQueue enqueue:(AVMetadataMachineReadableCodeObject *) object];
-                            NSLog(@"%@",_codeQueue.firstObject.stringValue);
-                        }
-//                        if (_ScanModel == 0) {
-//                            //扫描单个二维码模式
-//                            if (self.food_photo == nil) {//UIImage对象为空说明并不是在添加过程进行扫码
-//                                 [self performSelectorOnMainThread:@selector(setFocusCursorWithPoint:) withObject:(AVMetadataMachineReadableCodeObject *)object waitUntilDone:NO];      //在主线程中标记二维码的位置（还不够准确）
-//                                if([content hasPrefix:@"http://"]){
-//                                                    //打开这个链接
-//                                    [self performSelectorOnMainThread:@selector(OpenURL:) withObject:content waitUntilDone:NO];
-//                                }else if([content hasPrefix:@"Fosa"]||[content hasPrefix:@"FS9"]){
-//                                            [self performSelectorOnMainThread:@selector(showOneMessage:) withObject:content waitUntilDone:NO]; //在主线程中
-//                                }else{
-//                                    [self performSelectorOnMainThread:@selector(JumpToResult:) withObject:content waitUntilDone:NO];
-//                                }
-//                            }else{  //UIImage不为空则说明现在正处于添加功能中拍照完成后的扫码阶段
-//                                 //[self performSelectorOnMainThread:@selector(setFocusCursorWithPoint:) withObject:(AVMetadataMachineReadableCodeObject *)object waitUntilDone:NO];
-//                                if([content hasPrefix:@"FS9"]||[content hasPrefix:@"Fosa"]){
-//                                    //判断所扫描的二维码属于fosa产品
-//                                     [self performSelectorOnMainThread:@selector(JumpToAdd:) withObject:content waitUntilDone:NO];
-//                                }else{
-//                                    NSString *message = [NSString stringWithFormat:@"this QRcode does not belong to FOSA.  Its content is %@",content];
-//                                    [self performSelectorOnMainThread:@selector(SystemAlert:) withObject:message waitUntilDone:NO];
-//                                }
-//                            }
-//                        }
-                    }
-                }
-            }
-        //[self performSelectorOnMainThread:@selector(stopScanning) withObject:nil waitUntilDone:NO];
-        //对数组的二维码内容，按照位置进行排序,展示多个
-        if (_flag>0 && _ScanModel == 1) {
-            self.count = 0;
-            [self performSelectorOnMainThread:@selector(removeView) withObject:nil waitUntilDone:NO];
-            for (int i = 0; i < [_codeQueue size]-1; i++) {
-                for (int j = i+1; j < [_codeQueue size]; j++) {
-                    if ([self getCenterOfQRcode:[_codeQueue returnArray][i]].y > [self getCenterOfQRcode:[_codeQueue returnArray][j]].y ) {
-                        AVMetadataMachineReadableCodeObject *temp = [_codeQueue returnArray][i];
-                        [_codeQueue returnArray][i] = [_codeQueue returnArray][j];
-                        [_codeQueue returnArray][j] = temp;
-                    }
-                }
-            }
-            if ([_codeQueue size] < count) {
-                count = [_codeQueue size];
-            }
-            for (int k = 0;k < count;k++) {
-                //NSLog(@"%@",_array[k]);
-                //[self performSelectorOnMainThread:@selector(setFocusCursorWithPoint:) withObject:[_codeQueue returnArray][k] waitUntilDone:NO];
-                [self performSelectorOnMainThread:@selector(showMoreMessage:) withObject:[_codeQueue returnArray][k] waitUntilDone:NO];
-            }
-        }
+    }
+    //对数组的二维码内容，按照位置进行排序,展示多个
+    if (_flag>0 && _ScanModel == 1) {
+               self.count = 0;
+               [self performSelectorOnMainThread:@selector(removeView) withObject:nil waitUntilDone:NO];
+               for (int i = 0; i < [_codeQueue size]-1; i++) {
+                   for (int j = i+1; j < [_codeQueue size]; j++) {
+                       if ([self getCenterOfQRcode:[_codeQueue returnArray][i]].y > [self getCenterOfQRcode:[_codeQueue returnArray][j]].y ) {
+                           AVMetadataMachineReadableCodeObject *temp = [_codeQueue returnArray][i];
+                           [_codeQueue returnArray][i] = [_codeQueue returnArray][j];
+                           [_codeQueue returnArray][j] = temp;
+                       }
+                   }
+               }
+               if ([_codeQueue size] < count) {
+                   count = [_codeQueue size];
+               }
+               for (int k = 0;k < count;k++) {
+                   //NSLog(@"%@",_array[k]);
+                   [self performSelectorOnMainThread:@selector(SetFocusOnQRcode:) withObject:[_codeQueue returnArray][k] waitUntilDone:NO];
+                   [self performSelectorOnMainThread:@selector(showMoreMessage:) withObject:[_codeQueue returnArray][k] waitUntilDone:NO];
+               }
     }
 }
 /*
  获取环境光亮数值，判断是否打开闪光灯
  */
+
 #pragma mark- AVCaptureVideoDataOutputSampleBufferDelegate的方法
 - (void)captureOutput:(AVCaptureOutput *)captureOutput didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection {
     CFDictionaryRef metadataDict = CMCopyDictionaryOfAttachments(NULL,sampleBuffer, kCMAttachmentMode_ShouldPropagate);
@@ -697,7 +709,7 @@
     CFRelease(metadataDict);
     NSDictionary *exifMetadata = [[metadata objectForKey:(NSString *)kCGImagePropertyExifDictionary] mutableCopy];
     float brightnessValue = [[exifMetadata objectForKey:(NSString *)kCGImagePropertyExifBrightnessValue] floatValue];
-   // NSLog(@"%f",brightnessValue);
+                //NSLog(@"%f",brightnessValue);
     // 根据brightnessValue的值来打开和关闭闪光灯
     AVCaptureDevice *device = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
     BOOL result = [device hasTorch];// 判断设备是否有闪光灯
@@ -709,10 +721,6 @@
             [self.flashBtn removeFromSuperview];
         }
     }
-    
-    //判断每一帧图片中是否存在矩形
-   // UIImage *buffer_image = [self imageFromSampleBuffer:sampleBuffer];
-   // [self analyseRectImage:buffer_image];
 }
 
 // Create a UIImage from sample buffer data
@@ -816,13 +824,14 @@
 
 #pragma mark - 生成弹窗，显示二维码内容
 -(void)showMoreMessage:(AVMetadataMachineReadableCodeObject *)code{
+    AlertCount++;
     NSString *message = [code stringValue];
     CGFloat mainWidth = [UIScreen mainScreen].bounds.size.width;
     CGFloat navHeight = self.navigationController.navigationBar.frame.size.height;
     FoodMoreInfoView *circleAlertView = [[FoodMoreInfoView alloc]init];
     circleAlertView.model = [self OpenAndSelectsql:message];
     circleAlertView.frame = CGRectMake(0,(self.count)*(mainWidth*0.5+5)+1.5*navHeight,mainWidth*0.5,mainWidth*0.5);
-    circleAlertView.backgroundColor = [UIColor grayColor];
+    //circleAlertView.backgroundColor = [UIColor grayColor];
     //circleAlertView.layer.cornerRadius = mainWidth*0.2;
     circleAlertView.layer.masksToBounds = YES;
     
@@ -836,17 +845,55 @@
 
     switch (_count) {
         case 0:_circleAlertView1 = circleAlertView;
+            //_circleAlertView1.backgroundColor = [UIColor colorWithRed:237/255 green:0/255 blue:0/255 alpha:1.0];
+            _circleAlertView1.backgroundColor = [UIColor redColor];
+            
+            CGPoint point1 = [self getCenterOfQRcode:code];
+            NSLog(@"%f----%f",point1.x,point1.y);
+            CGPoint center1 = CGPointZero;
+            center1.x = [UIScreen mainScreen].bounds.size.width*(1-point1.y);
+            center1.y = [UIScreen mainScreen].bounds.size.height*(point1.x);
+            self.focusCursor1.center = center1;
+            //self.focusCursor1.transform = CGAffineTransformMakeScale(2,2);
+            self.focusCursor1.alpha = 1.0;
+            
             [self.view addSubview:_circleAlertView1];
            [_circleAlertView1.close addGestureRecognizer:tapgestureRecognizer];
             tapgestureRecognizer.view.tag = 0;
             break;
         case 1:_circleAlertView2 = circleAlertView;
+            
+            //_circleAlertView2.backgroundColor = [UIColor colorWithRed:0/255 green:251/255 blue:51/255 alpha:1.0];;
+              _circleAlertView2.backgroundColor = [UIColor greenColor];
+            
+            CGPoint point2 = [self getCenterOfQRcode:code];
+            NSLog(@"%f----%f",point2.x,point2.y);
+            CGPoint center2 = CGPointZero;
+            center2.x = [UIScreen mainScreen].bounds.size.width*(1-point2.y);
+            center2.y = [UIScreen mainScreen].bounds.size.height*(point2.x);
+            self.focusCursor2.center = center2;
+            //self.focusCursor2.transform = CGAffineTransformMakeScale(2,2);
+            self.focusCursor2.alpha = 1.0;
+            
             [self.view addSubview:_circleAlertView2];
+            
             [_circleAlertView2.close addGestureRecognizer:tapgestureRecognizer];
             tapgestureRecognizer.view.tag = 1;
             break;
         case 2:_circleAlertView3 = circleAlertView;
+           
+              _circleAlertView3.backgroundColor = [UIColor blueColor];
+            
+            CGPoint point3 = [self getCenterOfQRcode:code];
+            NSLog(@"%f----%f",point3.x,point3.y);
+            CGPoint center3 = CGPointZero;
+            center3.x = [UIScreen mainScreen].bounds.size.width*(1-point3.y);
+            center3.y = [UIScreen mainScreen].bounds.size.height*(point3.x);
+            self.focusCursor3.center = center3;
+            self.focusCursor3.alpha = 1.0;
+            
             [self.view addSubview:_circleAlertView3];
+            
             [_circleAlertView3.close addGestureRecognizer:tapgestureRecognizer];
             tapgestureRecognizer.view.tag = 2;
             break;
@@ -901,10 +948,13 @@
     UITapGestureRecognizer *tap = (UITapGestureRecognizer *)sender;
     if (tap.view.tag == 0) {
         [_circleAlertView1 removeFromSuperview];
+        AlertCount--;
     }else if (tap.view.tag == 1){
         [_circleAlertView2 removeFromSuperview];
+        AlertCount--;
     }else if (tap.view.tag == 2){
         [_circleAlertView3 removeFromSuperview];
+        AlertCount--;
     }
 }
 
@@ -918,7 +968,7 @@
     [self.session startRunning];
 }
 #pragma mark - 设置在二维码位置显示聚焦光标
--(void)setFocusCursorWithPoint:(AVMetadataMachineReadableCodeObject *)objc
+- (void)setFocusCursorWithPoint:(AVMetadataMachineReadableCodeObject *)objc
 {
     //[self.session stopRunning];//停止捕获
   //  NSLog(@"location");
@@ -937,8 +987,24 @@
     }];
     //[self.session startRunning];
 }
+
+- (void)SetFocusOnQRcode:(AVMetadataMachineReadableCodeObject *)objc
+{
+    CGPoint point = [self getCenterOfQRcode:objc];
+    CGPoint center = CGPointZero;
+    center.x = [UIScreen mainScreen].bounds.size.width*(1-point.y);
+    center.y = [UIScreen mainScreen].bounds.size.height*(point.x);
+    self.focusCursor.center = center;
+    //self.focusCursor.transform = CGAffineTransformMakeScale(3,3);
+    self.focusCursor.alpha = 1.0;
+//    [UIView animateWithDuration:2.0 animations:^{
+//        self.focusCursor.transform = CGAffineTransformIdentity;
+//    } completion:^(BOOL finished) {
+//        self.focusCursor.alpha = 0;
+//    }];
+}
 #pragma mark - 数据库查询的方法
--(FoodModel *)OpenAndSelectsql:(NSString *)device
+- (FoodModel *)OpenAndSelectsql:(NSString *)device
 {
     NSString *path = [self getPath];
     int sqlStatus = sqlite3_open_v2([path UTF8String], &_database,SQLITE_OPEN_CREATE|SQLITE_OPEN_READWRITE,NULL);
@@ -1008,9 +1074,15 @@
     //创建CIImage对象
     CIImage *ciImage  = [[CIImage alloc]initWithImage:image];
     //创建探测器
-    CIDetector *ciDetector = [CIDetector detectorOfType:CIDetectorTypeQRCode context:context options:@{CIDetectorAccuracy:CIDetectorAccuracyHigh}];
+    CIDetector *ciDetector = [CIDetector detectorOfType:CIDetectorTypeRectangle context:context options:@{CIDetectorAccuracy:CIDetectorAccuracyHigh}];
     // 取得识别结果
     NSArray *features = [ciDetector featuresInImage:ciImage];
+    if(features.count == 0){
+        [self SystemAlert:@"图片中没有识别到矩形"];
+        return;
+    }else{
+        NSLog(@"%lu",(unsigned long)features.count);
+    }
 }
 
 #pragma mark -  选取相册图片进行识别
@@ -1049,25 +1121,21 @@
     // CIDetector(CIDetector可用于人脸识别)进行图片解析，从而使我们可以便捷的从相册中获取到二维码
     [self dismissViewControllerAnimated:YES completion:nil];
     
-    // 声明一个 CIDetector，并设定识别类型 CIDetectorTypeQRCode
-    CIDetector *detector = [CIDetector detectorOfType:CIDetectorTypeQRCode context:nil options:@{CIDetectorAccuracy: CIDetectorAccuracyHigh}];
-
-    // 取得识别结果
-    NSArray *features = [detector featuresInImage:[CIImage imageWithCGImage:image.CGImage]];
-
-    if (features.count == 0) {
-        [self SystemAlert:@"识别不到二维码"];
-        return;
-    } else {
-        CIQRCodeFeature *firstfeature = [features objectAtIndex:0];
-        NSString *firstResult = firstfeature.messageString;
-        [self SystemAlert:firstResult];
-//        for (int index = 0; index < [features count]; index ++) {
-//            CIQRCodeFeature *feature = [features objectAtIndex:index];
-//            NSString *resultStr = feature.messageString;
-//            NSLog(@"相册中读取二维码数据信息 - - %@", resultStr);
-//        }
-    }
+    [self analyseRectImage:image];
+//    // 声明一个 CIDetector，并设定识别类型 CIDetectorTypeQRCode
+//    CIDetector *detector = [CIDetector detectorOfType:CIDetectorTypeQRCode context:nil options:@{CIDetectorAccuracy: CIDetectorAccuracyHigh}];
+//
+//    // 取得识别结果
+//    NSArray *features = [detector featuresInImage:[CIImage imageWithCGImage:image.CGImage]];
+//
+//    if (features.count == 0) {
+//        [self SystemAlert:@"识别不到二维码"];
+//        return;
+//    } else {
+//        CIQRCodeFeature *firstfeature = [features objectAtIndex:0];
+//        NSString *firstResult = firstfeature.messageString;
+//        [self SystemAlert:firstResult];
+//    }
 
 }
 - (void)getImageAndDetect

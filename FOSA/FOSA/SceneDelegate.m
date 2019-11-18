@@ -1,5 +1,6 @@
-#import "SceneDelegate.h"
 
+#import "SceneDelegate.h"
+#import "RootTabBarViewController.h"
 @interface SceneDelegate ()
 
 @end
@@ -11,6 +12,14 @@
     // Use this method to optionally configure and attach the UIWindow `window` to the provided UIWindowScene `scene`.
     // If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
     // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
+    //在这里手动创建新的window
+        if (scene) {
+            UIWindowScene *windowScene = (UIWindowScene *)scene;
+            self.window = [[UIWindow alloc] initWithWindowScene:windowScene];
+            self.window.frame = CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.height);
+            self.window.rootViewController = [RootTabBarViewController new];
+            [self.window makeKeyAndVisible];
+        }
 }
 
 

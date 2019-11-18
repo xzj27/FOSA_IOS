@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface FosaMainViewController : ViewController
 @property (nonatomic,strong) UIScrollView *CategoryScrollview;
 @property (nonatomic,strong) UICollectionView *StorageItemView;
-@property (nonatomic,strong) UIButton *QRscan;
+@property (nonatomic,strong) UIButton *QRscan,*Remindbtn;
 @property (nonatomic,assign) CGFloat mainWidth,mainHeight,navHeight;
 @end
 
