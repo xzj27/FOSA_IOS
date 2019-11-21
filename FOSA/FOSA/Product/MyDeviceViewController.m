@@ -8,7 +8,9 @@
 
 #import "MyDeviceViewController.h"
 
-@interface MyDeviceViewController ()
+@interface MyDeviceViewController ()<UITableViewDelegate,UITableViewDataSource>{
+    NSArray *arrayData;
+}
 
 @end
 
@@ -17,6 +19,23 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
+    
+}
+
+- (void)InitDeviceView{
+    self.mainWidth = [UIScreen mainScreen].bounds.size.width;
+    self.mainHeight = [UIScreen mainScreen].bounds.size.height;
+    self.navheight = self.navigationController.navigationBar.frame.size.height;
+    //device menu
+    self.deviceTable = [[UITableView alloc]initWithFrame:CGRectMake(0,_navheight+5, _mainWidth/5, _mainHeight-_navheight-5) style:UITableViewStylePlain];
+    self.deviceTable.delegate = self;
+    self.deviceTable.dataSource = self;
+    self.deviceTable.showsVerticalScrollIndicator = NO;
+    [self.deviceTable setSeparatorColor:[UIColor grayColor]];
+    [self.view addSubview:self.deviceTable];
+
+    //content
+    self.contentView = [[UIView alloc]initWithFrame:CGRectMake(self.mainWidth/5,5, self.mainWidth*4/5, self.mainHeight-_navheight-5)];
 }
 
 /*
