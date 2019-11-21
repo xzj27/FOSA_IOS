@@ -8,10 +8,8 @@
 
 #import "FosaPoundViewController.h"
 #import <UserNotifications/UserNotifications.h>
-#import "SealerTableViewCell.h"
 #import "ScanOneCodeViewController.h"
 
-#import "SealerModel.h"
 #import "SealerTable.h"
 //图片宽高的最大值
 #define KCompressibilityFactor 1280.00
@@ -20,6 +18,8 @@
     NSArray *arrayData;
     //标记当前是否展开
     Boolean isExpand;
+    //table cell的内容
+    NSString *foodname,*expireDate,*storageDate;
 }
 @property (nonatomic,strong) UIButton *send;
 @end
@@ -211,14 +211,17 @@
 {
     static NSString *cellIdentifier = @"cell";
     //初始化cell，并指定其类型
-    UITableViewCell *cell = (SealerTableViewCell*)[tableView  dequeueReusableCellWithIdentifier:cellIdentifier];
+    UITableViewCell *cell = [tableView  dequeueReusableCellWithIdentifier:cellIdentifier];
+    
     if (cell == nil) {
         //创建cell
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:cellIdentifier];
     }
     //取消点击cell时显示的背景色
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
     cell.textLabel.text = arrayData[indexPath.row];
+    cell.detailTextLabel.text = @"2019/11/20";
+    
     //返回cell
     return cell;
 }

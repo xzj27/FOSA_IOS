@@ -91,6 +91,7 @@
     self.mainWidth = [UIScreen mainScreen].bounds.size.width;
     self.mainHeight = [UIScreen mainScreen].bounds.size.height;
     self.navHeight = self.navigationController.navigationBar.frame.size.height;
+    NSLog(@"======%f",self.navHeight);
     //初始化layout
     UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc]init];
     //setting the rolling direction of the collectionViw

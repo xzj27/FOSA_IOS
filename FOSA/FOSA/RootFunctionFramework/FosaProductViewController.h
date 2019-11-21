@@ -12,6 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface FosaProductViewController : ViewController
 @property (nonatomic,assign) CGFloat mainWidth,mainHeight,navHeight;
+@property (nonatomic,strong) UIView *rootView;
 @end
 
 NS_ASSUME_NONNULL_END

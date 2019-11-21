@@ -77,19 +77,15 @@ CGFloat margin = 0;
         }
         [self addSubview:lbl];
         [self.labelM addObject:lbl];
-        
         // 添加点击事件
         UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(menuAction:)];
         lbl.userInteractionEnabled=YES;
         [lbl addGestureRecognizer:tap];
     }
-    
     UILabel *lastLbl = [self.labelM lastObject];
     CGFloat maxWidth = CGRectGetMaxX(lastLbl.frame) + margin;
-    
     // 设置内容宽度
     self.contentSize = CGSizeMake(maxWidth, 0);
-    
     // 默认滚到对应的下标
     [self tabOffset:index];
 }

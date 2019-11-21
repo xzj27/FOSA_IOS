@@ -42,13 +42,19 @@
     [self InitContentView];
 }
 - (void)InitContentView{
-    UIView *navV = [[UIView alloc] initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, 64)];
+    self.rootView = [[UIView alloc]initWithFrame:CGRectMake(0, self.navHeight, self.mainWidth, self.mainHeight)];
+    _rootView.backgroundColor = [UIColor whiteColor];
+    
+    
+    self.navHeight = self.navigationController.navigationBar.frame.size.height;
+    NSLog(@"------%f",self.navHeight);
+    UIView *navV = [[UIView alloc] initWithFrame:CGRectMake(0, self.navHeight, SCREEN_WIDTH, self.navHeight)];
     navV.backgroundColor = [UIColor whiteColor];
     [self.view addSubview:navV];
     
     NSArray *titles = @[@"My Device",@"Fosa Device"];
     self.fosaScrollview = [[FosaScrollview alloc] init];
-    [self.fosaScrollview configParameterFrame:CGRectMake(0, CGRectGetMaxY(navV.frame), SCREEN_WIDTH, 50) titles:titles index:3 block:^(NSInteger index) {
+    [self.fosaScrollview configParameterFrame:CGRectMake(0, CGRectGetMaxY(navV.frame), SCREEN_WIDTH, 50) titles:titles index:0 block:^(NSInteger index) {
         [self.productContent updateTab:index];
     }];
     self.fosaScrollview.bounces = NO;
@@ -58,12 +64,6 @@
     [self.view addSubview:self.productContent];
     
     NSMutableArray *contentM = [NSMutableArray array];
-    //在此处添加视图内容
-//    for (NSInteger i = 0; i < titles.count; i++) {
-//        UIViewController *vc = [[UIViewController alloc] init];
-//        vc.view.backgroundColor = RandomColor;
-//        [contentM addObject:vc];
-//    }
     MyDeviceViewController *mydevice = [[MyDeviceViewController alloc]init];
     mydevice.view.backgroundColor = RandomColor;
     [contentM addObject:mydevice];
@@ -72,14 +72,11 @@
     other.view.backgroundColor = RandomColor;
     [contentM addObject:other];
     
-    [self.productContent configParam:contentM index:3 block:^(NSInteger index) {
+    [self.productContent configParam:contentM index:2 block:^(NSInteger index) {
         [self.fosaScrollview tabOffset:index];
     }];
 }
-
-
 - (void)addEvent{
-    
     AddViewController *add = [[AddViewController alloc]init];
     add.hidesBottomBarWhenPushed = YES;
     
