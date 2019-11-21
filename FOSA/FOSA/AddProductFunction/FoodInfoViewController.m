@@ -465,7 +465,7 @@ NSLog(@"dele fail");
 }
 #pragma mark - 更新数据
 -(void) UpdateInfo{
-    NSString *sql = [NSString stringWithFormat:@"UPDATE Fosa2 SET foodName = '%@',aboutFood = '%@',expireDate = '%@',remindDate = '%@',photoPath = '%@'  WHERE deviceName = '%@'",self.foodName.text,self.aboutFood.text,self.expireDate.text,self.remindDate.text,self.foodName.text,self.deviceID];
+    NSString *sql = [NSString stringWithFormat:@"UPDATE Fosa2 SET foodName = '%@',aboutFood = '%@',expireDate = '%@',remindDate = '%@',photoPath = '%@'  WHERE deviceName = '%@'",self.foodName.text,self.aboutFood.text,expire_Date,remind_Date,self.foodName.text,self.deviceID];
     const char *updateSql = [sql UTF8String];
     int updateResult = sqlite3_exec(_database,updateSql,NULL,NULL,NULL);
     if (updateResult != SQLITE_OK) {
