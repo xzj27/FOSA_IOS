@@ -101,17 +101,15 @@
    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithImage:[UIImage imageNamed:@"icon_done"] style:UIBarButtonItemStylePlain target:nil action:nil];
     self.navigationItem.rightBarButtonItem.target = self;     self.navigationItem.rightBarButtonItem.action = @selector(finish);
     
-    
     self.mainWidth = [UIScreen mainScreen].bounds.size.width;
     self.mainheight = [UIScreen mainScreen].bounds.size.height;
     self.navHeight = self.navigationController.navigationBar.frame.size.height;
     
+    //底部滚动视图
     self.rootScrollview = [[UIScrollView alloc]initWithFrame:CGRectMake(0, _navHeight, _mainWidth, _mainheight)];
-
     _rootScrollview.contentSize = CGSizeMake(self.view.frame.size.width,_mainheight*2);
     [self.view addSubview:_rootScrollview];
     
-
     //添加头部
     CGFloat headerWidth = _mainWidth-20;
     CGFloat headerheight = _mainheight/3;

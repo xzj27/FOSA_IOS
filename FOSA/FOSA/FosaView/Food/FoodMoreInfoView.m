@@ -145,13 +145,13 @@
  */
 -(void)setModel:(FoodModel *)model
 {
- NSLog(@"%@-------%@------%@-------%@",model.device_name,model.food_name,model.expire_date,model.remind_date);
+// NSLog(@"%@-------%@------%@-------%@",model.device_name,model.food_name,model.expire_date,model.remind_date);
     _model = model;
     self.iconImageView.image = [self getImage:model.icon];
     self.nameLabel.text  = model.device_name;
-    if (model.device_name == NULL) {
-        self.nameLabel.text = @"该设备没有记录";
-    }
+//    if (model.device_name == NULL) {
+//        self.nameLabel.text = @"该设备没有记录";
+//    }
     self.foodName.text   = model.food_name;
     self.expireDate.text = model.expire_date;
     self.remindDate.text = model.remind_date;
