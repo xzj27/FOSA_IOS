@@ -52,9 +52,9 @@
     navV.backgroundColor = [UIColor whiteColor];
     [self.view addSubview:navV];
     
-    NSArray *titles = @[@"My Device",@"Fosa Device"];
+    NSArray *titles = @[@"Fosa Device",@"My Device"];
     self.fosaScrollview = [[FosaScrollview alloc] init];
-    [self.fosaScrollview configParameterFrame:CGRectMake(0, CGRectGetMaxY(navV.frame), SCREEN_WIDTH, 50) titles:titles index:0 block:^(NSInteger index) {
+    [self.fosaScrollview configParameterFrame:CGRectMake(0, CGRectGetMaxY(navV.frame), [UIScreen mainScreen].bounds.size.width, 50) titles:titles index:0 block:^(NSInteger index) {
         [self.productContent updateTab:index];
     }];
     self.fosaScrollview.bounces = NO;
@@ -72,7 +72,7 @@
     other.view.backgroundColor = RandomColor;
     [contentM addObject:other];
     
-    [self.productContent configParam:contentM index:2 block:^(NSInteger index) {
+    [self.productContent configParam:contentM index:0 block:^(NSInteger index) {
         [self.fosaScrollview tabOffset:index];
     }];
 }

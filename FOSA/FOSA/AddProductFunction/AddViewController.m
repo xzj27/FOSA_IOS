@@ -166,55 +166,70 @@
     _aboutFood.layer.borderWidth = 1.f;
     _aboutFood.layer.borderColor = [[UIColor grayColor] CGColor];
     _aboutFood.placeholder = @"您可以在这里输入一些说明!";
+    self.aboutFood.backgroundColor = [UIColor colorWithRed:180/255.0 green:180/255.0 blue:180/255.0 alpha:1.0];
     _aboutFood.font = [UIFont fontWithName:@"Arial" size:15.0f];
     _aboutFood.textColor = [UIColor blackColor];
-    //_aboutFood.textAlignment = UITextAlignmentLeft;
     _aboutFood.delegate = self;
     _aboutFood.returnKeyType = UIReturnKeyDone;
     [self.rootScrollview addSubview:_aboutFood];
-
-    //过期日期视图
-    self.expireView = [[UIView alloc]initWithFrame:CGRectMake(10, headerheight+140,headerWidth, 50)];
-    _expireView.backgroundColor = [UIColor colorWithRed:180/255.0 green:180/255.0 blue:180/255.0 alpha:1.0];
-    _expireView.layer.cornerRadius = 5;
-    [self.rootScrollview addSubview:_expireView];
-    
-    self.expireDate = [[UITextView alloc]initWithFrame:CGRectMake(10, 5, headerWidth/2, 40)];
-    _expireDate.textColor = [UIColor blackColor];
-    _expireDate.text = @"Expire Date";
-    _expireDate.backgroundColor = [UIColor clearColor];
-    _expireDate.userInteractionEnabled = NO;
-    [self.expireView addSubview:_expireDate];
-    self.expireBtn = [[UIButton alloc]initWithFrame:CGRectMake(headerWidth-45, 5, 40, 40)];
-    [_expireBtn setImage:[UIImage imageNamed:@"icon_date"] forState:UIControlStateNormal];
-    [self.expireView addSubview:_expireBtn];
-    [_expireBtn addTarget:self action:@selector(ExpireDateSelect) forControlEvents:UIControlEventTouchUpInside];
     
     //提醒日期视图
-    self.remindView = [[UIView alloc]initWithFrame:CGRectMake(10, headerheight+200,headerWidth, 50)];
+    self.remindView = [[UIView alloc]initWithFrame:CGRectMake(10, headerheight+140,headerWidth, 50)];
     _remindView.backgroundColor = [UIColor colorWithRed:180/255.0 green:180/255.0 blue:180/255.0 alpha:1.0];
     _remindView.layer.cornerRadius = 5;
     [self.rootScrollview addSubview:_remindView];
     
-    self.remindDate = [[UITextView alloc]initWithFrame:CGRectMake(10, 5, headerWidth/2, 40)];
+    self.remindDate = [[UITextView alloc]initWithFrame:CGRectMake(90, 5, headerWidth/2, 40)];
     _remindDate.textColor = [UIColor blackColor];
-    _remindDate.text = @"Remind Date";
     _remindDate.backgroundColor = [UIColor clearColor];
     _remindDate.userInteractionEnabled = NO;
     [self.remindView addSubview:_remindDate];
+    
+    UILabel *remindLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, 90, 40)];
+    remindLabel.text = @"Remind Date:";
+    remindLabel.font = [UIFont systemFontOfSize:13];
+    [self.remindView addSubview:remindLabel];
     
     self.remindBtn = [[UIButton alloc]initWithFrame:CGRectMake(headerWidth-45, 5, 40, 40)];
     [_remindBtn setImage:[UIImage imageNamed:@"icon_date"] forState:UIControlStateNormal];
     [self.remindView addSubview:_remindBtn];
     [_remindBtn addTarget:self action:@selector(RemindDateSelect) forControlEvents:UIControlEventTouchUpInside];
     
+    //过期日期视图
+    self.expireView = [[UIView alloc]initWithFrame:CGRectMake(10, headerheight+200,headerWidth, 50)];
+    _expireView.backgroundColor = [UIColor colorWithRed:180/255.0 green:180/255.0 blue:180/255.0 alpha:1.0];
+    _expireView.layer.cornerRadius = 5;
+    [self.rootScrollview addSubview:_expireView];
+    
+    self.expireDate = [[UITextView alloc]initWithFrame:CGRectMake(90, 5, headerWidth/2, 40)];
+    _expireDate.textColor = [UIColor blackColor];
+    _expireDate.backgroundColor = [UIColor clearColor];
+    _expireDate.userInteractionEnabled = NO;
+    [self.expireView addSubview:_expireDate];
+    
+    UILabel *expireLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, 90, 40)];
+    expireLabel.text = @"Expire Date:";
+    expireLabel.font = [UIFont systemFontOfSize:13];
+    [self.expireView addSubview:expireLabel];
+    
+    self.expireBtn = [[UIButton alloc]initWithFrame:CGRectMake(headerWidth-45, 5, 40, 40)];
+    [_expireBtn setImage:[UIImage imageNamed:@"icon_date"] forState:UIControlStateNormal];
+    [self.expireView addSubview:_expireBtn];
+    [_expireBtn addTarget:self action:@selector(ExpireDateSelect) forControlEvents:UIControlEventTouchUpInside];
+    
     //存储位置视图
     self.locationView = [[UIView alloc]initWithFrame:CGRectMake(10, headerheight+260,headerWidth, 50)];
     _locationView.backgroundColor = [UIColor colorWithRed:180/255.0 green:180/255.0 blue:180/255.0 alpha:1.0];
     _locationView.layer.cornerRadius = 5;
     [self.rootScrollview addSubview:_locationView];
+    
+    UILabel *locationLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, 90, 40)];
+    locationLabel.text = @"Location";
+    locationLabel.font = [UIFont systemFontOfSize:13];
+    [self.locationView addSubview:locationLabel];
+    
     self.location = [[UITextView alloc]initWithFrame:CGRectMake(10, 5, headerWidth/2, 40)];
-    _location.text = @"Storage Location";
+//    _location.text = @"Storage Location";
     _location.textColor =[UIColor blackColor];
     _location.backgroundColor = [UIColor clearColor];
     [self.locationView addSubview:_location];
@@ -228,8 +243,14 @@
     _weightView.layer.cornerRadius = 5;
     [self.rootScrollview addSubview:_weightView];
     
+    UILabel *weightLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, 90, 40)];
+    weightLabel.text = @"Weight";
+    weightLabel.font = [UIFont systemFontOfSize:13];
+    [self.weightView addSubview:weightLabel];
+    
     self.weightBtn = [[UIButton alloc]initWithFrame:CGRectMake(headerWidth/2-50, 5, 40, 40)];
     [_weightBtn setImage:[UIImage imageNamed:@"icon_weight"] forState:UIControlStateNormal];
+    [_weightBtn setTitle:@"Weight" forState:UIControlStateNormal];
     [self.weightView addSubview:_weightBtn];
     
     //卡路里视图
@@ -238,9 +259,15 @@
     _calorieView.layer.cornerRadius = 5;
     [self.rootScrollview addSubview:_calorieView];
     
+    UILabel *calorieLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, 90, 40)];
+       calorieLabel.text = @"Calorie";
+       calorieLabel.font = [UIFont systemFontOfSize:13];
+       [self.calorieView addSubview:calorieLabel];
+    
     self.calBtn = [[UIButton alloc]initWithFrame:CGRectMake(headerWidth/2-50, 5, 40, 40)];
     //_calBtn.backgroundColor = [UIColor blackColor];
     [self.calBtn setImage:[UIImage imageNamed:@"icon_calorie"] forState:UIControlStateNormal];
+    [_calBtn setTitle:@"Calorie" forState:UIControlStateNormal];
     [self.calorieView addSubview:_calBtn];
 }
 -(void)ExpireDateSelect{
@@ -260,12 +287,12 @@
     [dateFormatter setDateFormat:@"yyyy-MM-dd"];
     NSString *strDate = [dateFormatter stringFromDate:selectdate];
     if(isRemind){
-        self.remindDate.text = [NSString stringWithFormat:@"提醒日期为:%@",strDate];
+        self.remindDate.text = strDate;
         _redate = selectdate;
         remind_Date = strDate;
         NSLog(@"%@",remind_Date);
     }else{
-        self.expireDate.text = [NSString stringWithFormat:@"有效日期到:%@",strDate];
+        self.expireDate.text = strDate;
         _exdate = selectdate;
         expire_Date = strDate;
         NSLog(@"%@",expire_Date);
@@ -354,7 +381,7 @@
     char *erro = 0;
     if(self.foodName.text != nil){
     //插入语句
-    NSString *insertSql =[NSString stringWithFormat:@"insert into Fosa2(foodName,deviceName,aboutFood,expireDate,remindDate,photoPath)values('%@','%@','%@','%@','%@','%@')",_foodName.text,_deviceName.text,_aboutFood.text,ExpireDate,remindDate,self.foodName.text];
+    NSString *insertSql =[NSString stringWithFormat:@"insert into Fosa2(foodName,deviceName,aboutFood,expireDate,remindDate,photoPath)values('%@','%@','%@','%@','%@','%@')",_foodName.text,_deviceName.text,_aboutFood.text,self.expireDate.text,self.remindDate.text,self.foodName.text];
         int insertResult = sqlite3_exec(self.database, insertSql.UTF8String,NULL, NULL,&erro);
         if(insertResult == SQLITE_OK){
             NSLog(@"添加数据成功");
@@ -400,9 +427,7 @@
     [self InsertDataIntoSqlite:expire_Date remind:remind_Date];
     
     //[self SavePhotoIntoLibrary:self.imageView1.image];
-    picturePath = [self Savephoto:self.imageView1.image];
-    
-    [self initNotification];
+    picturePath = [self Savephoto:[self fixOrientation:self.imageView1.image]];
     //格式化时间
     NSDateFormatter * formatter = [[NSDateFormatter alloc]init];
     [formatter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
@@ -442,6 +467,80 @@
     }
     return filePath;
 }
+
+- (UIImage *)normalizedImage:(UIImage *)img {
+    if (img.imageOrientation == UIImageOrientationUp) return img;
+
+    UIGraphicsBeginImageContextWithOptions(img.size, NO, img.scale);
+    [img drawInRect:(CGRect){0, 0, img.size}];
+    UIImage *normalizedImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return normalizedImage;
+}
+- (UIImage *)fixOrientation:(UIImage *)aImage {
+// No-op if the orientation is already correct
+    if (aImage.imageOrientation == UIImageOrientationUp)
+        return aImage;
+    // We need to calculate the proper transformation to make the image upright.
+    // We do it in 2 steps: Rotate if Left/Right/Down, and then flip if Mirrored.
+    CGAffineTransform transform = CGAffineTransformIdentity;
+     switch (aImage.imageOrientation) {
+         case UIImageOrientationDown:
+         case UIImageOrientationDownMirrored:
+             transform = CGAffineTransformTranslate(transform, aImage.size.width, aImage.size.height);
+             transform = CGAffineTransformRotate(transform, M_PI);
+             break;
+         case UIImageOrientationLeft:
+         case UIImageOrientationLeftMirrored:
+             transform = CGAffineTransformTranslate(transform, aImage.size.width, 0);
+             transform = CGAffineTransformRotate(transform, M_PI_2);
+             break;
+         case UIImageOrientationRight:
+         case UIImageOrientationRightMirrored:
+             transform = CGAffineTransformTranslate(transform, 0, aImage.size.height);
+             transform = CGAffineTransformRotate(transform, -M_PI_2);
+             break;
+         default:
+             break;
+     }
+    switch (aImage.imageOrientation) {
+        case UIImageOrientationUpMirrored:
+        case UIImageOrientationDownMirrored:
+            transform = CGAffineTransformTranslate(transform, aImage.size.width, 0);
+            transform = CGAffineTransformScale(transform, -1, 1);
+            break;
+        case UIImageOrientationLeftMirrored:
+        case UIImageOrientationRightMirrored:
+            transform = CGAffineTransformTranslate(transform, aImage.size.height, 0);
+            transform = CGAffineTransformScale(transform, -1, 1);
+            break;
+        default:
+            break;
+    }
+    // Now we draw the underlying CGImage into a new context, applying the transform
+    // calculated above.
+     CGContextRef ctx = CGBitmapContextCreate(NULL, aImage.size.width, aImage.size.height,CGImageGetBitsPerComponent(aImage.CGImage), 0,CGImageGetColorSpace(aImage.CGImage),CGImageGetBitmapInfo(aImage.CGImage));
+    CGContextConcatCTM(ctx, transform);
+    switch (aImage.imageOrientation) {
+        case UIImageOrientationLeft:
+        case UIImageOrientationLeftMirrored:
+        case UIImageOrientationRight:
+        case UIImageOrientationRightMirrored:
+            CGContextDrawImage(ctx, CGRectMake(0,0,aImage.size.height,aImage.size.width), aImage.CGImage);
+            break;
+            default:
+            CGContextDrawImage(ctx, CGRectMake(0,0,aImage.size.width,aImage.size.height), aImage.CGImage);
+            break;
+    }
+// And now we just create a new UIImage from the drawing context
+    CGImageRef cgimg = CGBitmapContextCreateImage(ctx);
+    UIImage *img = [UIImage imageWithCGImage:cgimg];
+    CGContextRelease(ctx);
+    CGImageRelease(cgimg);
+    return img;
+}
+
+
 //取出保存在本地的图片
 //-(UIImage*)getImage{
 //    NSArray *paths =NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask,YES);
@@ -451,144 +550,6 @@
 //    NSLog(@"=== %@", img);
 //    return img;
 //}
-#pragma mark - 初始化和注册通知
--(void)initNotification{
-    // 必须写代理，不然无法监听通知的接收与点击
-    UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
-    center.delegate = self;
-    
-    //设置预设好的交互类型，NSSet里面是设置好的UNNotificationCategory
-    [center setNotificationCategories:[self createNotificationCategoryActions]];
-    
-    [center getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings * _Nonnull settings) {
-    if (settings.authorizationStatus==UNAuthorizationStatusNotDetermined){
-        [center requestAuthorizationWithOptions:(UNAuthorizationOptionAlert|UNAuthorizationOptionBadge | UNAuthorizationOptionSound) completionHandler:^(BOOL granted, NSError * _Nullable error){
-                if (granted) {
-                    } else {
-                    }
-                }];
-            }
-        else{
-           //do other things
-        }
-    }];
-    //移除一条通知
-   // [center removePendingNotificationRequestsWithIdentifiers:@[@"time interval request"]];
-}
-
-#pragma mark - 代理回调方法，通知即将展示的时候
-- (void)userNotificationCenter:(UNUserNotificationCenter *)center willPresentNotification:(UNNotification *)notification withCompletionHandler:(void (^)(UNNotificationPresentationOptions options))completionHandler{
-    NSLog(@"即将展示通知");
-//   UNNotificationRequest *request = notification.request; // 原始请求
-//    NSDictionary * userInfo = notification.request.content.userInfo;//userInfo数据
-//    UNNotificationContent *content = request.content; // 原始内容
-//    NSString *title = content.title;  // 标题
-//    NSString *subtitle = content.subtitle;  // 副标题
-//    NSNumber *badge = content.badge;  // 角标
-//    NSString *body = content.body;    // 推送消息体
-//    UNNotificationSound *sound = content.sound;  // 指定的声音
-//建议将根据Notification进行处理的逻辑统一封装，后期可在Extension中复用~
-completionHandler(UNNotificationPresentationOptionBadge|UNNotificationPresentationOptionSound|UNNotificationPresentationOptionAlert); // 回调block，将设置传入
-}
-#pragma mark - 用户与通知进行交互后的response，比如说用户直接点开通知打开App、用户点击通知的按钮或者进行输入文本框的文本
-- (void)userNotificationCenter:(UNUserNotificationCenter *)center didReceiveNotificationResponse:(UNNotificationResponse *)response withCompletionHandler:(void(^)(void))completionHandler{
-//在此，可判断response的种类和request的触发器是什么，可根据远程通知和本地通知分别处理，再根据action进行后续回调
-    if ([response isKindOfClass:[UNTextInputNotificationResponse class]]) {
-        UNTextInputNotificationResponse * textResponse = (UNTextInputNotificationResponse*)response;
-        NSString * text = textResponse.userText;
-        NSLog(@"%@",text);
-    }
-    else{
-        if ([response.actionIdentifier isEqualToString:@"see1"]){
-            NSLog(@"I love it!!");
-            ScanOneCodeViewController *scan = [[ScanOneCodeViewController alloc]init];
-            scan.hidesBottomBarWhenPushed = YES;
-            [self.navigationController pushViewController:scan animated:NO];
-        }
-        if ([response.actionIdentifier isEqualToString:@"see2"]) {
-            //I don't care~
-            NSLog(@"I don't like it");
-            [[UNUserNotificationCenter currentNotificationCenter] removeDeliveredNotificationsWithIdentifiers:@[response.notification.request.identifier]];
-        }
-    }
-    completionHandler();
-//
-//    UNNotificationRequest *request = response.notification.request; // 原始请求
-////NSDictionary * userInfo = notification.request.content.userInfo;//userInfo数据
-//    UNNotificationContent *content = request.content; // 原始内容
-//    NSString *title = content.title;  // 标题
-//    NSString *subtitle = content.subtitle;  // 副标题
-//    NSNumber *badge = content.badge;  // 角标
-//    NSString *body = content.body;    // 推送消息体
-//    UNNotificationSound *sound = content.sound;
-//在此，可判断response的种类和request的触发器是什么，可根据远程通知和本地通知分别处理，再根据action进行后续回调
-}
-#pragma mark - 编辑通知内容与发送
--(void)sendNotification:(NSDate *)date idertifier:(NSString *)RequestIdentifier body:(NSString *)body picture:(NSString *)path{
-        
-       UNMutableNotificationContent *content = [[UNMutableNotificationContent alloc] init];
-    
-        content.title = @"Notification By Fosa";
-        //content.subtitle = @"by Fosa";
-        content.body = body;
-        content.badge = @0;
-        if (self.food_image != NULL) {
-        
-           // NSString *path = [[NSBundle mainBundle] pathForResource:@"启动图2" ofType:@"png"];
-            NSError *error = nil;
-            //将本地图片的路径形成一个图片附件，加入到content中
-            UNNotificationAttachment *img_attachment = [UNNotificationAttachment attachmentWithIdentifier:@"att1" URL:[NSURL fileURLWithPath:path] options:nil error:&error];
-            if (error) {
-                NSLog(@"%@", error);
-            }
-            content.attachments = @[img_attachment];
-        }
-//           NSString *path = [[NSBundle mainBundle] pathForResource:@"启动图2" ofType:@"png"];
-    
-           //设置为@""以后，进入app将没有启动页
-           content.launchImageName = @"";
-           UNNotificationSound *sound = [UNNotificationSound defaultSound];
-           content.sound = sound;
-           //设置时间间隔的触发器
-            //格式化时间
-//          NSDateFormatter * formatter = [[NSDateFormatter alloc]init];
-//          [formatter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
-//          NSDate * date = [formatter dateFromString:@"2019-10-29 9:46:00"];
-          NSDateComponents * components = [[NSCalendar currentCalendar]
-                                             components:NSCalendarUnitYear |
-                                             NSCalendarUnitMonth |
-                                             NSCalendarUnitWeekday |
-                                             NSCalendarUnitDay |
-                                             NSCalendarUnitHour |
-                                             NSCalendarUnitMinute |
-                                             NSCalendarUnitSecond
-                                             fromDate:date];
-    
-            //UNTimeIntervalNotificationTrigger *time_trigger = [UNTimeIntervalNotificationTrigger triggerWithTimeInterval:5 repeats:NO];
-    UNCalendarNotificationTrigger *date_trigger = [UNCalendarNotificationTrigger triggerWithDateMatchingComponents:components repeats:NO];
-           NSString *requestIdentifer = RequestIdentifier;
-           //content.categoryIdentifier = @"seeCategory";
-           content.categoryIdentifier = @"seeCategory";
-           UNNotificationRequest *request = [UNNotificationRequest requestWithIdentifier:requestIdentifer content:content trigger:date_trigger];
-    
-           [[UNUserNotificationCenter currentNotificationCenter] addNotificationRequest:request withCompletionHandler:^(NSError * _Nullable error) {
-               NSLog(@"%@",error);
-           }];
-}
-#pragma mark - 创建通知交互动作
--(NSSet *)createNotificationCategoryActions{
-    //定义按钮的交互button action
-    UNNotificationAction * likeButton = [UNNotificationAction actionWithIdentifier:@"see1" title:@"I love it~" options:UNNotificationActionOptionAuthenticationRequired|UNNotificationActionOptionDestructive|UNNotificationActionOptionForeground];
-    UNNotificationAction * dislikeButton = [UNNotificationAction actionWithIdentifier:@"see2" title:@"I don't care~" options:UNNotificationActionOptionAuthenticationRequired|UNNotificationActionOptionDestructive|UNNotificationActionOptionForeground];
-    //定义文本框的action
-    UNTextInputNotificationAction * text = [UNTextInputNotificationAction actionWithIdentifier:@"text" title:@"How about it~?" options:UNNotificationActionOptionAuthenticationRequired|UNNotificationActionOptionDestructive|UNNotificationActionOptionForeground];
-    //将这些action带入category
-    UNNotificationCategory * choseCategory = [UNNotificationCategory categoryWithIdentifier:@"seeCategory" actions:@[likeButton,dislikeButton] intentIdentifiers:@[@"see1",@"see2"] options:UNNotificationCategoryOptionNone];
-    UNNotificationCategory * comment = [UNNotificationCategory categoryWithIdentifier:@"seeCategory1" actions:@[text] intentIdentifiers:@[@"text"] options:UNNotificationCategoryOptionNone];
-    return [NSSet setWithObjects:choseCategory,comment,nil];
-}
-
-
 #pragma mark - 退出键盘
 - (BOOL)textFieldShouldReturn:(UITextField *)textField{
     [self.aboutFood resignFirstResponder];

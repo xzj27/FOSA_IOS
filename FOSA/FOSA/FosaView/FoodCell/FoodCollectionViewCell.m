@@ -21,7 +21,7 @@
         self.nameLabel.userInteractionEnabled = NO;
         [self addSubview:self.nameLabel];
        
-        self.dateLabel = [[UILabel alloc]initWithFrame:CGRectMake(25, self.bounds.size.height/6+5, self.bounds.size.width-50, self.bounds.size.height/6)];
+        self.dateLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, self.bounds.size.height/6+5, self.bounds.size.width, self.bounds.size.height/6)];
         self.dateLabel.textColor = [UIColor blackColor];
         self.dateLabel.textAlignment = NSTextAlignmentCenter;
         self.dateLabel.font = [UIFont systemFontOfSize:10];
@@ -49,15 +49,16 @@
     }
     return self;
 }
--(void)setModel:(CellModel *)model
+- (void)setModel:(CellModel *)model
 {
     _model = model;
     self.foodImageview.image = [self getImage:model.foodPhoto];
     self.nameLabel.text  = model.foodName;
-    self.dateLabel.text = model.expiredDate;
+    
+    self.dateLabel.text = [NSString stringWithFormat:@"Remind:%@",model.remindDate ];
 }
 //取出保存在本地的图片
--(UIImage*)getImage:(NSString *)filepath{
+- (UIImage*)getImage:(NSString *)filepath{
     NSArray *paths =NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask,YES);
     NSString *photopath = [NSString stringWithFormat:@"%@.png",filepath];
     NSString *imagePath = [[paths objectAtIndex:0]stringByAppendingPathComponent:[NSString stringWithFormat:@"%@",photopath]];

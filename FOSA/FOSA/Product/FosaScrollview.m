@@ -11,7 +11,6 @@
 @interface FosaScrollview()<
 UIScrollViewDelegate
 >
-
 @property (nonatomic,strong) NSMutableArray *labelM;
 
 @property (nonatomic,strong) NSArray<NSString*> *titles;
@@ -19,11 +18,9 @@ UIScrollViewDelegate
 @property (nonatomic, assign) NSInteger tagIndex;
 /** 点击回调 */
 @property (nonatomic, copy) TabClickBlock clickBlock;
-
 @end
-
 CGFloat margin = 0;
-
+#define RandomColor ([UIColor colorWithRed:arc4random_uniform(255)/255.0 green:arc4random_uniform(255)/255.0 blue:arc4random_uniform(255)/255.0 alpha:1.0])
 @implementation FosaScrollview
 - (instancetype)initWithFrame:(CGRect)frame
 {
@@ -59,21 +56,22 @@ CGFloat margin = 0;
     self.titles = titles;
     self.clickBlock = clickBlock;
     self.tagIndex = index;
+    
     self.frame = frame;
     
     for (NSInteger i = 0; i < titles.count; i++) {
         UILabel *lbl = [[UILabel alloc]init];
         lbl.tag = i;
         lbl.textAlignment = NSTextAlignmentCenter;
+        lbl.backgroundColor = RandomColor;
         lbl.text = titles[i];
         lbl.textColor=[UIColor lightGrayColor];
         lbl.font = [UIFont systemFontOfSize:15];
-        CGSize tabSize = [lbl.text sizeWithAttributes:@{NSFontAttributeName:lbl.font}];
         if (i == 0) {
-            lbl.frame = CGRectMake(margin, 0, [UIScreen mainScreen].bounds.size.width/2, frame.size.height);
+            lbl.frame = CGRectMake(0, 0, frame.size.width/2, frame.size.height);
         }else {
-            UILabel *preLbl = self.labelM[i - 1];
-            lbl.frame = CGRectMake(CGRectGetMaxX(preLbl.frame) + margin, 0, [UIScreen mainScreen].bounds.size.width/2, frame.size.height);
+            //UILabel *preLbl = self.labelM[i - 1];
+            lbl.frame = CGRectMake(frame.size.width/2, 0, frame.size.width/2, frame.size.height);
         }
         [self addSubview:lbl];
         [self.labelM addObject:lbl];
@@ -82,10 +80,10 @@ CGFloat margin = 0;
         lbl.userInteractionEnabled=YES;
         [lbl addGestureRecognizer:tap];
     }
-    UILabel *lastLbl = [self.labelM lastObject];
-    CGFloat maxWidth = CGRectGetMaxX(lastLbl.frame) + margin;
+    //UILabel *lastLbl = [self.labelM lastObject];
+   // CGFloat maxWidth = CGRectGetMaxX(lastLbl.frame) + margin;
     // 设置内容宽度
-    self.contentSize = CGSizeMake(maxWidth, 0);
+    //self.contentSize = CGSizeMake(maxWidth, 0);
     // 默认滚到对应的下标
     [self tabOffset:index];
 }
@@ -116,7 +114,7 @@ CGFloat margin = 0;
             lbl.font = [UIFont boldSystemFontOfSize:14];
         }else {
             lbl.textColor=[UIColor lightGrayColor];
-            lbl.font = [UIFont systemFontOfSize:14];
+            lbl.font = [UIFont systemFontOfSize:15];
         }
     }
     

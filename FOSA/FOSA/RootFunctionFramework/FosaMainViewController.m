@@ -206,8 +206,8 @@
     
     //查询数据库所有食品并获得其foodname和expire date
     for (int i = 0; i < _storageArray.count; i++) {
-NSLog(@"foodName=%@&&&&&&&expireDate=%@",_storageArray[i].foodName,_storageArray[i].expiredDate);
-        NSString *Edate = _storageArray[i].expiredDate;
+NSLog(@"foodName=%@&&&&&&&expireDate=%@",_storageArray[i].foodName,_storageArray[i].remindDate);
+        NSString *Edate = _storageArray[i].remindDate;
         NSDate *foodDate = [[NSDate alloc]init];
         NSLog(@"%@",Edate);
         foodDate = [formatter dateFromString:Edate];
@@ -215,13 +215,13 @@ NSLog(@"foodName=%@&&&&&&&expireDate=%@",_storageArray[i].foodName,_storageArray
         NSComparisonResult result = [currentDate compare:foodDate];
         
         if (result == NSOrderedDescending) {
-            NSLog(@"%@ 已经在 %@ 过期了",_storageArray[i].foodName,_storageArray[i].expiredDate);
-            NSString *body = [NSString stringWithFormat:@"%@ 已经在 %@ 过期了",_storageArray[i].foodName,_storageArray[i].expiredDate];
+            NSLog(@"%@ 已经在 %@ 过期了",_storageArray[i].foodName,_storageArray[i].remindDate);
+            NSString *body = [NSString stringWithFormat:@"%@ 已经在 %@ 过期了",_storageArray[i].foodName,_storageArray[i].remindDate];
             //发送通知
             [_notification sendNotification:_storageArray[i].foodName body:body path:_storageArray[i].foodPhoto];
             
         }else if (result == NSOrderedAscending){
-            NSLog(@"%@ 将在 %@ 过期了，请及时使用",_storageArray[i].foodName,_storageArray[i].expiredDate);
+            NSLog(@"%@ 将在 %@ 过期了，请及时使用",_storageArray[i].foodName,_storageArray[i].remindDate);
         }else{
     NSLog(@"%@刚好在今天过期",_storageArray[i].foodName);
             NSString *body = [NSString stringWithFormat:@"%@ 今天就要过期啦",_storageArray[i].foodName];
@@ -266,6 +266,7 @@ NSLog(@"foodName=%@&&&&&&&expireDate=%@",_storageArray[i].foodName,_storageArray
         while (sqlite3_step(_stmt) == SQLITE_ROW) {
             const char *food_name = (const char *)sqlite3_column_text(_stmt, 0);
             const char *device_name = (const char*)sqlite3_column_text(_stmt,1);
+            const char *remind_date = (const char*)sqlite3_column_text(_stmt,4);
             const char *expired_date = (const char *)sqlite3_column_text(_stmt,3);
             const char *photo_path = (const char *)sqlite3_column_text(_stmt,5);
 
@@ -273,7 +274,7 @@ NSLog(@"foodName=%@&&&&&&&expireDate=%@",_storageArray[i].foodName,_storageArray
             NSLog(@"查询到数据%@",[NSString stringWithUTF8String:expired_date]);
             NSLog(@"查询到数据%@",[NSString stringWithUTF8String:photo_path]);
             NSLog(@"********************************");
-            [self CreatFoodViewWithName:[NSString stringWithUTF8String:food_name] fdevice:[NSString stringWithUTF8String:device_name] expireDate:[NSString stringWithUTF8String:expired_date] foodPhoto:[NSString stringWithUTF8String:photo_path]] ;
+            [self CreatFoodViewWithName:[NSString stringWithUTF8String:food_name] fdevice:[NSString stringWithUTF8String:device_name] remindDate:[NSString stringWithUTF8String:remind_date] foodPhoto:[NSString stringWithUTF8String:photo_path]] ;
         }
     }
 }
@@ -288,9 +289,9 @@ NSLog(@"foodName=%@&&&&&&&expireDate=%@",_storageArray[i].foodName,_storageArray
 }
 
 #pragma mark - cell相关的方法
-- (void)CreatFoodViewWithName:(NSString *)foodname fdevice:(NSString *)device expireDate:(NSString *)expireDate foodPhoto:(NSString *)photo{
+- (void)CreatFoodViewWithName:(NSString *)foodname fdevice:(NSString *)device remindDate:(NSString *)remindDate foodPhoto:(NSString *)photo{
     //创建食物模型
-    CellModel *model = [[CellModel alloc]initWithName:foodname foodIcon:photo expire_date:expireDate fdevice:device];
+    CellModel *model = [[CellModel alloc]initWithName:foodname foodIcon:photo remind_date:remindDate fdevice:device];
     [self.storageArray addObject:model];
 }
 //点击通知项的方法

@@ -12,10 +12,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CellModel : NSObject
 
-@property (nonatomic,copy) NSString *foodName,*expiredDate,*foodPhoto,*device;
+@property (nonatomic,copy) NSString *foodName,*remindDate,*foodPhoto,*device,*expireDate;
 
-+ (instancetype)modelWithName:(NSString *) food_name foodIcon:(NSString *)foodPhoto expire_date:(NSString *) expiredDate fdevice:(NSString *)device;
-- (instancetype)initWithName: (NSString *) food_name foodIcon:(NSString *)foodPhoto expire_date:(NSString *) expiredDate fdevice:(NSString *)device;
++ (instancetype)modelWithName:(NSString *) food_name foodIcon:(NSString *)foodPhoto remind_date:(NSString *) remindDate fdevice:(NSString *)device;
+- (instancetype)initWithName: (NSString *) food_name foodIcon:(NSString *)foodPhoto remind_date:(NSString *) remindDate fdevice:(NSString *)device;
 
 @end
 

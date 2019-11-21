@@ -74,12 +74,12 @@
 - (NSInteger)size {
     return _array.count;
 }
+
 - (BOOL)isEmpty {
     return _array.count == 0;
 }
 
 - (NSString *)description {
-    
     NSMutableString *res = [NSMutableString string];
     [res appendFormat:@"ArrayQueue: %p \n",self];
     [res appendString:@"front [ "];
@@ -93,7 +93,9 @@
     [res appendString:@" ] tail "];
     return res;
 }
-
+- (void)DeleObjectByIndex:(NSInteger)i{
+    [_array removeObjectAtIndex:i];
+}
 - (void)dealloc
 {
     

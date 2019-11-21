@@ -241,7 +241,9 @@
            // UIImageWriteToSavedPhotosAlbum(self.image, self,@selector(image:didFinishSavingWithError:contextInfo:),nil);
             //self.imgView.image = [self getImage];
             self.imgView.image = self.image;
+            //self.imgView.transform = CGAffineTransformMakeRotation(M_PI/2);
             [self DetectQRcode:self.image];
+            
             //self.imgView.hidden = NO;
         }
     }];

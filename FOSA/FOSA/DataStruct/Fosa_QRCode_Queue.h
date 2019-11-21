@@ -16,10 +16,11 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype) arrayQueueWithCapacity:(NSInteger)capacity;
 
 - (instancetype) initWithCapacity:(NSInteger)capacity;
-- (void)enqueue:(AVMetadataMachineReadableCodeObject *)obj; ///入队列
+- (void)enqueue:(AVMetadataMachineReadableCodeObject *)obj; //入队列
 - (id) dequeue; ///出队列
 - (void) removeAllObjects; ///移除队列里边所有元素
-- (NSMutableArray *)returnArray;  //
+- (void) DeleObjectByIndex:(NSInteger)i;
+- (NSMutableArray *)returnArray;
 - (int)getTheSameObjectIndex:(AVMetadataMachineReadableCodeObject *)obj;
 -(Boolean)isContainObject:(AVMetadataMachineReadableCodeObject *)obj;
 

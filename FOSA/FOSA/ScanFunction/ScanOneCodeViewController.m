@@ -923,6 +923,7 @@
     UITapGestureRecognizer *tap = (UITapGestureRecognizer *)sender;
     if (tap.view.tag == 0) {
         [_circleAlertView1 removeFromSuperview];
+        
         AlertCount--;
     }else if (tap.view.tag == 1){
         [_circleAlertView2 removeFromSuperview];
