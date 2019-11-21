@@ -67,6 +67,8 @@
 @property (nonatomic,strong) FoodInfoView *fosaAlertView;
 @property(nonatomic,assign) int ScanModel;      //determine the current scanning model:0 for which Scan QRCode for everytime,1 for which scan three or four QrCode for every time
 
+///*** 专门用于保存描边的图层 ***/
+@property (nonatomic,strong) CALayer *containerLayer;
 //数据库查询相关
 @property(nonatomic,assign)sqlite3 *database;
 //结果集定义
@@ -187,7 +189,7 @@
     self.array = [[NSMutableArray alloc]init];
     //用于存储可读码的队列
     self.codeQueue = [[Fosa_QRCode_Queue alloc]initWithCapacity:3];
-    self.QRcode = [[Fosa_NSString_Queue alloc]initWithCapacity:4];
+    self.QRcode = [[Fosa_NSString_Queue alloc]initWithCapacity:3];
     //扫码模式,默认扫一个
     self.ScanModel = 0;
     //notification window
@@ -282,27 +284,22 @@
     focusCursor.image = [UIImage imageNamed:@"icon_focusBlue"];
     
     self.focusCursor1 = [[UIImageView alloc] initWithFrame:CGRectMake(50, 50, 50, 50)];
-    focusCursor.alpha = 0;
-    focusCursor.image = [UIImage imageNamed:@"icon_focusRed"];
+    self.focusCursor1.alpha = 0;
+    self.focusCursor1.image = [UIImage imageNamed:@"icon_focusRed"];
     
-   self.focusCursor2 = [[UIImageView alloc] initWithFrame:CGRectMake(50, 50, 50, 50)];
-    focusCursor.alpha = 0;
-    focusCursor.image = [UIImage imageNamed:@"icon_focusGreen"];
+    self.focusCursor2 = [[UIImageView alloc] initWithFrame:CGRectMake(50, 50, 50, 50)];
+    self.focusCursor2.alpha = 0;
+    self.focusCursor2.image = [UIImage imageNamed:@"icon_focusGreen"];
     
     self.focusCursor3 = [[UIImageView alloc] initWithFrame:CGRectMake(50, 50, 50, 50)];
-    focusCursor.alpha = 0;
-    focusCursor.image = [UIImage imageNamed:@"icon_focusBlue"];
+    self.focusCursor3.alpha = 0;
+    self.focusCursor3.image = [UIImage imageNamed:@"icon_focusBlue"];
 
     [self.view addSubview:focusCursor];
     [self.view addSubview:self.focusCursor1];
     [self.view addSubview:self.focusCursor2];
     [self.view addSubview:self.focusCursor3];
     _focusCursor = focusCursor;
-    
-    //self.focusCursor1 = focusCursor1;
-    //self.focusCursor2 = focusCursor2;
-    //self.focusCursor3 = focusCursor3;
-    
     [self setScanScale:0];
 }
 #pragma mark - this fuction for setting the scanning scale
@@ -541,7 +538,7 @@
         CGPoint center = CGPointZero;
     // 扫码区域的坐标计算是以横屏为基准，应以右上角为（0，0），根据二维码的同一个点的y坐标来进行判断每个二维码的位置关系
         NSArray *array = objc.corners;
-         //NSLog(@"cornersArray = %@",array);
+        //NSLog(@"cornersArray = %@",array);
         CGPoint point = CGPointZero;
         int index = 0;
         CFDictionaryRef dict = (__bridge CFDictionaryRef)(array[index++]);
@@ -555,7 +552,31 @@
         center.y = (point2.y+point3.y)/2;
         CGPoint point4 = CGPointZero;
         CGPointMakeWithDictionaryRepresentation((__bridge CFDictionaryRef)array[index++], &point4);
-        // NSLog(@"X:%f -- Y:%f",point4.x,point4.y);
+
+    return center;
+}
+
+-(CGPoint)getCenter:(AVMetadataMachineReadableCodeObject *)objc
+{
+    
+        CGPoint center = CGPointZero;
+    //横屏状态下，二维码每个角的坐标顺序与竖屏时的有区别
+        NSArray *array = objc.corners;
+    //    NSLog(@"cornersArray = %@",array);
+        CGPoint point = CGPointZero;
+        int index = 0;
+        CFDictionaryRef dict = (__bridge CFDictionaryRef)(array[index++]);
+        // 把字典转换为点，存在point里，成功返回true 其他false
+        CGPointMakeWithDictionaryRepresentation(dict, &point);
+        CGPoint point2 = CGPointZero;
+        CGPointMakeWithDictionaryRepresentation((__bridge CFDictionaryRef)array[index++], &point2);
+        center.y=(point.y+point2.y)/2;
+        CGPoint point3 = CGPointZero;
+        CGPointMakeWithDictionaryRepresentation((__bridge CFDictionaryRef)array[index++], &point3);
+        center.x = (point2.x+point3.x)/2;
+        CGPoint point4 = CGPointZero;
+        CGPointMakeWithDictionaryRepresentation((__bridge CFDictionaryRef)array[index++], &point4);
+         NSLog(@"X:%f -- Y:%f",point4.x,point4.y);
         
     return center;
 }
@@ -605,15 +626,22 @@
 {
     if([[mobject type] isEqualToString:AVMetadataObjectTypeQRCode]){//如果是一个可读二维码对象
         self.isGetResult = true;                                    //修改标志，不再自动放大镜头
-        [self ScanSuccess:@"ding.wav"];
             if (self.food_photo == nil){//UIImage对象为空说明并不是在添加食物的过程进行扫码
                 [self performSelectorOnMainThread:@selector(setFocusCursorWithPoint:) withObject:(AVMetadataMachineReadableCodeObject *) mobject waitUntilDone:NO];      //在主线程中标记二维码的位置（还不够准确）
+                 [self performSelectorOnMainThread:@selector(drawLine:) withObject:(AVMetadataMachineReadableCodeObject *) mobject waitUntilDone:NO];      //在主线程中标记二维码的位置（还不够准确）
                 if([result hasPrefix:@"http://"]){//若是一个网站，就打开这个链接
-                    [self performSelectorOnMainThread:@selector(OpenURL:) withObject:result waitUntilDone:NO];
+                    if (!isJump) {
+                        [self ScanSuccess:@"ding.wav"];
+                        [self performSelectorOnMainThread:@selector(OpenURL:) withObject:result waitUntilDone:NO];
+                        isJump = true;
+                    }
+                    
                 }else if([result hasPrefix:@"Fosa"]||[result hasPrefix:@"FS9"]){
+                    [self ScanSuccess:@"ding.wav"];
                     [self performSelectorOnMainThread:@selector(showOneMessage:) withObject:result waitUntilDone:NO]; //在主线程中展示这个物品的通知
                 }else{
                     if (!isJump) {//当前还没有发生跳转
+                        [self ScanSuccess:@"ding.wav"];
                         [self performSelectorOnMainThread:@selector(JumpToResult:) withObject:result waitUntilDone:NO];
                         isJump = true;  //不再处理其他跳转
                     }
@@ -622,16 +650,19 @@
                 if([result hasPrefix:@"FS9"]||[result hasPrefix:@"Fosa"]){//判断所扫描的二维码属于fosa产品
                     [self.session stopRunning];
                     if (!isJump) {
+                        [self ScanSuccess:@"ding.wav"];
                          [self performSelectorOnMainThread:@selector(JumpToAdd:) withObject:result waitUntilDone:NO];
                         isJump = true;
                     }
                 }else{
+                    [self ScanSuccess:@"ding.wav"];
                     NSString *message = [NSString stringWithFormat:@"this QRcode does not belong to FOSA.  Its content is %@",result];
                     [self performSelectorOnMainThread:@selector(SystemAlert:) withObject:message waitUntilDone:NO];
                 }
             }
     }else{
         if (!isJump) {//不属于二维码对象，则将内容在另一个页面展示
+            [self ScanSuccess:@"ding.wav"];
             [self performSelectorOnMainThread:@selector(JumpToResult:) withObject:result waitUntilDone:NO];
             isJump = true;
         }
@@ -640,6 +671,9 @@
 
 //扫多个二维码的处理
 - (void)OperationOfMoreCode:(NSArray<__kindof AVMetadataObject *> *)metadataObjects{
+    if (AlertCount == 3 ) {
+        [self.session stopRunning];
+    }
     self.isGetResult = true;
     NSInteger count = 3;    //展示通知上限
     NSString *content;
@@ -650,14 +684,13 @@
             content = [(AVMetadataMachineReadableCodeObject *) object stringValue];
             //检查二维码信息是否已经被记录，否的话则添加记录
             if([self.QRcode isContainObject:content]){
-                
 //                if ([_array containsObject:content]==0) {
 //                    [_array addObject:content]; //二维码内容添加
 //                }
                 [self ScanSuccess:@"ding.wav"];
-                if (self.QRcode.size < 4) {
+                if (self.QRcode.size < 3) {
                     [self.QRcode enqueue:content];
-                }else if (self.QRcode.size == 4){
+                }else if (self.QRcode.size == 3){
                     [self.QRcode dequeue];
                     [self.QRcode enqueue:content];
                 }
@@ -671,29 +704,37 @@
                     [_codeQueue enqueue:(AVMetadataMachineReadableCodeObject *) object];
                     NSLog(@"%@",_codeQueue.firstObject.stringValue);
                 }
-
+            }else{
+                //更新位置
+                int index = [self.QRcode getTheSameObjectIndex:content];
+                [_codeQueue returnArray][index] = (AVMetadataMachineReadableCodeObject *) object;
             }
         }
     }
     //对数组的二维码内容，按照位置进行排序,展示多个
-    if (_flag>0 && _ScanModel == 1) {
+    if (_flag>0) {
                self.count = 0;
                [self performSelectorOnMainThread:@selector(removeView) withObject:nil waitUntilDone:NO];
-               for (int i = 0; i < [_codeQueue size]-1; i++) {
-                   for (int j = i+1; j < [_codeQueue size]; j++) {
-                       if ([self getCenterOfQRcode:[_codeQueue returnArray][i]].y > [self getCenterOfQRcode:[_codeQueue returnArray][j]].y ) {
-                           AVMetadataMachineReadableCodeObject *temp = [_codeQueue returnArray][i];
-                           [_codeQueue returnArray][i] = [_codeQueue returnArray][j];
-                           [_codeQueue returnArray][j] = temp;
-                       }
-                   }
-               }
+//               for (int i = 0; i < [_codeQueue size]-1; i++) {
+//                   for (int j = i+1; j < [_codeQueue size]; j++) {
+//                       if ([self getCenterOfQRcode:[_codeQueue returnArray][i]].y > [self getCenterOfQRcode:[_codeQueue returnArray][j]].y ) {
+//                           AVMetadataMachineReadableCodeObject *temp = [_codeQueue returnArray][i];
+//                           [_codeQueue returnArray][i] = [_codeQueue returnArray][j];
+//                           [_codeQueue returnArray][j] = temp;
+//                       }
+//                   }
+//               }
                if ([_codeQueue size] < count) {
                    count = [_codeQueue size];
                }
                for (int k = 0;k < count;k++) {
-                   //NSLog(@"%@",_array[k]);
-                   [self performSelectorOnMainThread:@selector(SetFocusOnQRcode:) withObject:[_codeQueue returnArray][k] waitUntilDone:NO];
+                   if (k == 0) {
+                       [self performSelectorOnMainThread:@selector(SetFocusOnQRcode1:) withObject:[_codeQueue returnArray][k] waitUntilDone:NO];
+                   }else if(k == 1){
+                       [self performSelectorOnMainThread:@selector(SetFocusOnQRcode2:) withObject:[_codeQueue returnArray][k] waitUntilDone:NO];
+                   }else if(k == 2){
+                       [self performSelectorOnMainThread:@selector(SetFocusOnQRcode3:) withObject:[_codeQueue returnArray][k] waitUntilDone:NO];
+                   }
                    [self performSelectorOnMainThread:@selector(showMoreMessage:) withObject:[_codeQueue returnArray][k] waitUntilDone:NO];
                }
     }
@@ -722,46 +763,8 @@
         }
     }
 }
-
-// Create a UIImage from sample buffer data
-- (UIImage *) imageFromSampleBuffer:(CMSampleBufferRef) sampleBuffer
-{
-    // Get a CMSampleBuffer's Core Video image buffer for the media data
-    CVImageBufferRef imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
-    // Lock the base address of the pixel buffer
-    CVPixelBufferLockBaseAddress(imageBuffer, 0);
- 
-    // Get the number of bytes per row for the pixel buffer
-    void *baseAddress = CVPixelBufferGetBaseAddress(imageBuffer);
- 
-    // Get the number of bytes per row for the pixel buffer
-    size_t bytesPerRow = CVPixelBufferGetBytesPerRow(imageBuffer);
-    // Get the pixel buffer width and height
-    size_t width = CVPixelBufferGetWidth(imageBuffer);
-    size_t height = CVPixelBufferGetHeight(imageBuffer);
- 
-    // Create a device-dependent RGB color space
-    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
- 
-    // Create a bitmap graphics context with the sample buffer data
-    CGContextRef context = CGBitmapContextCreate(baseAddress, width, height, 8,
-      bytesPerRow, colorSpace, kCGBitmapByteOrder32Little | kCGImageAlphaPremultipliedFirst);
-    // Create a Quartz image from the pixel data in the bitmap graphics context
-    CGImageRef quartzImage = CGBitmapContextCreateImage(context);
-    // Unlock the pixel buffer
-    CVPixelBufferUnlockBaseAddress(imageBuffer,0);
-
-    // Free up the context and color space
-    CGContextRelease(context);
-    CGColorSpaceRelease(colorSpace);
-    // Create an image object from the Quartz image
-    UIImage *image = [UIImage imageWithCGImage:quartzImage];
-    // Release the Quartz image
-    CGImageRelease(quartzImage);
-    return (image);
-}
 //跳转到添加界面
--(void)JumpToAdd:(NSString *)massage{
+- (void)JumpToAdd:(NSString *)massage{
     AddViewController *add = [[AddViewController alloc]init];
     
     CGFloat headerWidth = [UIScreen mainScreen].bounds.size.width-20;
@@ -785,7 +788,7 @@
     
 }
 //跳转到结果界面
--(void)JumpToResult:(NSString *)message{
+- (void)JumpToResult:(NSString *)message{
     ResultViewController *result = [[ResultViewController alloc]init];
     result.hidesBottomBarWhenPushed = YES;
     result.resultLabel = [[UILabel alloc]initWithFrame:CGRectMake([UIScreen mainScreen].bounds.size.width/4, [UIScreen mainScreen].bounds.size.height/2, [UIScreen mainScreen].bounds.size.width/2,50)];
@@ -797,7 +800,7 @@
 }
 
 //扫描成功的提示音
--(void)ScanSuccess:(NSString *)name{
+- (void)ScanSuccess:(NSString *)name{
     
         NSString *audioFile = [[NSBundle mainBundle] pathForResource:name ofType:nil];
         NSURL *fileUrl = [NSURL fileURLWithPath:audioFile];
@@ -807,11 +810,11 @@
 }
 
 //打开扫描到的网页
--(void)OpenURL:(NSString *)url{
+- (void)OpenURL:(NSString *)url{
     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:url]];
 }
 //弹出系统提示
--(void)SystemAlert:(NSString *)message{
+- (void)SystemAlert:(NSString *)message{
     [self.session stopRunning];
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Notification" message:message preferredStyle:UIAlertControllerStyleAlert];
     [alert addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil]];
@@ -823,16 +826,14 @@
 }
 
 #pragma mark - 生成弹窗，显示二维码内容
--(void)showMoreMessage:(AVMetadataMachineReadableCodeObject *)code{
+- (void)showMoreMessage:(AVMetadataMachineReadableCodeObject *)code{
     AlertCount++;
     NSString *message = [code stringValue];
     CGFloat mainWidth = [UIScreen mainScreen].bounds.size.width;
     CGFloat navHeight = self.navigationController.navigationBar.frame.size.height;
     FoodMoreInfoView *circleAlertView = [[FoodMoreInfoView alloc]init];
     circleAlertView.model = [self OpenAndSelectsql:message];
-    circleAlertView.frame = CGRectMake(0,(self.count)*(mainWidth*0.5+5)+1.5*navHeight,mainWidth*0.5,mainWidth*0.5);
-    //circleAlertView.backgroundColor = [UIColor grayColor];
-    //circleAlertView.layer.cornerRadius = mainWidth*0.2;
+    circleAlertView.frame = CGRectMake(0,(self.count)*(mainWidth*0.53+5)+1.5*navHeight,mainWidth*0.53,mainWidth*0.53);
     circleAlertView.layer.masksToBounds = YES;
     
     circleAlertView.transform = CGAffineTransformMakeRotation(M_PI_2);
@@ -845,36 +846,14 @@
 
     switch (_count) {
         case 0:_circleAlertView1 = circleAlertView;
-            //_circleAlertView1.backgroundColor = [UIColor colorWithRed:237/255 green:0/255 blue:0/255 alpha:1.0];
             _circleAlertView1.backgroundColor = [UIColor redColor];
-            
-            CGPoint point1 = [self getCenterOfQRcode:code];
-            NSLog(@"%f----%f",point1.x,point1.y);
-            CGPoint center1 = CGPointZero;
-            center1.x = [UIScreen mainScreen].bounds.size.width*(1-point1.y);
-            center1.y = [UIScreen mainScreen].bounds.size.height*(point1.x);
-            self.focusCursor1.center = center1;
-            //self.focusCursor1.transform = CGAffineTransformMakeScale(2,2);
-            self.focusCursor1.alpha = 1.0;
-            
             [self.view addSubview:_circleAlertView1];
            [_circleAlertView1.close addGestureRecognizer:tapgestureRecognizer];
             tapgestureRecognizer.view.tag = 0;
             break;
         case 1:_circleAlertView2 = circleAlertView;
-            
-            //_circleAlertView2.backgroundColor = [UIColor colorWithRed:0/255 green:251/255 blue:51/255 alpha:1.0];;
               _circleAlertView2.backgroundColor = [UIColor greenColor];
-            
-            CGPoint point2 = [self getCenterOfQRcode:code];
-            NSLog(@"%f----%f",point2.x,point2.y);
-            CGPoint center2 = CGPointZero;
-            center2.x = [UIScreen mainScreen].bounds.size.width*(1-point2.y);
-            center2.y = [UIScreen mainScreen].bounds.size.height*(point2.x);
-            self.focusCursor2.center = center2;
-            //self.focusCursor2.transform = CGAffineTransformMakeScale(2,2);
-            self.focusCursor2.alpha = 1.0;
-            
+
             [self.view addSubview:_circleAlertView2];
             
             [_circleAlertView2.close addGestureRecognizer:tapgestureRecognizer];
@@ -883,24 +862,16 @@
         case 2:_circleAlertView3 = circleAlertView;
            
               _circleAlertView3.backgroundColor = [UIColor blueColor];
-            
-            CGPoint point3 = [self getCenterOfQRcode:code];
-            NSLog(@"%f----%f",point3.x,point3.y);
-            CGPoint center3 = CGPointZero;
-            center3.x = [UIScreen mainScreen].bounds.size.width*(1-point3.y);
-            center3.y = [UIScreen mainScreen].bounds.size.height*(point3.x);
-            self.focusCursor3.center = center3;
-            self.focusCursor3.alpha = 1.0;
-            
             [self.view addSubview:_circleAlertView3];
-            
             [_circleAlertView3.close addGestureRecognizer:tapgestureRecognizer];
             tapgestureRecognizer.view.tag = 2;
             break;
         default:
             break;
     }
+    
     self.count = (self.count+1)%3;
+    
     NSLog(@"%d",self.count);
 }
 
@@ -926,6 +897,10 @@
     _circleAlertView1 = NULL;
     _circleAlertView2 = NULL;
     _circleAlertView3 = NULL;
+    self.focusCursor1.alpha = 0;
+    self.focusCursor2.alpha = 0;
+    self.focusCursor3.alpha = 0;
+    AlertCount = 0;
 }
 #pragma mark -  点击下方通知弹出具体内容
 -(void)tapAction:(id)sender{
@@ -956,6 +931,8 @@
         [_circleAlertView3 removeFromSuperview];
         AlertCount--;
     }
+    [self.session startRunning];
+    [self removeView];
 }
 
 #pragma mark - 用于移除当前点开的具体内容弹窗
@@ -977,6 +954,9 @@
     CGPoint center = CGPointZero;
     center.x = [UIScreen mainScreen].bounds.size.width*(1-point.y);
     center.y = [UIScreen mainScreen].bounds.size.height*(point.x);
+//    center.x = [UIScreen mainScreen].bounds.size.height*(point.x);
+//    center.y = [UIScreen mainScreen].bounds.size.width*(point.y);
+    
     self.focusCursor.center = center;
     self.focusCursor.transform = CGAffineTransformMakeScale(3,3);
     self.focusCursor.alpha = 1.0;
@@ -988,29 +968,50 @@
     //[self.session startRunning];
 }
 
-- (void)SetFocusOnQRcode:(AVMetadataMachineReadableCodeObject *)objc
+- (void)SetFocusOnQRcode1:(AVMetadataMachineReadableCodeObject *)objc
 {
-    CGPoint point = [self getCenterOfQRcode:objc];
+    NSLog(@"%%%%%%%%%%");
+    CGPoint point = [self getCenter:objc];
     CGPoint center = CGPointZero;
     center.x = [UIScreen mainScreen].bounds.size.width*(1-point.y);
     center.y = [UIScreen mainScreen].bounds.size.height*(point.x);
-    self.focusCursor.center = center;
-    //self.focusCursor.transform = CGAffineTransformMakeScale(3,3);
-    self.focusCursor.alpha = 1.0;
-//    [UIView animateWithDuration:2.0 animations:^{
-//        self.focusCursor.transform = CGAffineTransformIdentity;
-//    } completion:^(BOOL finished) {
-//        self.focusCursor.alpha = 0;
-//    }];
+    self.focusCursor1.center = center;
+    self.focusCursor1.alpha = 1.0;
+}
+- (void)SetFocusOnQRcode2:(AVMetadataMachineReadableCodeObject *)objc
+{
+    NSLog(@"&&&&&&&&");
+    CGPoint point = [self getCenter:objc];
+    CGPoint center = CGPointZero;
+    center.x = [UIScreen mainScreen].bounds.size.width*(1-point.y);
+    center.y = [UIScreen mainScreen].bounds.size.height*(point.x);
+    self.focusCursor2.center = center;
+    self.focusCursor2.alpha = 1.0;
+}
+- (void)SetFocusOnQRcode3:(AVMetadataMachineReadableCodeObject *)objc
+{
+    NSLog(@"*******");
+    CGPoint point = [self getCenter:objc];
+    CGPoint center = CGPointZero;
+    center.x = [UIScreen mainScreen].bounds.size.width*(1-point.y);
+    center.y = [UIScreen mainScreen].bounds.size.height*(point.x);
+    self.focusCursor3.center = center;
+    self.focusCursor3.alpha = 1.0;
 }
 #pragma mark - 数据库查询的方法
 - (FoodModel *)OpenAndSelectsql:(NSString *)device
 {
+    food = NULL;
+    fdevice = NULL;
+    photoPath = NULL;
+    expire  = NULL;
+    remind  = NULL;
+    
     NSString *path = [self getPath];
     int sqlStatus = sqlite3_open_v2([path UTF8String], &_database,SQLITE_OPEN_CREATE|SQLITE_OPEN_READWRITE,NULL);
-    if (sqlStatus == SQLITE_OK) {
-        NSLog(@"数据库打开成功");
-    }
+//    if (sqlStatus == SQLITE_OK) {
+//        NSLog(@"数据库打开成功");
+//    }
     //查询数据库新添加的食物
     NSString *sql = [NSString stringWithFormat:@"select foodName,deviceName,aboutFood,expireDate,remindDate,photoPath from Fosa2 where deviceName ='%@'",device];
     const char *selsql = (char *)[sql UTF8String];
@@ -1033,8 +1034,6 @@
             fdevice = [NSString stringWithUTF8String:device_name];
            
             about_food = (const char *)sqlite3_column_text(_stmt,2);
-            NSLog(@"查询到数据:%@",[NSString stringWithUTF8String:about_food]);
-            
             expire_date = (const char *)sqlite3_column_text(_stmt,3);
             expire = [NSString stringWithUTF8String:expire_date];
             
@@ -1045,17 +1044,17 @@
             photoPath = [NSString stringWithUTF8String:photo_path];
         }
     }
-    NSLog(@"查询到数据:%@",food);
-    NSLog(@"查询到数据:%@",fdevice);
-    NSLog(@"查询到数据:%@",expire);
-    NSLog(@"查询到数据:%@",remind);
-    NSLog(@"查询到数据:%@",photoPath);
+//    NSLog(@"查询到数据:%@",food);
+//    NSLog(@"查询到数据:%@",fdevice);
+//    NSLog(@"查询到数据:%@",expire);
+//    NSLog(@"查询到数据:%@",remind);
+//    NSLog(@"查询到数据:%@",photoPath);
+    if (fdevice == NULL) {
+        fdevice = device;
+        food = @"该设备没有记录";
+    }
     FoodModel *model = [FoodModel modelWithName:food device_name:fdevice icon:photoPath expire_date:expire remind_date:remind];
-    food = NULL;
-    fdevice = NULL;
-    photoPath = NULL;
-    expire  = NULL;
-    remind  = NULL;
+    
     return model;
 }
 //获取DB数据库所在的document路径
@@ -1152,6 +1151,48 @@
         }
     }];
 }
+
+
+- (void)drawLine:(AVMetadataMachineReadableCodeObject *)objc
+{
+
+    NSArray *array = objc.corners;
+
+    // 1.创建形状图层, 用于保存绘制的矩形
+    CAShapeLayer *layer = [[CAShapeLayer alloc] init];
+
+    // 设置线宽
+    layer.lineWidth = 2;
+    // 设置描边颜色
+    layer.strokeColor = [UIColor greenColor].CGColor;
+    layer.fillColor = [UIColor clearColor].CGColor;
+
+    // 2.创建UIBezierPath, 绘制矩形
+    UIBezierPath *path = [[UIBezierPath alloc] init];
+    CGPoint point = CGPointZero;
+    int index = 0;
+
+    CFDictionaryRef dict = (__bridge CFDictionaryRef)(array[index++]);
+    // 把点转换为不可变字典
+    // 把字典转换为点，存在point里，成功返回true 其他false
+    CGPointMakeWithDictionaryRepresentation(dict, &point);
+
+    // 设置起点
+    [path moveToPoint:point];
+    NSLog(@"X:%f -- Y:%f",point.x,point.y);
+
+    // 2.2连接其它线段
+    for (int i = 1; i<array.count; i++) {
+        CGPointMakeWithDictionaryRepresentation((__bridge CFDictionaryRef)array[i], &point);
+        [path addLineToPoint:point];
+        NSLog(@"X:%f -- Y:%f",point.x,point.y);
+    }
+    // 2.3关闭路径
+    [path closePath];
+    layer.path = path.CGPath;
+    // 3.将用于保存矩形的图层添加到界面上
+    [self.previewLayer addSublayer:layer];
+}
 #pragma mark - 此方法用于检测画面中是否存在二维码
 -(void)DetectQRcode:(UIImage *)image{
     //创建上下文对象
@@ -1193,47 +1234,6 @@
 }
 @end
 //
-///*** 专门用于保存描边的图层 ***/
-//@property (nonatomic,strong) CALayer *containerLayer;
-//
-//- (void)drawLine:(AVMetadataMachineReadableCodeObject *)objc
-//{
-//
-//    NSArray *array = objc.corners;
-//
-//    // 1.创建形状图层, 用于保存绘制的矩形
-//    CAShapeLayer *layer = [[CAShapeLayer alloc] init];
-//
-//    // 设置线宽
-//    layer.lineWidth = 2;
-//    // 设置描边颜色
-//    layer.strokeColor = [UIColor greenColor].CGColor;
-//    layer.fillColor = [UIColor clearColor].CGColor;
-//
-//    // 2.创建UIBezierPath, 绘制矩形
-//    UIBezierPath *path = [[UIBezierPath alloc] init];
-//    CGPoint point = CGPointZero;
-//    int index = 0;
-//
-//    CFDictionaryRef dict = (__bridge CFDictionaryRef)(array[index++]);
-//    // 把点转换为不可变字典
-//    // 把字典转换为点，存在point里，成功返回true 其他false
-//    CGPointMakeWithDictionaryRepresentation(dict, &point);
-//
-//    // 设置起点
-//    [path moveToPoint:point];
-//    NSLog(@"X:%f -- Y:%f",point.x,point.y);
-//
-//    // 2.2连接其它线段
-//    for (int i = 1; i<array.count; i++) {
-//        CGPointMakeWithDictionaryRepresentation((__bridge CFDictionaryRef)array[i], &point);
-//        [path addLineToPoint:point];
-//        NSLog(@"X:%f -- Y:%f",point.x,point.y);
-//    }
-//    // 2.3关闭路径
-//    [path closePath];
-//    layer.path = path.CGPath;
-//    // 3.将用于保存矩形的图层添加到界面上
-//    [self.containerLayer addSublayer:layer];
-//}
+
+
 
