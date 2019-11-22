@@ -10,6 +10,7 @@
 #import "ScanOneCodeViewController.h"
 #import "PhotoViewController.h"
 #import "FoodCollectionViewCell.h"
+#import "AddViewController.h"
 #import "MenuModel.h"
 #import "FosaMenu.h"
 #import "FoodInfoViewController.h"
@@ -26,6 +27,7 @@
     int i;
     NSString *ID;
     Boolean isEdit;
+    CGFloat cellHeight;
 }
 
 @property (nonatomic,strong) UIView *CategoryMenu;  //菜单视图
@@ -66,6 +68,7 @@
     self.navigationItem.leftBarButtonItem = leftItem;
     
     [self InitView];
+    //[self InitAddView];
    
 }
 
@@ -106,7 +109,7 @@
     _StorageItemView.showsVerticalScrollIndicator = NO;
     //regist the user-defined collctioncell
     [_StorageItemView registerClass:[FoodCollectionViewCell class] forCellWithReuseIdentifier:ID];
-    
+
     //给view 添加滑动事件
 //     UISwipeGestureRecognizer *recognizer;
 //        //right--
@@ -137,15 +140,10 @@
      [_refresh addTarget:self action:@selector(refresh:) forControlEvents:UIControlEventValueChanged];
     _StorageItemView.refreshControl = _refresh;
     }
-    
     _StorageItemView.delegate = self;
     _StorageItemView.dataSource = self;
     [self.view addSubview:_StorageItemView];
-    
-    
     _notification = [[FosaNotification alloc]init];
-    
-   
     [self CreatMenu];
 }
 
@@ -190,6 +188,44 @@
     [add addSubview:add_icon];
     [self.CategoryScrollview addSubview:add];
 }
+
+- (void)InitAddView{
+    //在UICollectionView最后添加一个addview
+    CGFloat cellWidth = (self.StorageItemView.frame.size.width-15)/2;
+    CGFloat cellheight = 101.666667;
+    NSLog(@"***********%f",cellheight);
+    CGFloat x = 5+(self.storageArray.count%2)*(cellWidth+5);
+    CGFloat y = 0;
+    if (self.storageArray.count % 2 == 0 && self.storageArray.count != 0) {
+        y = (cellheight+5)*(self.storageArray.count/2+1)+5;
+    }else{
+        y = (cellheight+5)*(self.storageArray.count/2)+5;
+    }
+    self.addView = [[UIButton alloc]initWithFrame:CGRectMake(x, y, cellWidth, cellheight)];
+    self.addView.layer.cornerRadius = 5;
+    _addView.backgroundColor = [UIColor colorWithRed:105/255.0 green:251/255.5 blue:241/255.0 alpha:1.0];
+    [self.addView setImage:[UIImage imageNamed:@"icon_additem"] forState:UIControlStateNormal];
+    [self.StorageItemView addSubview:self.addView];
+    //添加点击事件
+    [self.addView addTarget:self action:@selector(addFunction) forControlEvents:UIControlEventTouchUpInside];
+}
+// 添加事件
+- (void) addFunction{
+    CGFloat headerWidth = [UIScreen mainScreen].bounds.size.width-20;
+    CGFloat headerheight = [UIScreen mainScreen].bounds.size.height/3;
+    AddViewController *add = [[AddViewController alloc]init];
+    add.deviceName = [[UITextView alloc]initWithFrame:CGRectMake(15, 0,headerWidth/2, headerheight/4-5)];
+    add.deviceName.backgroundColor = [UIColor clearColor];
+    add.deviceName.textColor = [UIColor blackColor];
+    add.deviceName.text =  @"FS900000000000000003";
+    [add.headerView addSubview:add.deviceName];
+    [add.headerView addSubview:add.imageView1];
+
+    add.hidesBottomBarWhenPushed = YES;
+    [self.navigationController pushViewController:add animated:YES];
+}
+
+
 //滑动手势事件
 - (void)swipeGestureRight:(UISwipeGestureRecognizer *)swipeGestureRecognizer{
     NSLog(@"向右滑动");
@@ -362,7 +398,6 @@ NSLog(@"foodName=%@&&&&&&&expireDate=%@",_storageArray[i].foodName,_storageArray
            
     }
 }
-
 //-(void)handleSwipeFrom:(UISwipeGestureRecognizer *)recognizer
 //{
 //    if(recognizer.direction==UISwipeGestureRecognizerDirectionLeft) {
@@ -398,7 +433,6 @@ if (!_LeftOrRight) {//view 展开
     // 停止刷新
     [sender endRefreshing];
 }
-
 - (void)DeleteCell:(UIMenuController *)menu
 {
     isEdit = false;
@@ -461,11 +495,12 @@ if (!_LeftOrRight) {//view 展开
 //每个cell的具体内容
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:( NSIndexPath *)indexPath {
     FoodCollectionViewCell *cell = [self.StorageItemView dequeueReusableCellWithReuseIdentifier:ID forIndexPath:indexPath];
+    cellHeight = cell.frame.size.height;//获取cell的高度
     //给自定义cell的model传值
     long int index = indexPath.section*2+indexPath.row;
-    //if (index+1 <= self.storageArray.count) {
-        cell.model = self.storageArray[index];
-        [cell setModel:cell.model];
+    cell.model = self.storageArray[index];
+    
+    [cell setModel:cell.model];
         //cell.backgroundColor = [UIColor colorWithRed:arc4random()%255/255.0 green:arc4random()%255/255.0 blue:arc4random()%255/255.0 alpha:1];
     cell.backgroundColor = [UIColor colorWithRed:155/255.0 green:251/255.5 blue:241/255.0 alpha:1.0];
         cell.layer.cornerRadius = 10;
@@ -474,6 +509,10 @@ if (!_LeftOrRight) {//view 展开
         _longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(lonePressMoving:)];
         _longPress.minimumPressDuration = 2.0;
         [cell addGestureRecognizer:_longPress];
+    
+    if (index+1 == self.storageArray.count) {
+        [self InitAddView];
+    }
         return cell;
     //}
 }
