@@ -77,12 +77,6 @@
     }];
 }
 - (void)addEvent{
-    AddViewController *add = [[AddViewController alloc]init];
-    add.hidesBottomBarWhenPushed = YES;
-    
-    ScanOneCodeViewController *scan = [[ScanOneCodeViewController alloc]init];
-    scan.hidesBottomBarWhenPushed = YES;
-    
     PhotoViewController *photo = [[PhotoViewController alloc]init];
     photo.hidesBottomBarWhenPushed = YES;
     

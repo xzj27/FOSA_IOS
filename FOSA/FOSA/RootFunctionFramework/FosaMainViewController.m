@@ -10,7 +10,7 @@
 #import "ScanOneCodeViewController.h"
 #import "PhotoViewController.h"
 #import "FoodCollectionViewCell.h"
-#import "AddViewController.h"
+#import "PhotoViewController.h"
 #import "MenuModel.h"
 #import "FosaMenu.h"
 #import "FoodInfoViewController.h"
@@ -211,18 +211,9 @@
 }
 // 添加事件
 - (void) addFunction{
-    CGFloat headerWidth = [UIScreen mainScreen].bounds.size.width-20;
-    CGFloat headerheight = [UIScreen mainScreen].bounds.size.height/3;
-    AddViewController *add = [[AddViewController alloc]init];
-    add.deviceName = [[UITextView alloc]initWithFrame:CGRectMake(15, 0,headerWidth/2, headerheight/4-5)];
-    add.deviceName.backgroundColor = [UIColor clearColor];
-    add.deviceName.textColor = [UIColor blackColor];
-    add.deviceName.text =  @"FS900000000000000003";
-    [add.headerView addSubview:add.deviceName];
-    [add.headerView addSubview:add.imageView1];
-
-    add.hidesBottomBarWhenPushed = YES;
-    [self.navigationController pushViewController:add animated:YES];
+   PhotoViewController *photo = [[PhotoViewController alloc]init];
+    photo.hidesBottomBarWhenPushed = YES;
+    [self.navigationController pushViewController:photo animated:YES];
 }
 
 
