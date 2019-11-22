@@ -40,7 +40,7 @@
      
         UIImageView *iconImageView = [[UIImageView alloc]init];
         self.iconImageView = iconImageView;
-            self.iconImageView.transform = CGAffineTransformMakeRotation(M_PI_2);//顺时针旋转90度
+        //self.iconImageView.transform = CGAffineTransformMakeRotation(M_PI_2);//顺时针旋转90度
         [self addSubview:iconImageView];
         
         UILabel *nameLabel = [[UILabel alloc]init];

@@ -23,7 +23,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic,strong) UITextView *deviceName;
 
 //
-@property (nonatomic,strong) UIView *foodNameView,*expireView,*remindView,*locationView,*weightView,*calorieView;
+@property (nonatomic,strong) UIView *foodNameView,*aboutFoodView,*expireView,*remindView,*locationView,*weightView,*calorieView;
 @property (nonatomic,strong) UITextField *foodName,*aboutFood;
 @property (nonatomic,strong) UITextView *expireDate,*remindDate,*location,*weight,*calorie;
 @property (nonatomic,strong) UIButton *expireBtn,*remindBtn,*locationBtn,*weightBtn,*calBtn;

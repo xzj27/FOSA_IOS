@@ -146,15 +146,20 @@
     //给对应按钮添加响应
     [_share addTarget:self action:@selector(beginShare) forControlEvents:UIControlEventTouchUpInside];
     
-    
     //添加名称输入框视图
     self.foodNameView = [[UIView alloc]initWithFrame:CGRectMake(10, headerheight+20,headerWidth, 50)];
     _foodNameView.backgroundColor = [UIColor colorWithRed:180/255.0 green:180/255.0 blue:180/255.0 alpha:1.0];
     _foodNameView.layer.cornerRadius = 5;
+    [self.rootScrollview addSubview:_foodNameView];
+    
+    UILabel *foodlabel = [[UILabel alloc]initWithFrame:CGRectMake(5, 0, 90, 40)];
+    foodlabel.text = @"Food name:";
+    foodlabel.font = [UIFont systemFontOfSize:13];
+    [self.foodNameView addSubview:foodlabel];
+    
+    self.foodName = [[UITextField alloc]initWithFrame:CGRectMake(95, 5, headerWidth-95, 40)];
     _foodName.layer.borderColor = [[UIColor grayColor] CGColor];
     _foodName.font = [UIFont fontWithName:@"Arial" size:15.0f];
-    [self.rootScrollview addSubview:_foodNameView];
-    self.foodName = [[UITextField alloc]initWithFrame:CGRectMake(10, 5, headerWidth, 40)];
     _foodName.textColor = [UIColor blackColor];
     _foodName.placeholder = @"输入食品名称";
     _foodName.delegate = self;
@@ -162,8 +167,12 @@
     [self.foodNameView addSubview:_foodName];
     
     //食品描述框
-    self.aboutFood = [[UITextField alloc]initWithFrame:CGRectMake(10, headerheight+80, headerWidth, 50)];
-    _aboutFood.layer.borderWidth = 1.f;
+    self.aboutFoodView = [[UIView alloc]initWithFrame:CGRectMake(10, headerheight+80, headerWidth, 50)];
+    [self.rootScrollview addSubview:self.aboutFoodView];
+    _aboutFoodView .backgroundColor = [UIColor colorWithRed:180/255.0 green:180/255.0 blue:180/255.0 alpha:1.0];
+    _aboutFoodView .layer.cornerRadius = 5;
+    
+    self.aboutFood = [[UITextField alloc]initWithFrame:CGRectMake(95, 0, headerWidth-95, 50)];
     _aboutFood.layer.borderColor = [[UIColor grayColor] CGColor];
     _aboutFood.placeholder = @"您可以在这里输入一些说明!";
     self.aboutFood.backgroundColor = [UIColor colorWithRed:180/255.0 green:180/255.0 blue:180/255.0 alpha:1.0];
@@ -171,7 +180,12 @@
     _aboutFood.textColor = [UIColor blackColor];
     _aboutFood.delegate = self;
     _aboutFood.returnKeyType = UIReturnKeyDone;
-    [self.rootScrollview addSubview:_aboutFood];
+    
+    UILabel *aboutfoodlabel = [[UILabel alloc]initWithFrame:CGRectMake(5, 0, 90, 40)];
+    aboutfoodlabel.text = @"About Food:";
+    aboutfoodlabel.font = [UIFont systemFontOfSize:13];
+    [self.aboutFoodView addSubview:aboutfoodlabel];
+    [self.aboutFoodView addSubview:_aboutFood];
     
     //提醒日期视图
     self.remindView = [[UIView alloc]initWithFrame:CGRectMake(10, headerheight+140,headerWidth, 50)];
@@ -179,13 +193,13 @@
     _remindView.layer.cornerRadius = 5;
     [self.rootScrollview addSubview:_remindView];
     
-    self.remindDate = [[UITextView alloc]initWithFrame:CGRectMake(90, 5, headerWidth/2, 40)];
+    self.remindDate = [[UITextView alloc]initWithFrame:CGRectMake(95, 5, headerWidth/2, 40)];
     _remindDate.textColor = [UIColor blackColor];
     _remindDate.backgroundColor = [UIColor clearColor];
     _remindDate.userInteractionEnabled = NO;
     [self.remindView addSubview:_remindDate];
     
-    UILabel *remindLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, 90, 40)];
+    UILabel *remindLabel = [[UILabel alloc]initWithFrame:CGRectMake(5, 0, 90, 40)];
     remindLabel.text = @"Remind Date:";
     remindLabel.font = [UIFont systemFontOfSize:13];
     [self.remindView addSubview:remindLabel];
@@ -201,13 +215,13 @@
     _expireView.layer.cornerRadius = 5;
     [self.rootScrollview addSubview:_expireView];
     
-    self.expireDate = [[UITextView alloc]initWithFrame:CGRectMake(90, 5, headerWidth/2, 40)];
+    self.expireDate = [[UITextView alloc]initWithFrame:CGRectMake(95, 5, headerWidth/2, 40)];
     _expireDate.textColor = [UIColor blackColor];
     _expireDate.backgroundColor = [UIColor clearColor];
     _expireDate.userInteractionEnabled = NO;
     [self.expireView addSubview:_expireDate];
     
-    UILabel *expireLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, 90, 40)];
+    UILabel *expireLabel = [[UILabel alloc]initWithFrame:CGRectMake(5, 0, 90, 40)];
     expireLabel.text = @"Expire Date:";
     expireLabel.font = [UIFont systemFontOfSize:13];
     [self.expireView addSubview:expireLabel];
@@ -216,22 +230,24 @@
     [_expireBtn setImage:[UIImage imageNamed:@"icon_date"] forState:UIControlStateNormal];
     [self.expireView addSubview:_expireBtn];
     [_expireBtn addTarget:self action:@selector(ExpireDateSelect) forControlEvents:UIControlEventTouchUpInside];
-    
+
     //存储位置视图
     self.locationView = [[UIView alloc]initWithFrame:CGRectMake(10, headerheight+260,headerWidth, 50)];
     _locationView.backgroundColor = [UIColor colorWithRed:180/255.0 green:180/255.0 blue:180/255.0 alpha:1.0];
     _locationView.layer.cornerRadius = 5;
     [self.rootScrollview addSubview:_locationView];
     
-    UILabel *locationLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, 90, 40)];
-    locationLabel.text = @"Location";
+    UILabel *locationLabel = [[UILabel alloc]initWithFrame:CGRectMake(5, 0, 90, 40)];
+    locationLabel.text = @"Location:";
     locationLabel.font = [UIFont systemFontOfSize:13];
     [self.locationView addSubview:locationLabel];
     
-    self.location = [[UITextView alloc]initWithFrame:CGRectMake(10, 5, headerWidth/2, 40)];
+    self.location = [[UITextView alloc]initWithFrame:CGRectMake(45, 5, headerWidth/2, 40)];
 //    _location.text = @"Storage Location";
     _location.textColor =[UIColor blackColor];
     _location.backgroundColor = [UIColor clearColor];
+    _location.userInteractionEnabled = NO;
+    
     [self.locationView addSubview:_location];
     self.locationBtn = [[UIButton alloc]initWithFrame:CGRectMake(headerWidth-45, 5, 40, 40)];
     [_locationBtn setImage:[UIImage imageNamed:@"icon_location"] forState:UIControlStateNormal];
@@ -243,14 +259,13 @@
     _weightView.layer.cornerRadius = 5;
     [self.rootScrollview addSubview:_weightView];
     
-    UILabel *weightLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, 90, 40)];
+    UILabel *weightLabel = [[UILabel alloc]initWithFrame:CGRectMake(5, 0, 90, 40)];
     weightLabel.text = @"Weight";
     weightLabel.font = [UIFont systemFontOfSize:13];
     [self.weightView addSubview:weightLabel];
     
     self.weightBtn = [[UIButton alloc]initWithFrame:CGRectMake(headerWidth/2-50, 5, 40, 40)];
     [_weightBtn setImage:[UIImage imageNamed:@"icon_weight"] forState:UIControlStateNormal];
-    [_weightBtn setTitle:@"Weight" forState:UIControlStateNormal];
     [self.weightView addSubview:_weightBtn];
     
     //卡路里视图
@@ -259,7 +274,7 @@
     _calorieView.layer.cornerRadius = 5;
     [self.rootScrollview addSubview:_calorieView];
     
-    UILabel *calorieLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, 90, 40)];
+    UILabel *calorieLabel = [[UILabel alloc]initWithFrame:CGRectMake(5, 0, 90, 40)];
        calorieLabel.text = @"Calorie";
        calorieLabel.font = [UIFont systemFontOfSize:13];
        [self.calorieView addSubview:calorieLabel];
@@ -267,7 +282,6 @@
     self.calBtn = [[UIButton alloc]initWithFrame:CGRectMake(headerWidth/2-50, 5, 40, 40)];
     //_calBtn.backgroundColor = [UIColor blackColor];
     [self.calBtn setImage:[UIImage imageNamed:@"icon_calorie"] forState:UIControlStateNormal];
-    [_calBtn setTitle:@"Calorie" forState:UIControlStateNormal];
     [self.calorieView addSubview:_calBtn];
 }
 -(void)ExpireDateSelect{

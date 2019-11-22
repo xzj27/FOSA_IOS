@@ -146,9 +146,7 @@
     
     _notification = [[FosaNotification alloc]init];
     
-    //注册通知
-    [_notification initNotification];
-    
+   
     [self CreatMenu];
 }
 
@@ -215,13 +213,11 @@
 //发送通知提醒当天所有已过期的食品
 - (void)SendRemindingNotification
 {
+    //注册通知
+    [_notification initNotification];
     //标志
     Boolean isSend = false;
     
-    _circleview = [[LoadCircleView alloc]initWithFrame:CGRectMake(0  ,200,self.view.frame.size.width,100)];
-    //添加到视图上展示
-     [self.view addSubview:_circleview];
-    [self performSelector:@selector(removeLoading) withObject:nil afterDelay:4.0f];
     //获取当前日期
     NSDate *currentDate = [[NSDate alloc]init];
     NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
@@ -255,6 +251,10 @@ NSLog(@"foodName=%@&&&&&&&expireDate=%@",_storageArray[i].foodName,_storageArray
             [_notification sendNotification:_storageArray[i].foodName body:body path:_storageArray[i].foodPhoto];
         }
     }
+    _circleview = [[LoadCircleView alloc]initWithFrame:CGRectMake(0  ,200,self.view.frame.size.width,100)];
+    //添加到视图上展示
+     [self.view addSubview:_circleview];
+    [self performSelector:@selector(removeLoading) withObject:nil afterDelay:3.0f];
     
 }
 - (void)removeLoading{
