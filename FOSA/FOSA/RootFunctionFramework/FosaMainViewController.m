@@ -18,6 +18,7 @@
 #import "FosaNotification.h"
 
 #import <UserNotifications/UserNotifications.h>
+#import "LoadCircleView.h"
 #import <WebKit/WebKit.h>
 #import <sqlite3.h>
 
@@ -38,6 +39,7 @@
 @property (nonatomic,strong) UIRefreshControl *refresh;
 @property (nonatomic, strong) UILongPressGestureRecognizer *longPress;//长按手势
 
+@property (nonatomic,strong) LoadCircleView *circleview;
 @property (nonatomic,strong) FosaNotification *notification;
 @end
 
@@ -118,10 +120,10 @@
 //        recognizer = [[UISwipeGestureRecognizer alloc]initWithTarget:self action:@selector(handleSwipeFrom:)];
 //        [recognizer setDirection:(UISwipeGestureRecognizerDirectionLeft)];
 //        [[self view] addGestureRecognizer:recognizer];
-        //[recognizer release];
-    UIGestureRecognizer *recognizer = [[UIGestureRecognizer alloc]initWithTarget:self action:@selector(moveMenu)];
-    recognizer.delegate = self;
-    [[self StorageItemView] addGestureRecognizer:recognizer];
+//        //[recognizer release];
+    UIGestureRecognizer *Crecognizer = [[UIGestureRecognizer alloc]initWithTarget:self action:@selector(moveMenu)];
+    Crecognizer.delegate = self;
+    [[self StorageItemView] addGestureRecognizer:Crecognizer];
 
     
     if ([NSProcessInfo.processInfo isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion){10,0,0}])
@@ -211,8 +213,14 @@
     }
 }
 
+#pragma mark - Notification
 //发送通知提醒当天所有已过期的食品
 - (void)SendRemindingNotification{
+    
+    _circleview = [[LoadCircleView alloc]initWithFrame:CGRectMake(0  ,200,self.view.frame.size.width,100)];
+    //添加到视图上展示
+     [self.view addSubview:_circleview];
+    [self performSelector:@selector(removeLoading) withObject:nil afterDelay:4.0f];
     //获取当前日期
     NSDate *currentDate = [[NSDate alloc]init];
     NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
@@ -247,7 +255,9 @@ NSLog(@"foodName=%@&&&&&&&expireDate=%@",_storageArray[i].foodName,_storageArray
         }
     }
 }
-
+- (void)removeLoading{
+    [self.circleview removeFromSuperview];
+}
 //跳转到扫码界面
 - (void)Scan{
     
@@ -424,14 +434,11 @@ NSLog(@"foodName=%@&&&&&&&expireDate=%@",_storageArray[i].foodName,_storageArray
         }
     }
 }
-
 - (void)CancelEdit:(UIMenuController *)menu
 {
     NSLog(@"点击了取消");
-    
     isEdit = false;
 }
-
 - (BOOL)canBecomeFirstResponder
 {
     return YES;
@@ -462,7 +469,6 @@ NSLog(@"foodName=%@&&&&&&&expireDate=%@",_storageArray[i].foodName,_storageArray
         cell.layer.cornerRadius = 10;
         cell.userInteractionEnabled = YES;
         //给每一个cell添加长按手势
-        //添加一个长按手势
         _longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(lonePressMoving:)];
         _longPress.minimumPressDuration = 2.0;
         [cell addGestureRecognizer:_longPress];
@@ -471,8 +477,6 @@ NSLog(@"foodName=%@&&&&&&&expireDate=%@",_storageArray[i].foodName,_storageArray
 }
 //点击item方法
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath{
-    NSLog(@"&&&&&&&&&&&");
-    //[self moveMenu];
     //获取点击的cell
     FoodCollectionViewCell *cell = (FoodCollectionViewCell *)[self collectionView:_StorageItemView cellForItemAtIndexPath:indexPath];
     [self ClickNotification:cell];
@@ -493,8 +497,9 @@ NSLog(@"foodName=%@&&&&&&&expireDate=%@",_storageArray[i].foodName,_storageArray
       cell.backgroundColor = [UIColor colorWithRed:arc4random()%255/255.0 green:arc4random()%255/255.0 blue:arc4random()%255/255.0 alpha:1];
 }
 
+#pragma mark - UIGestureRecognizer
+//与didselect不冲突
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch{
-    NSLog(@"++++++++");
     if (touch.view != self.StorageItemView) {
         return NO;
     }else{
