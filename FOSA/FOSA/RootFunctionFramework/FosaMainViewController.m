@@ -107,6 +107,23 @@
     //regist the user-defined collctioncell
     [_StorageItemView registerClass:[FoodCollectionViewCell class] forCellWithReuseIdentifier:ID];
     
+    //给view 添加滑动事件
+     UISwipeGestureRecognizer *recognizer;
+        //right--
+        recognizer = [[UISwipeGestureRecognizer alloc]initWithTarget:self action:@selector(handleSwipeFrom:)];
+        [recognizer setDirection:(UISwipeGestureRecognizerDirectionRight)];
+        [[self view] addGestureRecognizer:recognizer];
+        //[recognizer release];
+        //left---
+        recognizer = [[UISwipeGestureRecognizer alloc]initWithTarget:self action:@selector(handleSwipeFrom:)];
+        [recognizer setDirection:(UISwipeGestureRecognizerDirectionLeft)];
+        [[self view] addGestureRecognizer:recognizer];
+       // [recognizer release];
+//    UIGestureRecognizer *recognizer = [[UIGestureRecognizer alloc]initWithTarget:self action:@selector(moveMenu)];
+//    [[self view] addGestureRecognizer:recognizer];
+
+    
+    
     if ([NSProcessInfo.processInfo isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion){10,0,0}])
     {
         //CGRect fresh = CGRectMake(0, 0, self.StorageItemView.frame.size.width,50);
@@ -309,7 +326,7 @@ NSLog(@"foodName=%@&&&&&&&expireDate=%@",_storageArray[i].foodName,_storageArray
 - (void)ClickCategory:(UIGestureRecognizer *)recognizer{
     NSLog(@"%@",recognizer.accessibilityValue);
 }
-#pragma mark - UICollectionView 长按事件
+#pragma mark - UICollectionView 事件
 - (void)lonePressMoving:(UILongPressGestureRecognizer *)longPress
 {
     NSLog(@"长按了item");
@@ -334,6 +351,33 @@ NSLog(@"foodName=%@&&&&&&&expireDate=%@",_storageArray[i].foodName,_storageArray
         }
             
            
+    }
+}
+
+-(void)handleSwipeFrom:(UISwipeGestureRecognizer *)recognizer
+{
+    if(recognizer.direction==UISwipeGestureRecognizerDirectionLeft) {
+        NSLog(@"swipe left");
+        //执行程序
+        [self moveMenu];
+    }
+    if(recognizer.direction==UISwipeGestureRecognizerDirectionRight) {
+        
+        NSLog(@"swipe right");
+        //执行程序
+        [self moveMenu];
+    }
+}
+- (void) moveMenu
+{
+    if (_LeftOrRight) {//view 折叠
+        _LeftOrRight = false;
+        //view 向左移动
+       _CategoryMenu.center = CGPointMake(self.CategoryMenu.frame.size.width/2, (self.CategoryMenu.frame.size.height)/2+self.navHeight);
+    }else if (!_LeftOrRight) {//view 展开
+        _LeftOrRight = true;
+        //向右移动
+         _CategoryMenu.center = CGPointMake(-self.mainWidth/12,(self.CategoryMenu.frame.size.height)/2+self.navHeight);
     }
 }
 #pragma mark - 刷新事件与menu事件
@@ -428,6 +472,7 @@ NSLog(@"foodName=%@&&&&&&&expireDate=%@",_storageArray[i].foodName,_storageArray
 //点击item方法
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath{
     NSLog(@"&&&&&&&&&&&");
+    [self moveMenu];
     //获取点击的cell
     FoodCollectionViewCell *cell = (FoodCollectionViewCell *)[self collectionView:_StorageItemView cellForItemAtIndexPath:indexPath];
     [self ClickNotification:cell];
