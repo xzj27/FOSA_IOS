@@ -66,10 +66,8 @@
     
     UIBarButtonItem *leftItem = [[UIBarButtonItem alloc]initWithCustomView:self.Remindbtn];
     self.navigationItem.leftBarButtonItem = leftItem;
-    
     [self InitView];
-    //[self InitAddView];
-   
+    [self InitAddView];
 }
 
 - (void)viewWillAppear:(BOOL)animated{
@@ -196,9 +194,11 @@
     NSLog(@"***********%f",cellheight);
     CGFloat x = 5+(self.storageArray.count%2)*(cellWidth+5);
     CGFloat y = 0;
-    if (self.storageArray.count % 2 == 0 && self.storageArray.count != 0) {
-        y = (cellheight+5)*(self.storageArray.count/2+1)+5;
-    }else{
+    if (_storageArray.count == 0) {
+        y = 5;
+    }else if(self.storageArray.count % 2 == 0){
+        y = (cellheight+5)*(self.storageArray.count/2)+5;
+    }else if(self.storageArray.count % 2 == 1){
         y = (cellheight+5)*(self.storageArray.count/2)+5;
     }
     self.addView = [[UIButton alloc]initWithFrame:CGRectMake(x, y, cellWidth, cellheight)];
@@ -448,6 +448,10 @@ if (!_LeftOrRight) {//view 展开
         NSLog(@"删除成功");
         [self.storageArray removeAllObjects];
         [self.StorageItemView reloadData];
+        if (self.storageArray.count == 0) {
+            [self.addView removeFromSuperview];
+            [self InitAddView];
+        }
     }
 }
 - (void)deleteFile:(NSString *)photoName {
@@ -511,6 +515,7 @@ if (!_LeftOrRight) {//view 展开
         [cell addGestureRecognizer:_longPress];
     
     if (index+1 == self.storageArray.count) {
+        [self.addView removeFromSuperview];
         [self InitAddView];
     }
         return cell;
@@ -535,7 +540,7 @@ if (!_LeftOrRight) {//view 展开
 }
 - (void)collectionView:(UICollectionView *)collectionView didUnhighlightItemAtIndexPath:(NSIndexPath *)indexPath{
     FoodCollectionViewCell *cell = (FoodCollectionViewCell *)[_StorageItemView cellForItemAtIndexPath:indexPath];
-      cell.backgroundColor = [UIColor colorWithRed:arc4random()%255/255.0 green:arc4random()%255/255.0 blue:arc4random()%255/255.0 alpha:1];
+      cell.backgroundColor = [UIColor colorWithRed:155/255.0 green:251/255.5 blue:241/255.0 alpha:1.0];
 }
 
 #pragma mark - UIGestureRecognizer
