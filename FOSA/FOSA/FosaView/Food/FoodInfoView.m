@@ -154,8 +154,8 @@
         self.nameLabel.text = @"该设备没有记录";
     }
     self.foodName.text   = model.food_name;
-    self.expireDate.text = model.expire_date;
-    self.remindDate.text = model.remind_date;
+    self.expireDate.text = [NSString stringWithFormat:@"有效日期：%@",model.expire_date];
+    self.remindDate.text = [NSString stringWithFormat:@"提醒日期：%@",model.remind_date];;
 }
 //取出保存在本地的图片
 -(UIImage*)getImage:(NSString *)filepath{
