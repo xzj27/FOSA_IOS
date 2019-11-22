@@ -39,6 +39,7 @@
     fosa.tabBarItem.selectedImage = [UIImage imageNamed:selectImage];
     //修改字体颜色
     [fosa.tabBarItem setTitleTextAttributes:@{NSForegroundColorAttributeName:[UIColor colorWithRed:0/255.0 green:255/255.0 blue:51/255.0 alpha:1.0]} forState:UIControlStateHighlighted];
+    
     //3.创建导航控制器
     UINavigationController *nvc = [[UINavigationController alloc]initWithRootViewController:fosa];
         //设置背景颜色

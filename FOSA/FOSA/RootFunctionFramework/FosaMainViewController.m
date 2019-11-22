@@ -71,7 +71,7 @@
 
 - (void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
-    [self creatOrOpensql];
+    //[self creatOrOpensql];
     //[self SelectDataFromSqlite];
     if (self.StorageItemView != nil) {
         NSLog(@"异步刷新界面");
@@ -79,8 +79,6 @@
             [self.storageArray removeAllObjects];
             [self.StorageItemView reloadData];
         });
-    }else{
-        [self SelectDataFromSqlite];
     }
 }
 
@@ -215,7 +213,10 @@
 
 #pragma mark - Notification
 //发送通知提醒当天所有已过期的食品
-- (void)SendRemindingNotification{
+- (void)SendRemindingNotification
+{
+    //标志
+    Boolean isSend = false;
     
     _circleview = [[LoadCircleView alloc]initWithFrame:CGRectMake(0  ,200,self.view.frame.size.width,100)];
     //添加到视图上展示
@@ -240,8 +241,8 @@ NSLog(@"foodName=%@&&&&&&&expireDate=%@",_storageArray[i].foodName,_storageArray
         NSComparisonResult result = [currentDate compare:foodDate];
         
         if (result == NSOrderedDescending) {
-            NSLog(@"%@ 已经在 %@ 过期了",_storageArray[i].foodName,_storageArray[i].remindDate);
-            NSString *body = [NSString stringWithFormat:@"%@ 已经在 %@ 过期了",_storageArray[i].foodName,_storageArray[i].remindDate];
+            isSend = true;
+            NSString *body = [NSString stringWithFormat:@"Fosa 提醒你应该在%@ 食用 %@",_storageArray[i].remindDate,_storageArray[i].foodName];
             //发送通知
             [_notification sendNotification:_storageArray[i].foodName body:body path:_storageArray[i].foodPhoto];
             
@@ -254,6 +255,7 @@ NSLog(@"foodName=%@&&&&&&&expireDate=%@",_storageArray[i].foodName,_storageArray
             [_notification sendNotification:_storageArray[i].foodName body:body path:_storageArray[i].foodPhoto];
         }
     }
+    
 }
 - (void)removeLoading{
     [self.circleview removeFromSuperview];
@@ -364,20 +366,20 @@ NSLog(@"foodName=%@&&&&&&&expireDate=%@",_storageArray[i].foodName,_storageArray
     }
 }
 
--(void)handleSwipeFrom:(UISwipeGestureRecognizer *)recognizer
-{
-    if(recognizer.direction==UISwipeGestureRecognizerDirectionLeft) {
-        NSLog(@"swipe left");
-        //执行程序
-        [self moveMenu];
-    }
-    if(recognizer.direction==UISwipeGestureRecognizerDirectionRight) {
-        
-        NSLog(@"swipe right");
-        //执行程序
-        [self moveMenu];
-    }
-}
+//-(void)handleSwipeFrom:(UISwipeGestureRecognizer *)recognizer
+//{
+//    if(recognizer.direction==UISwipeGestureRecognizerDirectionLeft) {
+//        NSLog(@"swipe left");
+//        //执行程序
+//        [self moveMenu];
+//    }
+//    if(recognizer.direction==UISwipeGestureRecognizerDirectionRight) {
+//
+//        NSLog(@"swipe right");
+//        //执行程序
+//        [self moveMenu];
+//    }
+//}
 - (void) moveMenu
 {
     if (_LeftOrRight) {//view 折叠
@@ -446,6 +448,7 @@ NSLog(@"foodName=%@&&&&&&&expireDate=%@",_storageArray[i].foodName,_storageArray
 #pragma mark - UICollectionViewDataSource
 //每个section有几个item
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
+    [self creatOrOpensql];
     [self SelectDataFromSqlite];
     return self.storageArray.count;
 }
@@ -465,7 +468,8 @@ NSLog(@"foodName=%@&&&&&&&expireDate=%@",_storageArray[i].foodName,_storageArray
     //if (index+1 <= self.storageArray.count) {
         cell.model = self.storageArray[index];
         [cell setModel:cell.model];
-        cell.backgroundColor = [UIColor colorWithRed:arc4random()%255/255.0 green:arc4random()%255/255.0 blue:arc4random()%255/255.0 alpha:1];
+        //cell.backgroundColor = [UIColor colorWithRed:arc4random()%255/255.0 green:arc4random()%255/255.0 blue:arc4random()%255/255.0 alpha:1];
+    cell.backgroundColor = [UIColor colorWithRed:155/255.0 green:251/255.5 blue:241/255.0 alpha:1.0];
         cell.layer.cornerRadius = 10;
         cell.userInteractionEnabled = YES;
         //给每一个cell添加长按手势
