@@ -108,21 +108,21 @@
     [_StorageItemView registerClass:[FoodCollectionViewCell class] forCellWithReuseIdentifier:ID];
     
     //给view 添加滑动事件
-     UISwipeGestureRecognizer *recognizer;
-        //right--
-        recognizer = [[UISwipeGestureRecognizer alloc]initWithTarget:self action:@selector(handleSwipeFrom:)];
-        [recognizer setDirection:(UISwipeGestureRecognizerDirectionRight)];
-        [[self view] addGestureRecognizer:recognizer];
+//     UISwipeGestureRecognizer *recognizer;
+//        //right--
+//        recognizer = [[UISwipeGestureRecognizer alloc]initWithTarget:self action:@selector(handleSwipeFrom:)];
+//        [recognizer setDirection:(UISwipeGestureRecognizerDirectionRight)];
+//        [[self view] addGestureRecognizer:recognizer];
+//        //[recognizer release];
+//        //left---
+//        recognizer = [[UISwipeGestureRecognizer alloc]initWithTarget:self action:@selector(handleSwipeFrom:)];
+//        [recognizer setDirection:(UISwipeGestureRecognizerDirectionLeft)];
+//        [[self view] addGestureRecognizer:recognizer];
         //[recognizer release];
-        //left---
-        recognizer = [[UISwipeGestureRecognizer alloc]initWithTarget:self action:@selector(handleSwipeFrom:)];
-        [recognizer setDirection:(UISwipeGestureRecognizerDirectionLeft)];
-        [[self view] addGestureRecognizer:recognizer];
-       // [recognizer release];
-//    UIGestureRecognizer *recognizer = [[UIGestureRecognizer alloc]initWithTarget:self action:@selector(moveMenu)];
-//    [[self view] addGestureRecognizer:recognizer];
+    UIGestureRecognizer *recognizer = [[UIGestureRecognizer alloc]initWithTarget:self action:@selector(moveMenu)];
+    recognizer.delegate = self;
+    [[self StorageItemView] addGestureRecognizer:recognizer];
 
-    
     
     if ([NSProcessInfo.processInfo isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion){10,0,0}])
     {
@@ -331,7 +331,7 @@ NSLog(@"foodName=%@&&&&&&&expireDate=%@",_storageArray[i].foodName,_storageArray
 {
     NSLog(@"长按了item");
     isEdit = true;
-    CGPoint touchPoint = [longPress locationInView:self.StorageItemView];//获取长按的点
+    //CGPoint touchPoint = [longPress locationInView:self.StorageItemView];//获取长按的点
     if (longPress.state == UIGestureRecognizerStateBegan) {
             FoodCollectionViewCell *cell = (FoodCollectionViewCell *)longPress.view;
             NSLog(@"%@",cell.model.foodName);
@@ -472,7 +472,7 @@ NSLog(@"foodName=%@&&&&&&&expireDate=%@",_storageArray[i].foodName,_storageArray
 //点击item方法
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath{
     NSLog(@"&&&&&&&&&&&");
-    [self moveMenu];
+    //[self moveMenu];
     //获取点击的cell
     FoodCollectionViewCell *cell = (FoodCollectionViewCell *)[self collectionView:_StorageItemView cellForItemAtIndexPath:indexPath];
     [self ClickNotification:cell];
@@ -492,6 +492,17 @@ NSLog(@"foodName=%@&&&&&&&expireDate=%@",_storageArray[i].foodName,_storageArray
     FoodCollectionViewCell *cell = (FoodCollectionViewCell *)[_StorageItemView cellForItemAtIndexPath:indexPath];
       cell.backgroundColor = [UIColor colorWithRed:arc4random()%255/255.0 green:arc4random()%255/255.0 blue:arc4random()%255/255.0 alpha:1];
 }
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch{
+    NSLog(@"++++++++");
+    if (touch.view != self.StorageItemView) {
+        return NO;
+    }else{
+        [self moveMenu];
+        return YES;
+    }
+}
+
 
 - (void)viewDidDisappear:(BOOL)animated{
     int close = sqlite3_close_v2(_database);
