@@ -44,7 +44,6 @@
         self.nameLabel = nameLabel;
         [self addSubview:self.nameLabel];
         
-        
         UITextField *food = [[UITextField alloc]init];
         food.textAlignment = NSTextAlignmentCenter;
         food.font = [UIFont systemFontOfSize:10];
@@ -155,7 +154,7 @@
     }
     self.foodName.text   = model.food_name;
     self.expireDate.text = [NSString stringWithFormat:@"有效日期：%@",model.expire_date];
-    self.remindDate.text = [NSString stringWithFormat:@"提醒日期：%@",model.remind_date];;
+    self.remindDate.text = [NSString stringWithFormat:@"提醒日期：%@",model.remind_date];
 }
 //取出保存在本地的图片
 -(UIImage*)getImage:(NSString *)filepath{

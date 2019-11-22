@@ -42,11 +42,17 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view.
     self.view.backgroundColor = [UIColor whiteColor];
+    
+    UITapGestureRecognizer *tapGr = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(viewTapped:)];
+    tapGr.cancelsTouchesInView = NO;
+    [self.view addGestureRecognizer:tapGr];
+    
     [self InitialDatePicker];
     [self CreatAndInitView];
     [self creatOrOpensql];
     [self SelectDataFromSqlite];
 }
+
 
 -(void)viewWillAppear:(BOOL)animated
 {
@@ -299,7 +305,7 @@
     self.takePhoto.userInteractionEnabled = NO;
 }
 -(void)AllowEdit{
-    //self.foodName.userInteractionEnabled = YES;
+    self.foodName.userInteractionEnabled = YES;
     self.aboutFood.userInteractionEnabled = YES;
     self.expireBtn.userInteractionEnabled = YES;
     self.remindBtn.userInteractionEnabled = YES;
@@ -622,7 +628,14 @@ NSLog(@"dele fail");
 - (BOOL)textViewShouldBeginEditing:(UITextView *)textView{
     return NO;
 }
-//退出键盘
+#pragma mark - 键盘
+
+-(void)viewTapped:(UITapGestureRecognizer*)tapGr{
+   [self.aboutFood resignFirstResponder];
+   [self.foodName resignFirstResponder];
+}
+
+
 - (BOOL)textFieldShouldReturn:(UITextField *)textField{
     [self.aboutFood resignFirstResponder];
     [self.foodName resignFirstResponder];
