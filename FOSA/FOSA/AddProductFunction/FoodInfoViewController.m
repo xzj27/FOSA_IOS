@@ -147,28 +147,47 @@
     
     
     //添加名称输入框视图
-    self.foodNameView = [[UIView alloc]initWithFrame:CGRectMake(10, headerheight+20,headerWidth, 50)];
+   self.foodNameView = [[UIView alloc]initWithFrame:CGRectMake(10, headerheight+20,headerWidth, 50)];
     _foodNameView.backgroundColor = [UIColor colorWithRed:180/255.0 green:180/255.0 blue:180/255.0 alpha:1.0];
     _foodNameView.layer.cornerRadius = 5;
+    [self.rootScrollview addSubview:_foodNameView];
+    
+    UILabel *foodlabel = [[UILabel alloc]initWithFrame:CGRectMake(5, 0, 90, 40)];
+    foodlabel.text = @"Food name:";
+    foodlabel.font = [UIFont systemFontOfSize:13];
+    [self.foodNameView addSubview:foodlabel];
+    
+    self.foodName = [[UITextField alloc]initWithFrame:CGRectMake(95, 5, headerWidth-95, 40)];
     _foodName.layer.borderColor = [[UIColor grayColor] CGColor];
     _foodName.font = [UIFont fontWithName:@"Arial" size:15.0f];
-    [self.rootScrollview addSubview:_foodNameView];
-    self.foodName = [[UITextField alloc]initWithFrame:CGRectMake(10, 5, headerWidth, 40)];
+    _foodName.textColor = [UIColor blackColor];
     _foodName.placeholder = @"输入食品名称";
     _foodName.delegate = self;
     _foodName.returnKeyType = UIReturnKeyDone;
     [self.foodNameView addSubview:_foodName];
     
     //食品描述框
-    self.aboutFood = [[UITextField alloc]initWithFrame:CGRectMake(10, headerheight+80, headerWidth, 50)];
-    _aboutFood.layer.borderWidth = 1.f;
+    self.aboutFoodView = [[UIView alloc]initWithFrame:CGRectMake(10, headerheight+80, headerWidth, 50)];
+    [self.rootScrollview addSubview:self.aboutFoodView];
+    _aboutFoodView .backgroundColor = [UIColor colorWithRed:180/255.0 green:180/255.0 blue:180/255.0 alpha:1.0];
+    _aboutFoodView .layer.cornerRadius = 5;
+    
+    self.aboutFood = [[UITextField alloc]initWithFrame:CGRectMake(95, 0, headerWidth-95, 50)];
     _aboutFood.layer.borderColor = [[UIColor grayColor] CGColor];
     _aboutFood.placeholder = @"您可以在这里输入一些说明!";
+    self.aboutFood.backgroundColor = [UIColor colorWithRed:180/255.0 green:180/255.0 blue:180/255.0 alpha:1.0];
     _aboutFood.font = [UIFont fontWithName:@"Arial" size:15.0f];
-    //_aboutFood.textAlignment = UITextAlignmentLeft;
+    _aboutFood.textColor = [UIColor blackColor];
     _aboutFood.delegate = self;
     _aboutFood.returnKeyType = UIReturnKeyDone;
-    [self.rootScrollview addSubview:_aboutFood];
+    
+    UILabel *aboutfoodlabel = [[UILabel alloc]initWithFrame:CGRectMake(5, 0, 90, 40)];
+    aboutfoodlabel.text = @"About Food:";
+    aboutfoodlabel.font = [UIFont systemFontOfSize:13];
+    [self.aboutFoodView addSubview:aboutfoodlabel];
+    [self.aboutFoodView addSubview:_aboutFood];
+    
+    
 
     //提醒日期视图
     self.remindView = [[UIView alloc]initWithFrame:CGRectMake(10, headerheight+140,headerWidth, 50)];
@@ -176,12 +195,12 @@
     _remindView.layer.cornerRadius = 5;
     [self.rootScrollview addSubview:_remindView];
     
-    UILabel *remindLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, 90, 40)];
+    UILabel *remindLabel = [[UILabel alloc]initWithFrame:CGRectMake(5, 0, 90, 40)];
     remindLabel.text = @"Remind Date:";
     remindLabel.font = [UIFont systemFontOfSize:13];
     [self.remindView addSubview:remindLabel];
     
-    self.remindDate = [[UITextView alloc]initWithFrame:CGRectMake(90, 5, headerWidth/2, 40)];
+    self.remindDate = [[UITextView alloc]initWithFrame:CGRectMake(95, 5, headerWidth/2, 40)];
     _remindDate.textColor = [UIColor blackColor];
     _remindDate.backgroundColor = [UIColor clearColor];
     [self.remindView addSubview:_remindDate];
@@ -197,12 +216,12 @@
     _expireView.layer.cornerRadius = 5;
     [self.rootScrollview addSubview:_expireView];
     
-    UILabel *expireLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, 90, 40)];
+    UILabel *expireLabel = [[UILabel alloc]initWithFrame:CGRectMake(5, 0, 90, 40)];
     expireLabel.text = @"Expire Date:";
     expireLabel.font = [UIFont systemFontOfSize:13];
     [self.expireView addSubview:expireLabel];
     
-    self.expireDate = [[UITextView alloc]initWithFrame:CGRectMake(90, 5, headerWidth/2, 40)];
+    self.expireDate = [[UITextView alloc]initWithFrame:CGRectMake(95, 5, headerWidth/2, 40)];
     _expireDate.textColor = [UIColor blackColor];
     _expireDate.backgroundColor = [UIColor clearColor];
     [self.expireView addSubview:_expireDate];
@@ -216,8 +235,15 @@
     _locationView.backgroundColor = [UIColor colorWithRed:180/255.0 green:180/255.0 blue:180/255.0 alpha:1.0];
     _locationView.layer.cornerRadius = 5;
     [self.rootScrollview addSubview:_locationView];
-    self.location = [[UITextView alloc]initWithFrame:CGRectMake(10, 5, headerWidth/2, 40)];
-    _location.text = @"Storage Location";
+    
+    UILabel *LocationLabel = [[UILabel alloc]initWithFrame:CGRectMake(5, 0, 120, 40)];
+    LocationLabel.text = @"Storage Location:";
+    LocationLabel.font = [UIFont systemFontOfSize:13];
+    [self.locationView addSubview:LocationLabel];
+    
+    
+    self.location = [[UITextView alloc]initWithFrame:CGRectMake(125, 5, headerWidth/2, 40)];
+   // _location.text = @"Storage Location";
     _location.textColor =[UIColor blackColor];
     _location.backgroundColor = [UIColor clearColor];
     [self.locationView addSubview:_location];
@@ -231,7 +257,7 @@
     _weightView.layer.cornerRadius = 5;
     [self.rootScrollview addSubview:_weightView];
     
-    UILabel *weightLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, 90, 40)];
+    UILabel *weightLabel = [[UILabel alloc]initWithFrame:CGRectMake(5, 0, 90, 40)];
     weightLabel.text = @"Weight";
     weightLabel.font = [UIFont systemFontOfSize:13];
     [self.weightView addSubview:weightLabel];
@@ -246,7 +272,7 @@
     _calorieView.layer.cornerRadius = 5;
     [self.rootScrollview addSubview:_calorieView];
     
-    UILabel *calorieLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, 90, 40)];
+    UILabel *calorieLabel = [[UILabel alloc]initWithFrame:CGRectMake(5, 0, 90, 40)];
     calorieLabel.text = @"Calorie";
     calorieLabel.font = [UIFont systemFontOfSize:13];
     [self.calorieView addSubview:calorieLabel];
