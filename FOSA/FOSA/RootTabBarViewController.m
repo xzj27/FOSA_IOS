@@ -21,10 +21,10 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
-    [self addChildWithVCName:@"FosaMainViewController" title:@"fosa" image:@"tabbar_logo" selectImage:@"tabbar_logoHL"];
-    [self addChildWithVCName:@"FosaProductViewController" title:@"product" image:@"tabbar_product" selectImage:@"tabbar_productHL"];
+    [self addChildWithVCName:@"FosaMainViewController" title:@"Fosa" image:@"tabbar_logo" selectImage:@"tabbar_logoHL"];
+    [self addChildWithVCName:@"FosaProductViewController" title:@"Product" image:@"tabbar_product" selectImage:@"tabbar_productHL"];
     [self addChildWithVCName:@"FosaPoundViewController" title:@"Blt" image:@"tabbar_pound" selectImage:@"tabbar_poundHL"];
-    [self addChildWithVCName:@"FosaUserViewController" title:@"me" image:@"tabbar_me" selectImage:@"tabbar_meHL"];
+    [self addChildWithVCName:@"FosaUserViewController" title:@"Me" image:@"tabbar_me" selectImage:@"tabbar_meHL"];
 }
 -(void)addChildWithVCName:(NSString *)vcName title:(NSString *)title image:(NSString *)image selectImage:(NSString *)selectImage{
     //1.创建控制器
