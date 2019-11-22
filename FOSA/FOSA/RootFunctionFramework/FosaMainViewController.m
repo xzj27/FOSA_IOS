@@ -123,21 +123,20 @@
     Crecognizer.delegate = self;
     [[self StorageItemView] addGestureRecognizer:Crecognizer];
 
-    
-    if ([NSProcessInfo.processInfo isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion){10,0,0}])
-    {
-        //CGRect fresh = CGRectMake(0, 0, self.StorageItemView.frame.size.width,50);
-    //创建刷新控件
-    _refresh = [[UIRefreshControl alloc]init];
-        //refresh.frame = fresh;
-    //配置控件
-    _refresh.tintColor = [UIColor grayColor];
-    NSDictionary *attributes = @{NSForegroundColorAttributeName : [UIColor redColor]};
-    _refresh.attributedTitle = [[NSAttributedString alloc]initWithString:@"正在刷新界面" attributes:attributes];
-    //添加事件
-     [_refresh addTarget:self action:@selector(refresh:) forControlEvents:UIControlEventValueChanged];
-    _StorageItemView.refreshControl = _refresh;
-    }
+//    if ([NSProcessInfo.processInfo isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion){10,0,0}])
+//    {
+//        //CGRect fresh = CGRectMake(0, 0, self.StorageItemView.frame.size.width,50);
+//    //创建刷新控件
+//    _refresh = [[UIRefreshControl alloc]init];
+//        //refresh.frame = fresh;
+//    //配置控件
+//    _refresh.tintColor = [UIColor grayColor];
+//    NSDictionary *attributes = @{NSForegroundColorAttributeName : [UIColor redColor]};
+//    _refresh.attributedTitle = [[NSAttributedString alloc]initWithString:@"正在刷新界面" attributes:attributes];
+//    //添加事件
+//     [_refresh addTarget:self action:@selector(refresh:) forControlEvents:UIControlEventValueChanged];
+//    _StorageItemView.refreshControl = _refresh;
+//    }
     
     _StorageItemView.delegate = self;
     _StorageItemView.dataSource = self;
@@ -208,7 +207,6 @@
          _CategoryMenu.center = CGPointMake(-self.mainWidth/12,(self.CategoryMenu.frame.size.height)/2+self.navHeight);
     }
 }
-
 #pragma mark - Notification
 //发送通知提醒当天所有已过期的食品
 - (void)SendRemindingNotification
@@ -217,7 +215,6 @@
     [_notification initNotification];
     //标志
     Boolean isSend = false;
-    
     //获取当前日期
     NSDate *currentDate = [[NSDate alloc]init];
     NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
@@ -382,11 +379,12 @@ NSLog(@"foodName=%@&&&&&&&expireDate=%@",_storageArray[i].foodName,_storageArray
 //}
 - (void) moveMenu
 {
-    if (_LeftOrRight) {//view 折叠
-        _LeftOrRight = false;
-        //view 向左移动
-       _CategoryMenu.center = CGPointMake(self.CategoryMenu.frame.size.width/2, (self.CategoryMenu.frame.size.height)/2+self.navHeight);
-    }else if (!_LeftOrRight) {//view 展开
+//    if (_LeftOrRight) {//view 折叠
+//        _LeftOrRight = false;
+//        //view 向左移动
+//       _CategoryMenu.center = CGPointMake(self.CategoryMenu.frame.size.width/2, (self.CategoryMenu.frame.size.height)/2+self.navHeight);
+//   }
+if (!_LeftOrRight) {//view 展开
         _LeftOrRight = true;
         //向右移动
          _CategoryMenu.center = CGPointMake(-self.mainWidth/12,(self.CategoryMenu.frame.size.height)/2+self.navHeight);
