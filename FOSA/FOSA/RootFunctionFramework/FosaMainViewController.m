@@ -251,7 +251,7 @@ NSLog(@"foodName=%@&&&&&&&expireDate=%@",_storageArray[i].foodName,_storageArray
             [_notification sendNotification:_storageArray[i].foodName body:body path:_storageArray[i].foodPhoto];
         }
     }
-    _circleview = [[LoadCircleView alloc]initWithFrame:CGRectMake(0  ,200,self.view.frame.size.width,100)];
+    _circleview = [[LoadCircleView alloc]initWithFrame:CGRectMake(0  ,400,self.view.frame.size.width,100)];
     //添加到视图上展示
      [self.view addSubview:_circleview];
     [self performSelector:@selector(removeLoading) withObject:nil afterDelay:3.0f];
