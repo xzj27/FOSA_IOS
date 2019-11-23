@@ -76,13 +76,13 @@
     containerView.layer.borderColor = [[UIColor grayColor] CGColor];
     [self.view addSubview:containerView];
     _containerView = containerView;
-    
+
     //拍照控制视图
-    UIView *takingPhoto =[[UIView alloc] initWithFrame:CGRectMake(0,containerViewH+marginY, w, 150)];
+    UIView *takingPhoto =[[UIView alloc] initWithFrame:CGRectMake(0,containerViewH+marginY, w, 180)];
     takingPhoto.backgroundColor = [UIColor blackColor];
     [self.view addSubview:takingPhoto];
     _TakingPhotoView = takingPhoto;
-    
+
     //摄像头切换按钮
     CGFloat cameraSwitchBtnW = 50.f;
     CGFloat cameraSwitchBtnMargin = 10.f;
@@ -90,7 +90,6 @@
     [cameraSwitchBtn setImage:[UIImage imageNamed:@"camera_switch"] forState:UIControlStateNormal];
     [cameraSwitchBtn addTarget:self action:@selector(cameraSwitchBtnOnClick) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:cameraSwitchBtn];
-    
     //拍摄快门按钮
     UIButton *shutter = [[UIButton alloc]initWithFrame:CGRectMake([UIScreen mainScreen].bounds.size.width/2-cameraSwitchBtnW/2, containerViewH+marginY+20, cameraSwitchBtnW, cameraSwitchBtnW)];
     [shutter setImage:[UIImage imageNamed:@"icon_takePhoto"] forState:UIControlStateNormal];
@@ -106,7 +105,7 @@
     
     //拍摄照片容器
     _image = [[UIImage alloc]init];
-    UIImageView *imgView = [[UIImageView alloc] initWithFrame:CGRectMake(20, containerViewH+marginY+15,70,70)];
+    UIImageView *imgView = [[UIImageView alloc] initWithFrame:CGRectMake(20, containerViewH+marginY+15,60,60)];
     imgView.hidden = NO;
     imgView.backgroundColor = [UIColor colorWithRed:80/255 green:80/255 blue:80/255 alpha:1.0];
     imgView.layer.borderWidth = 1.f;
@@ -237,9 +236,13 @@
         if (imageDataSampleBuffer) {
             NSData *imageData = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageDataSampleBuffer];
             self.image = [UIImage imageWithData:imageData];
- 
-           // UIImageWriteToSavedPhotosAlbum(self.image, self,@selector(image:didFinishSavingWithError:contextInfo:),nil);
+            CGFloat fixelW = CGImageGetWidth(self.image.CGImage);
+            CGFloat fixelH = CGImageGetHeight(self.image.CGImage);
+            NSLog(@"=========%f>>>>>>>>%f",fixelH,fixelW);
+           UIImageWriteToSavedPhotosAlbum(self.image, self,@selector(image:didFinishSavingWithError:contextInfo:),nil);
             //self.imgView.image = [self getImage];
+            self.imgView.contentMode = UIViewContentModeScaleAspectFill;
+            self.imgView.clipsToBounds = YES;
             self.imgView.image = self.image;
             //self.imgView.transform = CGAffineTransformMakeRotation(M_PI/2);
             [self DetectQRcode:self.image];
@@ -311,7 +314,7 @@
         captureDevice.subjectAreaChangeMonitoringEnabled = YES;
     }];
     //捕获区域发生改变
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(areaChange:) name:AVCaptureDeviceSubjectAreaDidChangeNotification object:captureDevice];
+//    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(areaChange:) name:AVCaptureDeviceSubjectAreaDidChangeNotification object:captureDevice];
 }
 - (void)removeNotificationFromCaptureDevice:(AVCaptureDevice *)captureDevice
 {
@@ -335,10 +338,10 @@
 }
 
 //捕获区域改变
-- (void)areaChange:(NSNotification *)notification
-{
-    NSLog(@"捕获区域改变...");
-}
+//- (void)areaChange:(NSNotification *)notification
+//{
+//    NSLog(@"捕获区域改变...");
+//}
 
 #pragma mark - 私有方法
 //取得指定位置的摄像头

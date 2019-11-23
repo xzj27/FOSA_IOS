@@ -31,6 +31,8 @@
         self.foodImageview = [[UIImageView alloc]initWithFrame:CGRectMake((self.bounds.size.width-self.bounds.size.height*2/3)/2, self.bounds.size.height*1/3+5, self.bounds.size.height*2/3-10, self.bounds.size.height*2/3-10)];
         //self.foodImageview.transform = CGAffineTransformMakeRotation(M_PI/2);
         self.foodImageview.userInteractionEnabled = NO;
+        self.foodImageview.contentMode = UIViewContentModeScaleAspectFill;
+        self.foodImageview.clipsToBounds = YES;
         [self addSubview:self.foodImageview];
         
         

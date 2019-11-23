@@ -135,6 +135,9 @@
     [self.headerView addSubview:_imageView1];   //添加图片视图
     [self.headerView addSubview:_deviceName];
     
+    self.imageView1.contentMode = UIViewContentModeScaleAspectFill;
+    self.imageView1.clipsToBounds = YES;
+    
     self.share = [[UIButton alloc]initWithFrame:CGRectMake(headerWidth-35,5,30,30)];
     [_share setImage:[UIImage imageNamed:@"icon_share"] forState:UIControlStateNormal];
     self.like = [[UIButton alloc]initWithFrame:CGRectMake(headerWidth-35, headerheight-30,30,30)];

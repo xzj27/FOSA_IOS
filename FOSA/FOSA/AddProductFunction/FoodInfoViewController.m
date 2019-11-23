@@ -127,7 +127,8 @@
     
     //添加头部控件,已经在扫码界面初始化
     self.imageView1 = [[UIImageView alloc]initWithFrame:CGRectMake(15, headerheight/4-5,headerheight*3/4-5,headerheight*3/4-5)];
-    //self.imageView1.transform = CGAffineTransformMakeRotation(M_PI/2);
+    self.imageView1.contentMode = UIViewContentModeScaleAspectFill;
+    self.imageView1.clipsToBounds = YES;
     self.deviceName = [[UITextView alloc]initWithFrame:CGRectMake(0, 0,headerWidth/2, headerheight/4-5)];
     self.deviceName.backgroundColor = [UIColor clearColor];
     [self.headerView addSubview:_imageView1];   //添加图片视图

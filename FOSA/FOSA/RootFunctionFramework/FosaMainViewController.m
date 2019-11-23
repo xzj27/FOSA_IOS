@@ -216,7 +216,6 @@
     [self.navigationController pushViewController:photo animated:YES];
 }
 
-
 //滑动手势事件
 - (void)swipeGestureRight:(UISwipeGestureRecognizer *)swipeGestureRecognizer{
     NSLog(@"向右滑动");

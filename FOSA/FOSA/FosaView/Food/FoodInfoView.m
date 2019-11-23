@@ -33,7 +33,8 @@
         self.backgroundColor = [UIColor whiteColor];
         UIImageView *iconImageView = [[UIImageView alloc]init];
         self.iconImageView = iconImageView;
-        //self.iconImageView.transform = CGAffineTransformMakeRotation(M_PI_2);//顺时针旋转90度
+        self.iconImageView.contentMode = UIViewContentModeScaleAspectFill;
+        self.iconImageView.clipsToBounds = YES;
         [self addSubview:iconImageView];
         
         UILabel *nameLabel = [[UILabel alloc]init];
@@ -117,9 +118,9 @@
     //food name
     self.foodName.frame = CGRectMake(iconImageViewW+20,40,iconImageViewW*2-40,30);
     //expire date
-    self.expireDate.frame = CGRectMake(iconImageViewW+20,80,iconImageViewW*2-40,30);
+    self.expireDate.frame = CGRectMake(iconImageViewW+20,120,iconImageViewW*2-40,30);
     //remind date
-    self.remindDate.frame = CGRectMake(iconImageViewW+20,120,iconImageViewW*2-40,30);
+    self.remindDate.frame = CGRectMake(iconImageViewW+20,80,iconImageViewW*2-40,30);
     //edit button
     self.edited.frame = CGRectMake(0, self.bounds.size.height-60,self.bounds.size.width, 60);
 }

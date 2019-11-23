@@ -163,7 +163,7 @@
     NSString *imagePath = [[paths objectAtIndex:0]stringByAppendingPathComponent:[NSString stringWithFormat:@"%@",photopath]];
     // 保存文件的名称
     UIImage *img = [UIImage imageWithContentsOfFile:imagePath];
-    NSLog(@"=== %@", img);
+    //NSLog(@"=== %@", img);
     return img;
 }
 //退出键盘

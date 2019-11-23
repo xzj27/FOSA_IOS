@@ -20,10 +20,11 @@
 //仿照系统通知绘制UIview
 - (UIView *)CreatNotificatonView:(NSString *)title body:(NSString *)body{
     NSLog(@"begin creating");
-    UIView *notification = [[UIView alloc]initWithFrame:CGRectMake(0, 0, 200, 350)];
+    UIView *notification = [[UIView alloc]initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width/2, [UIScreen mainScreen].bounds.size.height/2)];
     notification.backgroundColor = [UIColor whiteColor];
     UIImageView *logo = [[UIImageView alloc]initWithFrame:CGRectMake(10, 10, 30, 30)];
     UILabel *brand = [[UILabel alloc]initWithFrame:CGRectMake(40, 15, 50, 15)];
+    
     UIImageView *image = [[UIImageView alloc]initWithFrame:CGRectMake(0,50, 200, 200)];
     UILabel *Ntitle = [[UILabel alloc]initWithFrame:CGRectMake(5, 280, 200, 20)];
     UILabel *Nbody = [[UILabel alloc]initWithFrame:CGRectMake(5, 310, 200, 20)];
