@@ -20,8 +20,7 @@
 
 #import <UserNotifications/UserNotifications.h>
 #import "LoadCircleView.h"
-#import <WebKit/WebKit.h>
-#import <sqlite3.h>
+#import "SqliteManager.h"
 
 @interface FosaMainViewController ()<UICollectionViewDataSource, UICollectionViewDelegateFlowLayout,UIGestureRecognizerDelegate>{
     int i;
@@ -31,9 +30,12 @@
 }
 
 @property (nonatomic,strong) UIView *CategoryMenu;  //菜单视图
-@property(nonatomic,assign)sqlite3 *database;
+@property(nonatomic,assign) sqlite3 *database;
 //结果集定义
-@property(nonatomic,assign)sqlite3_stmt *stmt;
+@property(nonatomic,assign) sqlite3_stmt *stmt;
+
+
+
 @property (nonatomic,assign) int count;
 @property (nonatomic,assign) Boolean LeftOrRight;
 @property (nonatomic,strong) NSMutableArray<CellModel *> *storageArray;
@@ -68,6 +70,13 @@
     self.navigationItem.leftBarButtonItem = leftItem;
     [self InitView];
     [self InitAddView];
+    
+//    //分割字符串的测试
+//    NSString *string = @"abcd&efgh&ijkl&mnop&qrst";
+//    NSArray *array = [NSArray array];
+//    array = [string componentsSeparatedByString:@"&"];
+//    NSLog(@"<<<<<<<<<<<<%@",array[0]);
+//
 }
 
 - (void)viewWillAppear:(BOOL)animated{
@@ -82,11 +91,11 @@
         });
     }
 }
-
 - (void)InitView{
     ID = @"FosaCell";
     isEdit = false;
     _LeftOrRight = true;    //true mean that the view is folded
+    cellHeight = 101.666667;
     _count = 0;
     self.storageArray = [[NSMutableArray alloc]init];
     self.mainWidth = [UIScreen mainScreen].bounds.size.width;
@@ -190,7 +199,7 @@
 - (void)InitAddView{
     //在UICollectionView最后添加一个addview
     CGFloat cellWidth = (self.StorageItemView.frame.size.width-15)/2;
-    CGFloat cellheight = 101.666667;
+    CGFloat cellheight = cellHeight;
     NSLog(@"***********%f",cellheight);
     CGFloat x = 5+(self.storageArray.count%2)*(cellWidth+5);
     CGFloat y = 0;
@@ -263,15 +272,15 @@ NSLog(@"foodName=%@&&&&&&&expireDate=%@",_storageArray[i].foodName,_storageArray
             isSend = true;
             NSString *body = [NSString stringWithFormat:@"Fosa 提醒你应该在%@ 食用 %@",_storageArray[i].remindDate,_storageArray[i].foodName];
             //发送通知
-            [_notification sendNotification:_storageArray[i].foodName body:body path:_storageArray[i].foodPhoto];
+            [_notification sendNotification:_storageArray[i].foodName body:body path:_storageArray[i].foodPhoto deviceName:_storageArray[i].device];
             
         }else if (result == NSOrderedAscending){
             NSLog(@"%@ 将在 %@ 过期了，请及时使用",_storageArray[i].foodName,_storageArray[i].remindDate);
         }else{
     NSLog(@"%@刚好在今天过期",_storageArray[i].foodName);
-            NSString *body = [NSString stringWithFormat:@"%@ 今天就要过期啦",_storageArray[i].foodName];
+            NSString *body = [NSString stringWithFormat:@"今天要记得吃 %@",_storageArray[i].foodName];
             //发送通知
-            [_notification sendNotification:_storageArray[i].foodName body:body path:_storageArray[i].foodPhoto];
+            [_notification sendNotification:_storageArray[i].foodName body:body path:_storageArray[i].foodPhoto deviceName:_storageArray[i].device];
         }
     }
     _circleview = [[LoadCircleView alloc]initWithFrame:CGRectMake(0  ,400,self.view.frame.size.width,100)];
@@ -294,52 +303,30 @@ NSLog(@"foodName=%@&&&&&&&expireDate=%@",_storageArray[i].foodName,_storageArray
 #pragma mark - 数据库操作
 - (void)creatOrOpensql
 {
-    NSString *path = [self getPath];
-    int sqlStatus = sqlite3_open_v2([path UTF8String], &_database,SQLITE_OPEN_CREATE|SQLITE_OPEN_READWRITE,NULL);
-    if (sqlStatus == SQLITE_OK) {
-        NSLog(@"数据库打开成功");
-    }else{
-        int close = sqlite3_close_v2(_database);
-        if (close == SQLITE_OK) {
-            _database = nil;
-        }else{
-            NSLog(@"数据库关闭异常");
-        }
-    }
+    self.database = [SqliteManager InitSqliteWithName:@"Fosa.db"];
 }
 - (void) SelectDataFromSqlite{
     //查询数据库添加的食物
     NSString *sql = [NSString stringWithFormat:@"select foodName,deviceName,aboutFood,expireDate,remindDate,photoPath from Fosa2"];
-    const char *selsql = (char *)[sql UTF8String];
-    int selresult = sqlite3_prepare_v2(self.database, selsql, -1, &_stmt, NULL);
-    if(selresult != SQLITE_OK){
-        NSLog(@"查询失败");
-    }else{
+    self.stmt = [SqliteManager SelectDataFromTable:sql database:self.database];
+    if (self.stmt != NULL) {
         while (sqlite3_step(_stmt) == SQLITE_ROW) {
-            const char *food_name = (const char *)sqlite3_column_text(_stmt, 0);
-            const char *device_name = (const char*)sqlite3_column_text(_stmt,1);
-            const char *remind_date = (const char*)sqlite3_column_text(_stmt,4);
-            const char *expired_date = (const char *)sqlite3_column_text(_stmt,3);
-            const char *photo_path = (const char *)sqlite3_column_text(_stmt,5);
-
-            NSLog(@"查询到数据%@",[NSString stringWithUTF8String:food_name]);
-            NSLog(@"查询到数据%@",[NSString stringWithUTF8String:expired_date]);
-            NSLog(@"查询到数据%@",[NSString stringWithUTF8String:photo_path]);
-            NSLog(@"********************************");
-            [self CreatFoodViewWithName:[NSString stringWithUTF8String:food_name] fdevice:[NSString stringWithUTF8String:device_name] remindDate:[NSString stringWithUTF8String:remind_date] foodPhoto:[NSString stringWithUTF8String:photo_path]] ;
-        }
+                    const char *food_name = (const char *)sqlite3_column_text(_stmt, 0);
+                    const char *device_name = (const char*)sqlite3_column_text(_stmt,1);
+                    const char *remind_date = (const char*)sqlite3_column_text(_stmt,4);
+                    const char *expired_date = (const char *)sqlite3_column_text(_stmt,3);
+                    const char *photo_path = (const char *)sqlite3_column_text(_stmt,5);
+        
+                    NSLog(@"查询到数据%@",[NSString stringWithUTF8String:food_name]);
+                    NSLog(@"查询到数据%@",[NSString stringWithUTF8String:expired_date]);
+                    NSLog(@"查询到数据%@",[NSString stringWithUTF8String:photo_path]);
+                    NSLog(@"********************************");
+                    [self CreatFoodViewWithName:[NSString stringWithUTF8String:food_name] fdevice:[NSString stringWithUTF8String:device_name] remindDate:[NSString stringWithUTF8String:remind_date] foodPhoto:[NSString stringWithUTF8String:photo_path]] ;
+                }
+    }else{
+        NSLog(@"查询失败");
     }
 }
-//获取DB数据库所在的document路径
-- (NSString *)getPath
-{
-    NSString *filename = @"Fosa.db";
-    NSString *doc = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
-    NSString *filePath = [doc stringByAppendingPathComponent:filename];
-    NSLog(@"%@",filePath);
-    return filePath;
-}
-
 #pragma mark - cell相关的方法
 - (void)CreatFoodViewWithName:(NSString *)foodname fdevice:(NSString *)device remindDate:(NSString *)remindDate foodPhoto:(NSString *)photo{
     //创建食物模型

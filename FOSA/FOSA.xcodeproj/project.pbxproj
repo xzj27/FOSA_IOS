@@ -350,8 +350,8 @@
 			isa = PBXGroup;
 			children = (
 				4551FE2E2378FB0F007A2EFB /* AddViewController.h */,
-				4551FE2F2378FB0F007A2EFB /* AddViewController.m */,
 				4551FE312378FB22007A2EFB /* FoodInfoViewController.h */,
+				4551FE2F2378FB0F007A2EFB /* AddViewController.m */,
 				4551FE322378FB22007A2EFB /* FoodInfoViewController.m */,
 			);
 			path = AddProductFunction;

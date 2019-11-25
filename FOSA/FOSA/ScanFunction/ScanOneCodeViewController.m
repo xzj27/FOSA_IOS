@@ -16,6 +16,7 @@
 #import <sqlite3.h>
 #import "Fosa_QRCode_Queue.h"
 #import "Fosa_NSString_queue.h"
+#import "SqliteManager.h"
 @interface ScanOneCodeViewController ()<AVCaptureMetadataOutputObjectsDelegate,UINavigationControllerDelegate,AVCaptureVideoDataOutputSampleBufferDelegate,UIImagePickerControllerDelegate>{
     //用于初始化数据模型的数据
     NSString *food,*fdevice,*expire,*remind,*photoPath;
@@ -24,8 +25,6 @@
     
     Boolean isJump;
     int AlertCount;
-    
-    Boolean lock;
 }
 @property (nonatomic, strong) AVCaptureDevice * device;
 @property (nonatomic, strong) AVCaptureDeviceInput * input;
@@ -183,6 +182,7 @@
 }
 #pragma mark - 初始化二维码扫描相关数据设置
 -(void) initScanning{
+
     AlertCount = 0;  //当前没有正在展示通知
     //存储结果
     self.array = [[NSMutableArray alloc]init];
@@ -677,13 +677,16 @@
     NSInteger count = 3;    //展示通知上限
     NSString *content;
     // 识别多个码的信息，并将每一个二维码的内容存放在不重复的数组中
-    for(AVMetadataObject *object in metadataObjects){
+    if (metadataObjects.count <= 3) {
+        count = metadataObjects.count;
+    }
+    for(int i = 0; i < count;i++){
+        AVMetadataObject *object = metadataObjects[i];
         //如果是可读的码的对象
         if ([object isKindOfClass:[AVMetadataMachineReadableCodeObject class]]){
             content = [(AVMetadataMachineReadableCodeObject *) object stringValue];
             //检查二维码信息是否已经被记录，否的话则添加记录
             if([self.QRcode isContainObject:content]){
-                [self ScanSuccess:@"ding.wav"];
                 if (self.QRcode.size < 3) {
                     [self.QRcode enqueue:content];
                 }else if (self.QRcode.size == 3){
@@ -711,7 +714,7 @@
     if (_flag>0) {
                self.count = 0;
         //删除与生成有时候顺序混乱，怀疑是进程的问题
-               [self performSelectorOnMainThread:@selector(removeView) withObject:nil waitUntilDone:NO];
+               [self performSelectorOnMainThread:@selector(MoreMessage) withObject:nil waitUntilDone:NO];
 //               for (int i = 0; i < [_codeQueue size]-1; i++) {
 //                   for (int j = i+1; j < [_codeQueue size]; j++) {
 //                       if ([self getCenterOfQRcode:[_codeQueue returnArray][i]].y > [self getCenterOfQRcode:[_codeQueue returnArray][j]].y ) {
@@ -721,21 +724,7 @@
 //                       }
 //                   }
 //               }
-               if ([_codeQueue size] < count) {
-                   count = [_codeQueue size];
-               }
-               for (int k = 0;k < count;k++) {
-                   NSLog(@"-------------------------------------------------%d",k);
-                   if (k == 0) {
-                       [self performSelectorOnMainThread:@selector(SetFocusOnQRcode1:) withObject:[_codeQueue returnArray][k] waitUntilDone:NO];
-                   }else if(k == 1){
-                       [self performSelectorOnMainThread:@selector(SetFocusOnQRcode2:) withObject:[_codeQueue returnArray][k] waitUntilDone:NO];
-                   }else if(k == 2){
-                       [self performSelectorOnMainThread:@selector(SetFocusOnQRcode3:) withObject:[_codeQueue returnArray][k] waitUntilDone:NO];
-                   }
-                   [self performSelectorOnMainThread:@selector(showMoreMessage:) withObject:[_codeQueue returnArray][k] waitUntilDone:NO];
-               }
-    }
+        }
     NSLog(@"ENDENDENDENDENDENDENDENDENDeNDendend");
 }
 /*
@@ -825,7 +814,30 @@
 }
 
 #pragma mark - 生成弹窗，显示二维码内容
+- (void)MoreMessage{
+    [self removeView];
+    NSInteger count = 3;    //展示通知上限
+    if ([_codeQueue size] < count) {
+        count = [_codeQueue size];
+        }
+    if (AlertCount == 0) {
+        for (int k = 0;k < count;k++) {
+            NSLog(@"-------------------------------------------------%d",k);
+                if (k == 0) {
+                    [self SetFocusOnQRcode1:[_codeQueue returnArray][k]];
+                }else if(k == 1){
+                    [self SetFocusOnQRcode2:[_codeQueue returnArray][k]];
+                }else if(k == 2){
+                    [self SetFocusOnQRcode3:[_codeQueue returnArray][k]];;
+                }
+            [self showMoreMessage:[_codeQueue returnArray][k]];
+            [self ScanSuccess:@"ding.wav"];
+        }
+    }
+    
+}
 - (void)showMoreMessage:(AVMetadataMachineReadableCodeObject *)code{
+    NSLog(@"%d",AlertCount);
     AlertCount++;
     NSString *message = [code stringValue];
     CGFloat mainWidth = [UIScreen mainScreen].bounds.size.width;
@@ -889,7 +901,6 @@
 
 #pragma mark - remove fosaAlertView
 -(void)removeView{
-    NSLog(@"remove");
     [_circleAlertView1 removeFromSuperview];
     [_circleAlertView2 removeFromSuperview];
     [_circleAlertView3 removeFromSuperview];
@@ -900,6 +911,7 @@
     self.focusCursor2.alpha = 0;
     self.focusCursor3.alpha = 0;
     AlertCount = 0;
+    NSLog(@"我移除了上一次的通知");
 }
 #pragma mark -  点击下方通知弹出具体内容
 -(void)tapAction:(id)sender{
@@ -1113,32 +1125,33 @@
     
     [self getPartOfImage:image];
     //[self analyseRectImage:image];
-//    // 声明一个 CIDetector，并设定识别类型 CIDetectorTypeQRCode
-//    CIDetector *detector = [CIDetector detectorOfType:CIDetectorTypeQRCode context:nil options:@{CIDetectorAccuracy: CIDetectorAccuracyHigh}];
-//
-//    // 取得识别结果
-//    NSArray *features = [detector featuresInImage:[CIImage imageWithCGImage:image.CGImage]];
-//
-//    if (features.count == 0) {
-//        [self SystemAlert:@"识别不到二维码"];
-//        return;
-//    } else {
-//        CIQRCodeFeature *firstfeature = [features objectAtIndex:0];
-//        NSString *firstResult = firstfeature.messageString;
-//        [self SystemAlert:firstResult];
-//    }
+    // 声明一个 CIDetector，并设定识别类型 CIDetectorTypeQRCode
+    CIDetector *detector = [CIDetector detectorOfType:CIDetectorTypeQRCode context:nil options:@{CIDetectorAccuracy: CIDetectorAccuracyHigh}];
+
+    // 取得识别结果
+    NSArray *features = [detector featuresInImage:[CIImage imageWithCGImage:image.CGImage]];
+
+    if (features.count == 0) {
+        [self SystemAlert:@"识别不到二维码"];
+        return;
+    } else {
+        CIQRCodeFeature *firstfeature = [features objectAtIndex:0];
+        NSString *firstResult = firstfeature.messageString;
+        [self SystemAlert:firstResult];
+    }
 
 }
 
 - (void)getPartOfImage:(UIImage *)img
 {
+    CGFloat mainwidth = [UIScreen mainScreen].bounds.size.width;
+    CGFloat mainHeight = [UIScreen mainScreen].bounds.size.height;
+    
     CGImageRef cgRef = img.CGImage;
-    CGImageRef imageRef = CGImageCreateWithImageInRect(cgRef, CGRectMake(0,0, 300, 300));
+    CGImageRef imageRef = CGImageCreateWithImageInRect(cgRef, CGRectMake(0,mainHeight/4, mainwidth, mainHeight/2));
     UIImage *thumbScale = [UIImage imageWithCGImage:imageRef];
     CGImageRelease(imageRef);
-    
      UIImageWriteToSavedPhotosAlbum(thumbScale, self,@selector(image:didFinishSavingWithError:contextInfo:),nil);
-
 }
 #pragma mark - <保存到相册>
 -(void)image:(UIImage *)image didFinishSavingWithError:(NSError *)error contextInfo:(void *)contextInfo {

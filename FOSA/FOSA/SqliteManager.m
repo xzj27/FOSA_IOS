@@ -8,23 +8,20 @@
 
 #import "SqliteManager.h"
 #import <sqlite3.h>
-@interface SqliteManager(){
-    sqlite3 *database;
-}
-@end
 
 @implementation SqliteManager
 
-- (instancetype)InitSqliteWithName:(NSString *)databaseName{
++ (sqlite3 *)InitSqliteWithName:(NSString *)databaseName{
+        sqlite3 *database;
        NSString *path = [self getPathWithName:databaseName];
        int sqlStatus = sqlite3_open_v2([path UTF8String], &database,SQLITE_OPEN_CREATE|SQLITE_OPEN_READWRITE,NULL);
        if (sqlStatus == SQLITE_OK) {
            NSLog(@"数据库打开成功");
        }
-    return (__bridge SqliteManager *)(database);
+    return database;
        
 }
-- (void)InitTableWithName:(NSString *)CreateSql database:(sqlite3 *)db{
++ (void)InitTableWithName:(NSString *)CreateSql database:(sqlite3 *)db{
     const char *sql = [CreateSql UTF8String];
     char *erro = 0;
     int tabelStatus = sqlite3_exec(db, sql,NULL, NULL, &erro);//运行结果
@@ -34,7 +31,7 @@
     }
 }
 
-- (void)InsertDataIntoTable:(NSString *)InsertSql database:(sqlite3 *)db{
++ (void)InsertDataIntoTable:(NSString *)InsertSql database:(sqlite3 *)db{
     const char *sql = [InsertSql UTF8String];
     char *erro = 0;
     int insertResult = sqlite3_exec(db,sql,NULL,NULL,&erro);
@@ -44,16 +41,28 @@
         NSLog(@"插入数据失败");
     }
 }
-- (void)SelectDataFromTable:(NSString *)SelectSql database:(sqlite3 *)db{}
-- (void)DeleteDataFromTable:(NSString *)DeleteSql database:(sqlite3 *)db{}
-- (void)UpdataDataFromTable:(NSString *)UpdateSql database:(sqlite3 *)db{}
 
-- (NSString *)getPathWithName:(NSString *)databaseName{
+/// 根据选择语句与数据库进行选择操作
+/// @param SelectSql 选择语句
+/// @param db 数据库实例
++ (sqlite3_stmt *)SelectDataFromTable:(NSString *)SelectSql database:(sqlite3 *)db {
+    sqlite3_stmt *stmt;
+    const char *selsql = (char *)[SelectSql UTF8String];
+    int selresult = sqlite3_prepare_v2(db, selsql, -1, &stmt, NULL);
+    if(selresult != SQLITE_OK){
+        NSLog(@"select Fail");
+        return stmt;
+    }else{
+        return stmt;
+    }
+}
++ (void)DeleteDataFromTable:(NSString *)DeleteSql database:(sqlite3 *)db{}
++ (void)UpdataDataFromTable:(NSString *)UpdateSql database:(sqlite3 *)db{}
++ (NSString *)getPathWithName:(NSString *)databaseName{
     NSString *doc = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
     NSString *filePath = [doc stringByAppendingPathComponent:databaseName];
     NSLog(@"%@",filePath);
     return filePath;
 }
-
 
 @end

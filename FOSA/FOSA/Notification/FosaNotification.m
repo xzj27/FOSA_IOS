@@ -8,10 +8,12 @@
 
 #import "FosaNotification.h"
 #import <UserNotifications/UserNotifications.h>
+#import <CoreImage/CoreImage.h>
+#import "SqliteManager.h"
 //图片宽高的最大值
 #define KCompressibilityFactor 1280.00
 @interface FosaNotification()<UNUserNotificationCenterDelegate>
-@property (nonatomic,strong) UIImage *image;
+@property (nonatomic,strong) UIImage *image,*codeImage;
 @end
 
 @implementation FosaNotification
@@ -20,23 +22,35 @@
 //仿照系统通知绘制UIview
 - (UIView *)CreatNotificatonView:(NSString *)title body:(NSString *)body{
     NSLog(@"begin creating");
-    UIView *notification = [[UIView alloc]initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width/2, [UIScreen mainScreen].bounds.size.height/2)];
-    notification.backgroundColor = [UIColor whiteColor];
-    UIImageView *logo = [[UIImageView alloc]initWithFrame:CGRectMake(10, 10, 30, 30)];
-    UILabel *brand = [[UILabel alloc]initWithFrame:CGRectMake(40, 15, 50, 15)];
+    CGFloat mainwidth = [UIScreen mainScreen].bounds.size.width/2;
+    CGFloat mainHeight = [UIScreen mainScreen].bounds.size.height/2;
     
-    UIImageView *image = [[UIImageView alloc]initWithFrame:CGRectMake(0,50, 200, 200)];
-    UILabel *Ntitle = [[UILabel alloc]initWithFrame:CGRectMake(5, 280, 200, 20)];
-    UILabel *Nbody = [[UILabel alloc]initWithFrame:CGRectMake(5, 310, 200, 20)];
+    UIView *notification = [[UIView alloc]initWithFrame:CGRectMake(0, 0, mainwidth,mainHeight)];
+    notification.backgroundColor = [UIColor whiteColor];
+    
+    UIImageView *logo = [[UIImageView alloc]initWithFrame:CGRectMake(mainwidth/12, mainwidth/12, 40, 40)];
+    UILabel *brand = [[UILabel alloc]initWithFrame:CGRectMake(mainwidth/4, mainwidth/8, 50, 15)];
+    UIImageView *InfoCodeView = [[UIImageView alloc]initWithFrame:CGRectMake(mainwidth*4/5-10, 5, mainwidth/5, mainwidth/5)];
+    
+    UIImageView *image = [[UIImageView alloc]initWithFrame:CGRectMake(0,mainHeight/4, mainwidth, mainHeight/2)];
+    UILabel *Ntitle = [[UILabel alloc]initWithFrame:CGRectMake(5,mainHeight*3/4+10, mainwidth, 20)];
+    UILabel *Nbody = [[UILabel alloc]initWithFrame:CGRectMake(5, mainHeight*3/4+40, mainwidth, 20)];
     [notification addSubview:logo];
     [notification addSubview:brand];
+    [notification addSubview:InfoCodeView];
     [notification addSubview:Ntitle];
     [notification addSubview:image];
     [notification addSubview:Nbody];
     
     logo.image  = [UIImage imageNamed:@"logo"];
     image.image = self.image;
-    image.contentMode = UIViewContentModeScaleToFill;
+    image.contentMode = UIViewContentModeScaleAspectFill;
+    image.clipsToBounds = YES;
+    
+    InfoCodeView.image = self.codeImage;
+    InfoCodeView.backgroundColor = [UIColor redColor];
+    InfoCodeView.contentMode = UIViewContentModeScaleAspectFill;
+    InfoCodeView.clipsToBounds = YES;
     
     brand.font  = [UIFont systemFontOfSize:10];
     brand.textAlignment = NSTextAlignmentCenter;
@@ -63,6 +77,46 @@
     UIGraphicsEndImageContext();
     return imageRet;
 }
+- (UIImage *)GenerateQRCodeByMessage:(NSString *)message{
+    // 1. 创建一个二维码滤镜实例(CIFilter)
+    CIFilter *filter = [CIFilter filterWithName:@"CIQRCodeGenerator"];
+    // 滤镜恢复默认设置
+    [filter setDefaults];
+    
+    // 2. 给滤镜添加数据
+    NSData *data = [message dataUsingEncoding:NSUTF8StringEncoding];
+    
+    [filter setValue:data forKeyPath:@"inputMessage"];
+    
+    // 3. 生成二维码
+    CIImage *image = [filter outputImage];
+    
+    //[self createNonInterpolatedUIImageFormCIImage:image withSize:];
+    return [UIImage imageWithCIImage:image];
+}
+- (UIImage *)createNonInterpolatedUIImageFormCIImage:(CIImage *)image withSize:(CGFloat) size {
+    
+    CGRect extent = CGRectIntegral(image.extent);
+    CGFloat scale = MIN(size/CGRectGetWidth(extent), size/CGRectGetHeight(extent));
+    
+    // 1.创建bitmap;
+    size_t width = CGRectGetWidth(extent) * scale;
+    size_t height = CGRectGetHeight(extent) * scale;
+    CGColorSpaceRef cs = CGColorSpaceCreateDeviceGray();
+    CGContextRef bitmapRef = CGBitmapContextCreate(nil, width, height, 8, 0, cs, (CGBitmapInfo)kCGImageAlphaNone);
+    CIContext *context = [CIContext contextWithOptions:nil];
+    CGImageRef bitmapImage = [context createCGImage:image fromRect:extent];
+    CGContextSetInterpolationQuality(bitmapRef, kCGInterpolationNone);
+    CGContextScaleCTM(bitmapRef, scale, scale);
+    CGContextDrawImage(bitmapRef, extent, bitmapImage);
+    
+    // 2.保存bitmap到图片
+    CGImageRef scaledImage = CGBitmapContextCreateImage(bitmapRef);
+    CGContextRelease(bitmapRef);
+    CGImageRelease(bitmapImage);
+    return [UIImage imageWithCGImage:scaledImage];
+}
+
 
 
 -(void)initNotification{
@@ -111,9 +165,9 @@ completionHandler(UNNotificationPresentationOptionBadge|UNNotificationPresentati
     NSString *title = content.title;  // 标题
     NSString *body = content.body;    // 推送消息体
    
-    UIImage *image = [self SaveViewAsPicture: [self CreatNotificatonView:title body:body]];
+    UIImage *notificationImage = [self SaveViewAsPicture: [self CreatNotificatonView:title body:body]];
     //[self beginShare:image];
-    UIImageWriteToSavedPhotosAlbum(image, self,@selector(image:didFinishSavingWithError:contextInfo:),nil);
+    UIImageWriteToSavedPhotosAlbum(notificationImage, self,@selector(image:didFinishSavingWithError:contextInfo:),nil);
     
 //在此，可判断response的种类和request的触发器是什么，可根据远程通知和本地通知分别处理，再根据action进行后续回调
     if ([response isKindOfClass:[UNTextInputNotificationResponse class]]) {
@@ -149,15 +203,13 @@ completionHandler(UNNotificationPresentationOptionBadge|UNNotificationPresentati
 //在此，可判断response的种类和request的触发器是什么，可根据远程通知和本地通知分别处理，再根据action进行后续回调
 
 }
-- (void)sendNotification:(NSString *)foodName body:(NSString *)body path:(NSString *)photo{
+- (void)sendNotificationByDate:(NSString *)foodName body:(NSString *)body path:(NSString *)photo deviceName:(NSString *)device{
     NSLog(@"我将发送一个系统通知");
     UNMutableNotificationContent *content = [[UNMutableNotificationContent alloc] init];
     content.title = @"\"Reminding\"";
     content.subtitle = @"by Fosa";
     content.body = body;
     content.badge = @0;
-    NSLog(@"11111111");
-    
     //获取沙盒中的图片
     NSArray *paths =NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask,YES);
     NSString *photopath = [NSString stringWithFormat:@"%@.png",photo];
@@ -168,16 +220,9 @@ completionHandler(UNNotificationPresentationOptionBadge|UNNotificationPresentati
     NSError *error = nil;
     //将本地图片的路径形成一个图片附件，加入到content中
     UNNotificationAttachment *img_attachment = [UNNotificationAttachment attachmentWithIdentifier:@"att1" URL:[NSURL fileURLWithPath:imagePath] options:nil error:&error];
-    
-//    NSString *path = [[NSBundle mainBundle] pathForResource:@"启动图2" ofType:@"png"];
-//       NSError *error = nil;
-//       //将本地图片的路径形成一个图片附件，加入到content中
-//       UNNotificationAttachment *img_attachment = [UNNotificationAttachment attachmentWithIdentifier:@"att1" URL:[NSURL fileURLWithPath:path] options:nil error:&error];
-    
-    
     if (error) {
         NSLog(@"%@", error);
-    }
+       }
     content.attachments = @[img_attachment];
     //设置为@""以后，进入app将没有启动页
     content.launchImageName = @"";
@@ -189,27 +234,94 @@ completionHandler(UNNotificationPresentationOptionBadge|UNNotificationPresentati
     [formatter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
     NSDate * date = [formatter dateFromString:@"2019-11-12 15:36:00"];
     NSDateComponents * components = [[NSCalendar currentCalendar]
-                                             components:NSCalendarUnitYear |
-                                             NSCalendarUnitMonth |
-                                             NSCalendarUnitWeekday |
-                                             NSCalendarUnitDay |
-                                             NSCalendarUnitHour |
-                                             NSCalendarUnitMinute |
-                                             NSCalendarUnitSecond
-                                             fromDate:date];
-    
-    UNTimeIntervalNotificationTrigger *time_trigger = [UNTimeIntervalNotificationTrigger triggerWithTimeInterval:3 repeats:NO];
+                                                components:NSCalendarUnitYear |
+                                                NSCalendarUnitMonth |
+                                                NSCalendarUnitWeekday |
+                                                NSCalendarUnitDay |
+                                                NSCalendarUnitHour |
+                                                NSCalendarUnitMinute |
+                                                NSCalendarUnitSecond
+                                                fromDate:date];
     UNCalendarNotificationTrigger *date_trigger = [UNCalendarNotificationTrigger triggerWithDateMatchingComponents:components repeats:NO];
+    NSString *requestIdentifer = photo;
+           //content.categoryIdentifier = @"textCategory";
+    content.categoryIdentifier = @"seeCategory";
+    UNNotificationRequest *request = [UNNotificationRequest requestWithIdentifier:requestIdentifer content:content trigger:date_trigger];
+       
+    [[UNUserNotificationCenter currentNotificationCenter] addNotificationRequest:request withCompletionHandler:^(NSError * _Nullable error) {
+           NSLog(@"%@",error);
+    }];
+    [self Savephoto:img name:photo];
+}
+
+
+- (void)sendNotification:(NSString *)foodName body:(NSString *)body path:(NSString *)photo deviceName:(NSString *)device{
+    NSLog(@"我将发送一个系统通知");
+    UNMutableNotificationContent *content = [[UNMutableNotificationContent alloc] init];
+    content.title = @"\"Reminding\"";
+    content.subtitle = @"by Fosa";
+    content.body = body;
+    content.badge = @0;
+    //获取沙盒中的图片
+    NSArray *paths =NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask,YES);
+    NSString *photopath = [NSString stringWithFormat:@"%@.png",photo];
+    NSString *imagePath = [[paths objectAtIndex:0]stringByAppendingPathComponent:[NSString stringWithFormat:@"%@",photopath]];
+    UIImage *img = [UIImage imageWithContentsOfFile:imagePath];
+    self.image = img;
+    [self Savephoto:self.image name:photo];//重新保存图片
+    
+    NSLog(@">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>%@",imagePath);
+    NSError *error = nil;
+    //将本地图片的路径形成一个图片附件，加入到content中
+    UNNotificationAttachment *img_attachment = [UNNotificationAttachment attachmentWithIdentifier:@"att1" URL:[NSURL fileURLWithPath:imagePath] options:nil error:&error];
+ 
+    if (error) {
+        NSLog(@"%@", error);
+    }
+    content.attachments = @[img_attachment];
+    //设置为@""以后，进入app将没有启动页
+    content.launchImageName = @"";
+    UNNotificationSound *sound = [UNNotificationSound defaultSound];
+    content.sound = sound;
+    //设置时间间隔的触发器
+    UNTimeIntervalNotificationTrigger *time_trigger = [UNTimeIntervalNotificationTrigger triggerWithTimeInterval:3 repeats:NO];
     NSString *requestIdentifer = photo;
         //content.categoryIdentifier = @"textCategory";
     content.categoryIdentifier = @"seeCategory";
     UNNotificationRequest *request = [UNNotificationRequest requestWithIdentifier:requestIdentifer content:content trigger:time_trigger];
-    
     [[UNUserNotificationCenter currentNotificationCenter] addNotificationRequest:request withCompletionHandler:^(NSError * _Nullable error) {
         NSLog(@"%@",error);
     }];
-    
-    [self Savephoto:img name:photo];
+    [self SelectSql:device foodname:foodName];
+}
+- (void)SelectSql:(NSString *)device foodname:(NSString *)name{
+    //打开数据库
+    sqlite3 *database = [SqliteManager InitSqliteWithName:@"Fosa.db"];
+    sqlite3_stmt *stmt;
+     NSString *sql = [NSString stringWithFormat:@"select foodName,deviceName,aboutFood,expireDate,remindDate,photoPath from Fosa2 where deviceName = '%@' and foodName = '%@'",device,name];
+    stmt = [SqliteManager SelectDataFromTable:sql database:database];
+    if (stmt != NULL) {
+     while (sqlite3_step(stmt) == SQLITE_ROW) {
+        const char *food_name = (const char *)sqlite3_column_text(stmt, 0);
+        const char *device_name = (const char*)sqlite3_column_text(stmt,1);
+        const char *about_food = (const char*) sqlite3_column_text(stmt,2);
+        const char *expired_date = (const char *)sqlite3_column_text(stmt,3);
+        const char *remind_date = (const char*)sqlite3_column_text(stmt,4);
+        const char *photo_path = (const char *)sqlite3_column_text(stmt,5);
+         NSString *foodName = [NSString stringWithUTF8String:food_name];
+         NSString *deviceName = [NSString stringWithUTF8String:device_name];
+         NSString *aboutFood = [NSString stringWithUTF8String:about_food];
+         NSString *expireDate = [NSString stringWithUTF8String:expired_date];
+         NSString *remindDate = [NSString stringWithUTF8String:remind_date];
+         NSString *FoodInfo = [NSString stringWithFormat:@"%@&%@&%@&%@&%@&",foodName,deviceName,aboutFood,expireDate,remindDate];
+         NSLog(@"<<<<<<<<<<<<<<<<%@",FoodInfo);
+         self.codeImage = [self GenerateQRCodeByMessage:FoodInfo];
+         break;
+            }
+
+        }else{
+            NSLog(@"查询失败");
+        }
 }
 -(NSSet *)createNotificationCategoryActions{
     //定义按钮的交互button action
