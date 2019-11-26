@@ -44,21 +44,23 @@
 - (void)InitContentView{
     self.rootView = [[UIView alloc]initWithFrame:CGRectMake(0, self.navHeight, self.mainWidth, self.mainHeight)];
     _rootView.backgroundColor = [UIColor whiteColor];
-    
+    [self.view addSubview:self.rootView];
     
     self.navHeight = self.navigationController.navigationBar.frame.size.height;
     NSLog(@"------%f",self.navHeight);
-    UIView *navV = [[UIView alloc] initWithFrame:CGRectMake(0, self.navHeight, SCREEN_WIDTH, self.navHeight)];
-    navV.backgroundColor = [UIColor whiteColor];
+    UIView *navV = [[UIView alloc] initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, self.navHeight)];
+    navV.backgroundColor = [UIColor redColor];
+    
     [self.view addSubview:navV];
     
+    NSLog(@"%f",CGRectGetMaxY(navV.frame));
     NSArray *titles = @[@"Fosa Device",@"My Device"];
     self.fosaScrollview = [[FosaScrollview alloc] init];
-    [self.fosaScrollview configParameterFrame:CGRectMake(0, CGRectGetMaxY(navV.frame), [UIScreen mainScreen].bounds.size.width, 50) titles:titles index:0 block:^(NSInteger index) {
+    [self.fosaScrollview configParameterFrame:CGRectMake(0,2*self.navHeight, [UIScreen mainScreen].bounds.size.width, 50) titles:titles index:0 block:^(NSInteger index) {
         [self.productContent updateTab:index];
     }];
     self.fosaScrollview.bounces = NO;
-    [self.view addSubview:self.fosaScrollview];
+    [navV addSubview:self.fosaScrollview];
     
     self.productContent = [[productView alloc] init];
     [self.view addSubview:self.productContent];

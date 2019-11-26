@@ -11,15 +11,15 @@
 #import <AVFoundation/AVFoundation.h>
 #import <UserNotifications/UserNotifications.h>
 
+#define MaxSCale 3.0  //最大缩放比例
+#define MinScale 0.5  //最小缩放比例
+
 @interface PhotoViewController ()
 
 @property (nonatomic, strong) AVCaptureSession *captureSession;//负责输入和输出设备之间的数据传递
 @property (nonatomic, strong) AVCaptureDeviceInput *captureDeviceInput;//负责从AVCaptureDevice获得输入数据
 @property (nonatomic, strong) AVCaptureStillImageOutput *captureStillImageOutput;//照片输出流
-
 //@property (nonatomic,strong) AVCapturePhotoOutput *imageOutput; //图片输出流 （iOS10之后）
-
-
 @property (nonatomic, strong) AVCaptureVideoPreviewLayer *captureVideoPreviewLayer;//相机拍摄预览图层
 @property (nonatomic, weak) UIView *containerView;//内容视图
 @property (nonatomic, weak) UIView *TakingPhotoView;//拍照与照片缩略图
@@ -27,6 +27,11 @@
 @property (nonatomic, weak) UIImageView *imgView;//拍摄照片
 @property (nonatomic, weak) UIButton *shutter;
 @property (nonatomic, strong) UIImage *image;
+
+//图片放大视图
+@property (nonatomic,strong) UIView *backGround;
+@property (nonatomic,strong) UIImageView *bigImage;
+@property (nonatomic,assign) CGFloat totalScale;
 @end
 
 @implementation PhotoViewController
@@ -114,6 +119,8 @@
     imgView.clipsToBounds = YES;
     [self.view addSubview:imgView];
     _imgView = imgView;
+    UITapGestureRecognizer *clickRevognizer = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(EnlargePhoto)];
+    [_imgView addSubview:_imgView];
 }
 
 #pragma mark - 进入扫码界面
@@ -269,6 +276,54 @@
     NSLog(@"=== %@", img);
     return img;
 }
+
+#pragma mark -  放大缩小图片
+- (void)EnlargePhoto{
+    self.navigationController.navigationBar.hidden = YES;
+[[UIApplication sharedApplication]setStatusBarHidden:YES withAnimation:UIStatusBarAnimationFade];
+    //底层视图
+    self.backGround = [[UIView alloc]init];
+    self.backGround.backgroundColor = [UIColor blackColor];
+    self.backGround.frame = self.view.frame;
+    self.totalScale = 1.0;
+    self.bigImage = [[UIImageView alloc]init];
+    _bigImage.frame = self.view.frame;
+    self.bigImage.image = self.imgView.image;
+    self.bigImage.userInteractionEnabled = YES;
+    self.bigImage.contentMode = UIViewContentModeScaleAspectFit;
+    self.bigImage.clipsToBounds = YES;
+    UITapGestureRecognizer *shrinkRecognizer = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(shirnkPhoto)];
+    [self.bigImage addGestureRecognizer:shrinkRecognizer];
+    UIPinchGestureRecognizer *pinchGestureRecognizer = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(handlePinch:)];
+    [self.bigImage addGestureRecognizer:pinchGestureRecognizer];
+    
+    [self.backGround addSubview:self.bigImage];
+    //[self.view addSubview:self.backGround];
+}
+- (void)shirnkPhoto{
+    [self.backGround removeFromSuperview];
+    self.navigationController.navigationBar.hidden = NO;
+    [[UIApplication sharedApplication]setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
+}
+- (void) handlePinch:(UIPinchGestureRecognizer*) recognizer {
+
+    CGFloat scale = recognizer.scale;
+     //放大情况
+     if(scale > 1.0){
+         if(self.totalScale > MaxSCale) return;
+     }
+
+     //缩小情况
+     if (scale < 1.0) {
+         if (self.totalScale < MinScale) return;
+     }
+
+     self.bigImage.transform = CGAffineTransformScale(self.bigImage.transform, scale, scale);
+     self.totalScale *=scale;
+     recognizer.scale = 1.0;
+}
+
+
 
 #pragma mark - <保存到相册>
 -(void)image:(UIImage *)image didFinishSavingWithError:(NSError *)error contextInfo:(void *)contextInfo {

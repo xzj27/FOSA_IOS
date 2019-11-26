@@ -270,7 +270,7 @@ NSLog(@"foodName=%@&&&&&&&expireDate=%@",_storageArray[i].foodName,_storageArray
     NSLog(@"%@刚好在今天过期",_storageArray[i].foodName);
             NSString *body = [NSString stringWithFormat:@"今天要记得吃 %@",_storageArray[i].foodName];
             //发送通知
-            [_notification sendNotification:_storageArray[i].foodName body:body path:_storageArray[i].foodPhoto deviceName:_storageArray[i].device];
+            [_notification sendNotification:_storageArray[i].foodName body:body path:[self getImage:_storageArray[i].foodName] deviceName:_storageArray[i].device];
         }
     }
     _circleview = [[LoadCircleView alloc]initWithFrame:CGRectMake(0  ,400,self.view.frame.size.width,100)];
@@ -340,7 +340,7 @@ NSLog(@"foodName=%@&&&&&&&expireDate=%@",_storageArray[i].foodName,_storageArray
         FoodInfoViewController *info = [[FoodInfoViewController alloc]init];
         info.hidesBottomBarWhenPushed = YES;
         info.deviceID = cell.model.device;
-        info.foodID = cell.model.foodName;
+        info.name = cell.model.foodName;
         [self.navigationController pushViewController:info animated:YES];
     }else{
         NSLog(@"正处于编辑状态无法跳转");
@@ -418,6 +418,7 @@ if (!_LeftOrRight) {//view 展开
     NSLog(@"%@",menu.accessibilityValue);
     NSLog(@"点击了删除");
     NSString *sql = [NSString stringWithFormat:@"delete from Fosa2 where foodName = '%@'",menu.accessibilityValue];
+    NSLog(@"%@",menu.accessibilityValue);
     [self deleteFile:menu.accessibilityValue];//删除存储在沙盒下下的同名的食物图片
     char * errmsg;
     sqlite3_exec(_database, sql.UTF8String, NULL, NULL, &errmsg);

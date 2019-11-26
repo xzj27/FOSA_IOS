@@ -12,7 +12,8 @@
 #import "SqliteManager.h"
 //图片宽高的最大值
 #define KCompressibilityFactor 1280.00
-
+#define MaxSCale 3.0  //最大缩放比例
+#define MinScale 0.5  //最小缩放比例
 @interface FoodInfoViewController ()<UITextFieldDelegate,UINavigationControllerDelegate,UNUserNotificationCenterDelegate,UITextViewDelegate,UIImagePickerControllerDelegate>{
     //日期选择
     UIDatePicker *datePicker;
@@ -25,15 +26,23 @@
     Boolean isRemind;
     //标示是否可编辑
     Boolean _CanEdit;
+    UIImage *codeImage; // 分享二维码
+    NSString *shareMessage;
+    
+    Boolean isSelect; //标志是否查询到数据
 
    }
-@property(nonatomic,assign) NSString *storagePath;;
-@property(nonatomic,assign) sqlite3 *database;
+@property (nonatomic,assign) NSString *storagePath;;
+@property (nonatomic,assign) sqlite3 *database;
 //结果集定义
-@property(nonatomic,assign) sqlite3_stmt *stmt;
-
+@property (nonatomic,assign) sqlite3_stmt *stmt;
 //记录所选择的日期
 @property (nonatomic,assign) NSDate *exdate,*redate;
+
+//图片放大视图
+@property (nonatomic,strong) UIView *backGround;
+@property (nonatomic,strong) UIImageView *bigImage;
+@property (nonatomic,assign) CGFloat totalScale;
 @end
 
 @implementation FoodInfoViewController
@@ -97,6 +106,7 @@
 #pragma mark - 创建并初始化界面
 -(void)CreatAndInitView{
     _CanEdit = false;
+    isSelect = false;
     self.edit = [[UIButton alloc]initWithFrame:CGRectMake(0,0,40,40)];
     [self.edit setImage:[UIImage imageNamed:@"icon_edit"] forState:UIControlStateNormal];
     [self.edit addTarget:self action:@selector(BeginEditing) forControlEvents:UIControlEventTouchUpInside];
@@ -129,6 +139,12 @@
     self.imageView1 = [[UIImageView alloc]initWithFrame:CGRectMake(15, headerheight/4-5,headerheight*3/4-5,headerheight*3/4-5)];
     self.imageView1.contentMode = UIViewContentModeScaleAspectFill;
     self.imageView1.clipsToBounds = YES;
+    self.imageView1.userInteractionEnabled = YES;
+    // 点击图片放大还原
+    UITapGestureRecognizer *clickRecognizer = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(EnlargePhoto)];
+    [self.imageView1 addGestureRecognizer:clickRecognizer];
+
+    
     self.deviceName = [[UITextView alloc]initWithFrame:CGRectMake(0, 0,headerWidth/2, headerheight/4-5)];
     self.deviceName.backgroundColor = [UIColor clearColor];
     [self.headerView addSubview:_imageView1];   //添加图片视图
@@ -136,6 +152,7 @@
     
     self.share = [[UIButton alloc]initWithFrame:CGRectMake(headerWidth-35,5,30,30)];
     [_share setImage:[UIImage imageNamed:@"icon_share"] forState:UIControlStateNormal];
+    [_share addTarget:self action:@selector(beginShare) forControlEvents:UIControlEventTouchUpInside];
     
     self.takePhoto = [[UIButton alloc]initWithFrame:CGRectMake(headerWidth-45,40, 40, 40)];
     [_takePhoto setImage:[UIImage imageNamed:@"icon_takePicture"] forState:UIControlStateNormal];
@@ -151,8 +168,6 @@
     
     //给对应按钮添加响应
     [_share addTarget:self action:@selector(beginShare) forControlEvents:UIControlEventTouchUpInside];
-    
-    
     //添加名称输入框视图
    self.foodNameView = [[UIView alloc]initWithFrame:CGRectMake(10, headerheight+20,headerWidth, 50)];
     _foodNameView.backgroundColor = [UIColor colorWithRed:180/255.0 green:180/255.0 blue:180/255.0 alpha:1.0];
@@ -193,9 +208,6 @@
     aboutfoodlabel.font = [UIFont systemFontOfSize:13];
     [self.aboutFoodView addSubview:aboutfoodlabel];
     [self.aboutFoodView addSubview:_aboutFood];
-    
-    
-
     //提醒日期视图
     self.remindView = [[UIView alloc]initWithFrame:CGRectMake(10, headerheight+140,headerWidth, 50)];
     _remindView.backgroundColor = [UIColor colorWithRed:180/255.0 green:180/255.0 blue:180/255.0 alpha:1.0];
@@ -294,6 +306,7 @@
 #pragma mark - 禁止视图与外界交互
 -(void)prohibitEdit{
     self.foodName.userInteractionEnabled = NO;
+    //self.share.userInteractionEnabled = NO;
     self.aboutFood.userInteractionEnabled = NO;
     self.expireBtn.userInteractionEnabled = NO;
     self.remindBtn.userInteractionEnabled = NO;
@@ -307,6 +320,7 @@
 }
 -(void)AllowEdit{
     self.foodName.userInteractionEnabled = YES;
+   // self.share.userInteractionEnabled = YES;
     self.aboutFood.userInteractionEnabled = YES;
     self.expireBtn.userInteractionEnabled = YES;
     self.remindBtn.userInteractionEnabled = YES;
@@ -346,14 +360,146 @@
     [dateView removeFromSuperview];
 }
 #pragma mark - 分享
--(void)beginShare{
-    NSLog(@"点击了分享");
-    UIImage *sharephoto = [self getJPEGImagerImg:self.food_image];
-    UIImage *sharephoto1 = [self getJPEGImagerImg:[UIImage imageNamed:@"启动图2"]];
-    NSArray *activityItems = @[sharephoto,sharephoto1];
-    UIActivityViewController *activityVC = [[UIActivityViewController alloc]initWithActivityItems:activityItems applicationActivities:nil];
-    [self presentViewController:activityVC animated:TRUE completion:nil];
+//生成share的UIView
+- (UIView *)CreatShareView:(NSString *)title body:(NSString *)body{
+    NSLog(@"begin creating");
+    CGFloat mainwidth = [UIScreen mainScreen].bounds.size.width/2;
+    CGFloat mainHeight = [UIScreen mainScreen].bounds.size.height/2;
+    
+    UIView *notification = [[UIView alloc]initWithFrame:CGRectMake(0, 0, mainwidth,mainHeight)];
+    notification.backgroundColor = [UIColor whiteColor];
+    
+    UIImageView *logo = [[UIImageView alloc]initWithFrame:CGRectMake(mainwidth/12, mainwidth/12, 30, 30)];
+    UILabel *brand = [[UILabel alloc]initWithFrame:CGRectMake(mainwidth/4+10, mainwidth/6, 50, 15)];
+    UIImageView *InfoCodeView = [[UIImageView alloc]initWithFrame:CGRectMake(mainwidth*4/5-10, 5, mainwidth/5, mainwidth/5)];
+    
+    UIImageView *image = [[UIImageView alloc]initWithFrame:CGRectMake(0,mainHeight/4, mainwidth, mainHeight/2)];
+    UILabel *Ntitle = [[UILabel alloc]initWithFrame:CGRectMake(5,mainHeight*3/4+10, mainwidth, 20)];
+    UILabel *Nbody = [[UILabel alloc]initWithFrame:CGRectMake(5, mainHeight*3/4+40, mainwidth, 20)];
+    [notification addSubview:logo];
+    [notification addSubview:brand];
+    [notification addSubview:InfoCodeView];
+    [notification addSubview:Ntitle];
+    [notification addSubview:image];
+    [notification addSubview:Nbody];
+    
+    logo.image  = [UIImage imageNamed:@"logo"];
+    image.image = self.food_image;
+    image.contentMode = UIViewContentModeScaleAspectFill;
+    image.clipsToBounds = YES;
+    
+    InfoCodeView.image = codeImage;
+    InfoCodeView.backgroundColor = [UIColor redColor];
+    InfoCodeView.contentMode = UIViewContentModeScaleAspectFill;
+    InfoCodeView.clipsToBounds = YES;
+    
+    brand.font  = [UIFont systemFontOfSize:10];
+    brand.textAlignment = NSTextAlignmentCenter;
+    brand.text  = @"FOSA";
+    
+    Ntitle.font  = [UIFont systemFontOfSize:12];
+    Ntitle.textColor = [UIColor redColor];
+    Ntitle.text = title;
+    
+    Nbody.font   = [UIFont systemFontOfSize:5];
+    Nbody.text = body;
+    
+    return notification;
 }
+
+//将UIView转化为图片并保存在相册
+- (UIImage *)SaveViewAsPicture:(UIView *)view{
+    NSLog(@"begin saving");
+    UIImage *imageRet = [[UIImage alloc]init];
+    //UIGraphicsBeginImageContextWithOptions(区域大小, 是否是非透明的, 屏幕密度);
+    UIGraphicsBeginImageContextWithOptions(view.frame.size, YES, [UIScreen mainScreen].scale);
+    [view.layer renderInContext:UIGraphicsGetCurrentContext()];
+    imageRet = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return imageRet;
+}
+- (UIImage *)GenerateQRCodeByMessage:(NSString *)message{
+    // 1. 创建一个二维码滤镜实例(CIFilter)
+    CIFilter *filter = [CIFilter filterWithName:@"CIQRCodeGenerator"];
+    // 滤镜恢复默认设置
+    [filter setDefaults];
+    
+    // 2. 给滤镜添加数据
+    NSData *data = [message dataUsingEncoding:NSUTF8StringEncoding];
+    
+    [filter setValue:data forKeyPath:@"inputMessage"];
+    
+    // 3. 生成二维码
+    CIImage *image = [filter outputImage];
+    
+    //[self createNonInterpolatedUIImageFormCIImage:image withSize:];
+    return [UIImage imageWithCIImage:image];
+}
+-(void)beginShare{
+    NSLog(@"@@@@@@@@@");
+    if (isSelect) {
+        NSLog(@"**************************");
+        codeImage = [self GenerateQRCodeByMessage:shareMessage];
+        NSString *title = @"My Share";
+        NSString *body = @"You can get the detail of my food by Scanning the Qrcode";
+        UIImage *sharephoto = [self SaveViewAsPicture:[self CreatShareView:title body:body]];
+        NSArray *activityItems = @[sharephoto];
+        UIActivityViewController *activityVC = [[UIActivityViewController alloc]initWithActivityItems:activityItems applicationActivities:nil];
+        [self presentViewController:activityVC animated:TRUE completion:nil];
+    }
+//    UIImage *sharephoto = [self getJPEGImagerImg:self.food_image];
+//    UIImage *sharephoto1 = [self getJPEGImagerImg:[UIImage imageNamed:@"启动图2"]];
+   
+}
+#pragma mark -  放大缩小图片
+- (void)EnlargePhoto{
+    self.navigationController.navigationBar.hidden = YES;
+    //[[UIApplication sharedApplication] setStatusBarHidden:YES];
+[[UIApplication sharedApplication]setStatusBarHidden:YES withAnimation:UIStatusBarAnimationFade];
+    //底层视图
+    self.backGround = [[UIView alloc]init];
+    self.backGround.backgroundColor = [UIColor blackColor];
+    self.backGround.frame = self.view.frame;
+    [self.view addSubview:self.backGround];
+    
+    self.totalScale = 1.0;
+    [self.foodName resignFirstResponder];
+    [self.aboutFood resignFirstResponder];
+    self.bigImage = [[UIImageView alloc]initWithFrame:CGRectMake(0, 0, self.mainWidth, self.mainheight)];
+    self.bigImage.image = self.imageView1.image;
+    self.bigImage.userInteractionEnabled = YES;
+    self.bigImage.contentMode = UIViewContentModeScaleAspectFit;
+    self.bigImage.clipsToBounds = YES;
+    UITapGestureRecognizer *shrinkRecognizer = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(shirnkPhoto)];
+    [self.bigImage addGestureRecognizer:shrinkRecognizer];
+    UIPinchGestureRecognizer *pinchGestureRecognizer = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(handlePinch:)];
+        
+    [self.bigImage addGestureRecognizer:pinchGestureRecognizer];
+    [self.backGround addSubview:self.bigImage];
+}
+- (void)shirnkPhoto{
+    [self.backGround removeFromSuperview];
+    self.navigationController.navigationBar.hidden = NO;
+    [[UIApplication sharedApplication]setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
+}
+- (void) handlePinch:(UIPinchGestureRecognizer*) recognizer {
+
+    CGFloat scale = recognizer.scale;
+     //放大情况
+     if(scale > 1.0){
+         if(self.totalScale > MaxSCale) return;
+     }
+
+     //缩小情况
+     if (scale < 1.0) {
+         if (self.totalScale < MinScale) return;
+     }
+
+     self.bigImage.transform = CGAffineTransformScale(self.bigImage.transform, scale, scale);
+     self.totalScale *=scale;
+     recognizer.scale = 1.0;
+}
+
 #pragma mark - 压缩图片
 - (UIImage *)getJPEGImagerImg:(UIImage *)image{
  CGFloat oldImg_WID = image.size.width;
@@ -511,15 +657,13 @@ NSLog(@"dele fail");
 #pragma mark - 根据存储设备编号查找所存储内容的信息
 - (void) SelectDataFromSqlite{
     //查询数据库里对应食物的详细信息
-    
-    Boolean isSelect = false; //标志是否查询到数据
-    NSString *sql = [NSString stringWithFormat:@"select aboutFood,expireDate,remindDate,photoPath from Fosa2 where deviceName = '%@' and foodName = '%@' ",self.deviceID,self.foodID];
+    NSLog(@"$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+    NSString *sql = [NSString stringWithFormat:@"select aboutFood,expireDate,remindDate,photoPath from Fosa2 where deviceName = '%@' and foodName = '%@' ",self.deviceID,self.name];
     self.stmt = [SqliteManager SelectDataFromTable:sql database:self.database];
     if (self.stmt != NULL) {
         NSLog(@"&*&**&*&*&*&*&*&*&*&*&");
         while (sqlite3_step(_stmt) == SQLITE_ROW) {
-            isSelect = true;
-                self.foodName.text = self.foodID;
+                self.foodName.text = self.name;
                 self.deviceName.text = self.deviceID;
                 const char *about_food  = (const char*)sqlite3_column_text(_stmt,0);
                 NSLog(@"查询到数据:%@",[NSString stringWithUTF8String:about_food]);
@@ -534,33 +678,33 @@ NSLog(@"dele fail");
                 NSLog(@"----%@",[NSString stringWithUTF8String:photopath]);
                 self.food_image = [self getImage:[NSString stringWithUTF8String:photopath]];    //保存原本的图片
                 self.imageView1.image = self.food_image;
+            shareMessage = [NSString stringWithFormat:@"FOSA&%@&%@&%@&%@&%@&",self.foodName.text,self.deviceName.text,self.aboutFood.text,self.expireDate.text,self.remindDate.text];
+            NSLog(@"%@",shareMessage);
+            isSelect = true;
             }
-        if (!isSelect) {
-            NSString *message = @"数据库中没有这个记录，是否保存？";
-            UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Notification" message:message preferredStyle:UIAlertControllerStyleAlert];
-            [alert addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-                NSLog(@"<<<<<<<<<YES");
-                 NSString *insertSql =[NSString stringWithFormat:@"insert into Fosa2(foodName,deviceName,aboutFood,expireDate,remindDate,photoPath)values('%@','%@','%@','%@','%@','%@')",self.foodID,self.deviceID,self.infoArray[3],self.infoArray[4],self.infoArray[5],self.foodID];
-                
-                 //NSLog(@"%@",self.foodID);
-                [self InsertData:insertSql];
-            }]];
-            [alert addAction:[UIAlertAction actionWithTitle:@"NO" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
-                NSLog(@"》〉》〉》〉》〉》〉》〉》 Cancel");
-            }]];
-            [self presentViewController:alert animated:true completion:nil];
-        }
+    }
+    if (!isSelect) {
+        NSString *message = @"数据库中没有这个记录，是否保存？";
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Notification" message:message preferredStyle:UIAlertControllerStyleAlert];
+        [alert addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            NSLog(@"<<<<<<<<<YES");
+             NSString *insertSql =[NSString stringWithFormat:@"insert into Fosa2(foodName,deviceName,aboutFood,expireDate,remindDate,photoPath)values('%@','%@','%@','%@','%@','%@')",self.name,self.deviceID,self.infoArray[3],self.infoArray[4],self.infoArray[5],self.name];
+            [self InsertData:insertSql];
+        }]];
+        [alert addAction:[UIAlertAction actionWithTitle:@"NO" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
+            NSLog(@"》〉》〉》〉》〉》〉》〉》 Cancel");
+        }]];
+        [self presentViewController:alert animated:true completion:nil];
     }
 }
 //插入新数据
 - (void)InsertData:(NSString *)sql{
     //错误信息定义
     char *erro = 0;
-
     int insertResult = sqlite3_exec(self.database, sql.UTF8String,NULL, NULL,&erro);
     if(insertResult == SQLITE_OK){
         NSLog(@"添加数据成功");
-        [self Savephoto:self.foodImage];
+        [self Savephoto:self.food_image];
         [self SelectDataFromSqlite];
     }else{
         NSLog(@"插入数据失败");
@@ -596,7 +740,7 @@ NSLog(@"dele fail");
 //保存照片到沙盒
 - (NSString *)Savephoto:(UIImage *)image{
     NSArray *paths =NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask,YES);
-    NSString *photoName = [NSString stringWithFormat:@"%@.png",self.foodID];
+    NSString *photoName = [NSString stringWithFormat:@"%@.png",self.name];
     NSString *filePath = [[paths objectAtIndex:0]stringByAppendingPathComponent: photoName];// 保存文件的路径
     NSLog(@"这个是照片的保存地址:%@",filePath);
     BOOL result =[UIImagePNGRepresentation(image) writeToFile:filePath  atomically:YES];// 保存成功会返回YES

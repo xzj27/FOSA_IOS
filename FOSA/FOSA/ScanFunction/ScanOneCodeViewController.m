@@ -638,6 +638,17 @@
                 }else if([result hasPrefix:@"Fosa"]||[result hasPrefix:@"FS9"]){
                     [self ScanSuccess:@"ding.wav"];
                     [self performSelectorOnMainThread:@selector(showOneMessage:) withObject:result waitUntilDone:NO]; //在主线程中展示这个物品的通知
+                }else if ([result hasPrefix:@"FOSA"]) {
+                        FoodInfoViewController *food = [[FoodInfoViewController alloc]init];
+                        //分割字符串的测试
+                        food.infoArray = [NSArray array];
+                        food.infoArray = [result componentsSeparatedByString:@"&"];
+                        NSLog(@"%@",food.infoArray);
+                        food.name = food.infoArray[1];
+                        food.deviceID = food.infoArray[2];
+                        NSLog(@"%@---%@",food.name,food.deviceID);
+                        //food.food_image = [self getPartOfImage:image];
+                        [self.navigationController pushViewController:food animated:YES];
                 }else{
                     if (!isJump) {//当前还没有发生跳转
                         [self ScanSuccess:@"ding.wav"];
@@ -1135,12 +1146,12 @@
             //分割字符串的测试
             food.infoArray = [NSArray array];
             food.infoArray = [firstResult componentsSeparatedByString:@"&"];
-            NSLog(@"%@",food.infoArray[3]);
-            food.foodID = food.infoArray[1];
+            NSLog(@"%@",food.infoArray);
+            food.name = food.infoArray[1];
             food.deviceID = food.infoArray[2];
-            NSLog(@"%@---%@",food.foodID,food.deviceID);
+            NSLog(@"%@---%@",food.name,food.deviceID);
             
-            food.foodImage = [self getPartOfImage:image];
+            food.food_image = [self getPartOfImage:image];
             [self.navigationController pushViewController:food animated:YES];
         }
     }
