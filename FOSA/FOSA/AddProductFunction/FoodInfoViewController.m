@@ -9,7 +9,7 @@
 #import "FoodInfoViewController.h"
 #import "PhotoViewController.h"
 #import <UserNotifications/UserNotifications.h>
-#import <sqlite3.h>
+#import "SqliteManager.h"
 //图片宽高的最大值
 #define KCompressibilityFactor 1280.00
 
@@ -493,88 +493,86 @@ NSLog(@"dele fail");
 }
 //数据库操作
 #pragma mark - 创建或打开数据库
--(void)creatOrOpensql
+- (void)creatOrOpensql
 {
-    NSString *path = [self getPath];
-   // char *erro = 0;
-    int sqlStatus = sqlite3_open_v2([path UTF8String], &_database,SQLITE_OPEN_CREATE|SQLITE_OPEN_READWRITE,NULL);
-    if (sqlStatus == SQLITE_OK) {
-        NSLog(@"数据库打开成功");
-    }
-}
-//判断表是否已经存在
--(BOOL)isTabelExist:(NSString *)name{
-    char *err;
-    NSString *sql = [NSString stringWithFormat:@"SELECT COUNT(*) FROM sqlite_master where type='table' and name='%@';",name];
-    const char *sql_stmt = [sql UTF8String];
-    if(sqlite3_exec(_database, sql_stmt, NULL, NULL, &err) == 1){
-        return YES;
-    }else{
-        return NO;
-    }
+    self.database = [SqliteManager InitSqliteWithName:@"Fosa.db"];
 }
 #pragma mark - 更新数据
--(void) UpdateInfo{
+- (void) UpdateInfo{
     NSString *sql = [NSString stringWithFormat:@"UPDATE Fosa2 SET foodName = '%@',aboutFood = '%@',expireDate = '%@',remindDate = '%@',photoPath = '%@'  WHERE deviceName = '%@'",self.foodName.text,self.aboutFood.text,self.expireDate.text,self.remindDate.text,self.foodName.text,self.deviceID];
     const char *updateSql = [sql UTF8String];
     int updateResult = sqlite3_exec(_database,updateSql,NULL,NULL,NULL);
     if (updateResult != SQLITE_OK) {
         [self SystemAlert:@"保存内容失败"];
     }else{
-        [self.navigationController popViewControllerAnimated:YES];
+        [self.navigationController popToRootViewControllerAnimated:YES];
     }
 }
 #pragma mark - 根据存储设备编号查找所存储内容的信息
--(void) SelectDataFromSqlite{
+- (void) SelectDataFromSqlite{
     //查询数据库里对应食物的详细信息
-    NSString *sql = [NSString stringWithFormat:@"select foodName,deviceName,aboutFood,expireDate,remindDate,photoPath from Fosa2 where deviceName = '%@'",self.deviceID];
-    const char *selsql = [sql UTF8String];
-    int selresult = sqlite3_prepare_v2(self.database, selsql, -1,&_stmt, NULL);
-    if(selresult != SQLITE_OK){
-        NSLog(@"查询失败");
-    }else{
+    
+    Boolean isSelect = false; //标志是否查询到数据
+    NSString *sql = [NSString stringWithFormat:@"select aboutFood,expireDate,remindDate,photoPath from Fosa2 where deviceName = '%@' and foodName = '%@' ",self.deviceID,self.foodID];
+    self.stmt = [SqliteManager SelectDataFromTable:sql database:self.database];
+    if (self.stmt != NULL) {
+        NSLog(@"&*&**&*&*&*&*&*&*&*&*&");
         while (sqlite3_step(_stmt) == SQLITE_ROW) {
-            const char *food_name   = (const char*)sqlite3_column_text(_stmt, 0);
-            NSLog(@"查询到数据:%@",[NSString stringWithUTF8String:food_name]);
-            self.name = [NSString stringWithUTF8String:food_name];
-            self.foodName.text = self.name;
-            const char *device_name = (const char*)sqlite3_column_text(_stmt,1);
-            NSLog(@"查询到数据:%@",[NSString stringWithUTF8String:device_name]);
-            self.deviceName.text = self.deviceID;
-            const char *about_food  = (const char*)sqlite3_column_text(_stmt,2);
-           NSLog(@"查询到数据:%@",[NSString stringWithUTF8String:about_food]);
-            self.aboutFood.text = [NSString stringWithUTF8String:about_food];
-            const char *expire_date = (const char*)sqlite3_column_text(_stmt,3);
-            NSLog(@"查询到数据:%@",[NSString stringWithUTF8String:expire_date]);
-            self.expireDate.text = [NSString stringWithUTF8String:expire_date];
-            const char *remind_date = (const char*)sqlite3_column_text(_stmt,4);
-            NSLog(@"查询到数据:%@",[NSString stringWithUTF8String:remind_date]);
-            self.remindDate.text = [NSString stringWithUTF8String:remind_date];
-            const char *photopath = (const char*)sqlite3_column_text(_stmt,5);
-            NSLog(@"----%@",[NSString stringWithUTF8String:photopath]);
-            self.food_image = [self getImage:[NSString stringWithUTF8String:photopath]];    //保存原本的图片
-            self.imageView1.image = self.food_image;
+            isSelect = true;
+                self.foodName.text = self.foodID;
+                self.deviceName.text = self.deviceID;
+                const char *about_food  = (const char*)sqlite3_column_text(_stmt,0);
+                NSLog(@"查询到数据:%@",[NSString stringWithUTF8String:about_food]);
+                self.aboutFood.text = [NSString stringWithUTF8String:about_food];
+                const char *expire_date = (const char*)sqlite3_column_text(_stmt,1);
+                NSLog(@"查询到数据:%@",[NSString stringWithUTF8String:expire_date]);
+                self.expireDate.text = [NSString stringWithUTF8String:expire_date];
+                const char *remind_date = (const char*)sqlite3_column_text(_stmt,2);
+                NSLog(@"查询到数据:%@",[NSString stringWithUTF8String:remind_date]);
+                self.remindDate.text = [NSString stringWithUTF8String:remind_date];
+                const char *photopath = (const char*)sqlite3_column_text(_stmt,3);
+                NSLog(@"----%@",[NSString stringWithUTF8String:photopath]);
+                self.food_image = [self getImage:[NSString stringWithUTF8String:photopath]];    //保存原本的图片
+                self.imageView1.image = self.food_image;
+            }
+        if (!isSelect) {
+            NSString *message = @"数据库中没有这个记录，是否保存？";
+            UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Notification" message:message preferredStyle:UIAlertControllerStyleAlert];
+            [alert addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+                NSLog(@"<<<<<<<<<YES");
+                 NSString *insertSql =[NSString stringWithFormat:@"insert into Fosa2(foodName,deviceName,aboutFood,expireDate,remindDate,photoPath)values('%@','%@','%@','%@','%@','%@')",self.foodID,self.deviceID,self.infoArray[3],self.infoArray[4],self.infoArray[5],self.foodID];
+                
+                 //NSLog(@"%@",self.foodID);
+                [self InsertData:insertSql];
+            }]];
+            [alert addAction:[UIAlertAction actionWithTitle:@"NO" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
+                NSLog(@"》〉》〉》〉》〉》〉》〉》 Cancel");
+            }]];
+            [self presentViewController:alert animated:true completion:nil];
         }
     }
 }
-#pragma mark - 获取DB数据库所在的document路径
--(NSString *)getPath
-{
-    NSString *filename = @"Fosa.db";
-    NSString *doc = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
-    NSString *filePath = [doc stringByAppendingPathComponent:filename];
-    NSLog(@"%@",filePath);
-    return filePath;
+//插入新数据
+- (void)InsertData:(NSString *)sql{
+    //错误信息定义
+    char *erro = 0;
+
+    int insertResult = sqlite3_exec(self.database, sql.UTF8String,NULL, NULL,&erro);
+    if(insertResult == SQLITE_OK){
+        NSLog(@"添加数据成功");
+        [self Savephoto:self.foodImage];
+        [self SelectDataFromSqlite];
+    }else{
+        NSLog(@"插入数据失败");
+    }
 }
 //完成输入，将数据写入数据库
 -(void)BeginEditing{
-    
     if (_CanEdit) {
         _CanEdit = false;
         [self.edit setImage:[UIImage imageNamed:@"icon_edit"] forState:UIControlStateNormal];
         [self Savephoto];
         [self UpdateInfo];
-        
 //        [self creatOrOpensql];
 //        [self InsertDataIntoSqlite];
 //        [self.navigationController popToRootViewControllerAnimated:YES];
@@ -596,17 +594,17 @@ NSLog(@"dele fail");
     }
 }
 //保存照片到沙盒
-//-(NSString *)Savephoto:(UIImage *)image{
-//    NSArray *paths =NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask,YES);
-//    NSString *photoName = [NSString stringWithFormat:@"%@.png",self.foodName.text];
-//    NSString *filePath = [[paths objectAtIndex:0]stringByAppendingPathComponent: photoName];// 保存文件的路径
-//    NSLog(@"这个是照片的保存地址:%@",filePath);
-//    BOOL result =[UIImagePNGRepresentation(image) writeToFile:filePath  atomically:YES];// 保存成功会返回YES
-//    if(result == YES) {
-//        NSLog(@"保存成功");
-//    }
-//    return filePath;
-//}
+- (NSString *)Savephoto:(UIImage *)image{
+    NSArray *paths =NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask,YES);
+    NSString *photoName = [NSString stringWithFormat:@"%@.png",self.foodID];
+    NSString *filePath = [[paths objectAtIndex:0]stringByAppendingPathComponent: photoName];// 保存文件的路径
+    NSLog(@"这个是照片的保存地址:%@",filePath);
+    BOOL result =[UIImagePNGRepresentation(image) writeToFile:filePath  atomically:YES];// 保存成功会返回YES
+    if(result == YES) {
+        NSLog(@"保存成功");
+    }
+    return filePath;
+}
 #pragma mark - 取出保存在本地的图片
 -(UIImage*)getImage:(NSString *)filepath{
     NSArray *paths =NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask,YES);
@@ -675,15 +673,4 @@ NSLog(@"dele fail");
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillHideNotification object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillShowNotification object:nil];
 }
-
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
-
 @end

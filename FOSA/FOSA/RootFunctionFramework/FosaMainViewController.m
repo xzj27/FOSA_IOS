@@ -28,14 +28,10 @@
     Boolean isEdit;
     CGFloat cellHeight;
 }
-
 @property (nonatomic,strong) UIView *CategoryMenu;  //菜单视图
 @property(nonatomic,assign) sqlite3 *database;
 //结果集定义
 @property(nonatomic,assign) sqlite3_stmt *stmt;
-
-
-
 @property (nonatomic,assign) int count;
 @property (nonatomic,assign) Boolean LeftOrRight;
 @property (nonatomic,strong) NSMutableArray<CellModel *> *storageArray;
@@ -70,13 +66,6 @@
     self.navigationItem.leftBarButtonItem = leftItem;
     [self InitView];
     [self InitAddView];
-    
-//    //分割字符串的测试
-//    NSString *string = @"abcd&efgh&ijkl&mnop&qrst";
-//    NSArray *array = [NSArray array];
-//    array = [string componentsSeparatedByString:@"&"];
-//    NSLog(@"<<<<<<<<<<<<%@",array[0]);
-//
 }
 
 - (void)viewWillAppear:(BOOL)animated{
@@ -272,7 +261,8 @@ NSLog(@"foodName=%@&&&&&&&expireDate=%@",_storageArray[i].foodName,_storageArray
             isSend = true;
             NSString *body = [NSString stringWithFormat:@"Fosa 提醒你应该在%@ 食用 %@",_storageArray[i].remindDate,_storageArray[i].foodName];
             //发送通知
-            [_notification sendNotification:_storageArray[i].foodName body:body path:_storageArray[i].foodPhoto deviceName:_storageArray[i].device];
+            [_notification sendNotification:_storageArray[i].foodName body:body path:[self getImage:_storageArray[i].foodName] deviceName:_storageArray[i].device];
+           
             
         }else if (result == NSOrderedAscending){
             NSLog(@"%@ 将在 %@ 过期了，请及时使用",_storageArray[i].foodName,_storageArray[i].remindDate);
@@ -289,6 +279,17 @@ NSLog(@"foodName=%@&&&&&&&expireDate=%@",_storageArray[i].foodName,_storageArray
     [self performSelector:@selector(removeLoading) withObject:nil afterDelay:3.0f];
     
 }
+//取出保存在本地的图片
+- (UIImage*)getImage:(NSString *)filepath{
+    NSArray *paths =NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask,YES);
+    NSString *photopath = [NSString stringWithFormat:@"%@.png",filepath];
+    NSString *imagePath = [[paths objectAtIndex:0]stringByAppendingPathComponent:[NSString stringWithFormat:@"%@",photopath]];
+    // 保存文件的名称
+    UIImage *img = [UIImage imageWithContentsOfFile:imagePath];
+    NSLog(@"===%@", img);
+    return img;
+}
+
 - (void)removeLoading{
     [self.circleview removeFromSuperview];
 }
@@ -339,6 +340,7 @@ NSLog(@"foodName=%@&&&&&&&expireDate=%@",_storageArray[i].foodName,_storageArray
         FoodInfoViewController *info = [[FoodInfoViewController alloc]init];
         info.hidesBottomBarWhenPushed = YES;
         info.deviceID = cell.model.device;
+        info.foodID = cell.model.foodName;
         [self.navigationController pushViewController:info animated:YES];
     }else{
         NSLog(@"正处于编辑状态无法跳转");

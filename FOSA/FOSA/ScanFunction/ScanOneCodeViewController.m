@@ -17,6 +17,7 @@
 #import "Fosa_QRCode_Queue.h"
 #import "Fosa_NSString_queue.h"
 #import "SqliteManager.h"
+#import "FoodInfoViewController.h"
 @interface ScanOneCodeViewController ()<AVCaptureMetadataOutputObjectsDelegate,UINavigationControllerDelegate,AVCaptureVideoDataOutputSampleBufferDelegate,UIImagePickerControllerDelegate>{
     //用于初始化数据模型的数据
     NSString *food,*fdevice,*expire,*remind,*photoPath;
@@ -1047,11 +1048,6 @@
             photoPath = [NSString stringWithUTF8String:photo_path];
         }
     }
-//    NSLog(@"查询到数据:%@",food);
-//    NSLog(@"查询到数据:%@",fdevice);
-//    NSLog(@"查询到数据:%@",expire);
-//    NSLog(@"查询到数据:%@",remind);
-//    NSLog(@"查询到数据:%@",photoPath);
     if (fdevice == NULL) {
         fdevice = device;
         food = @"该设备没有记录";
@@ -1122,27 +1118,36 @@
     UIImage *image = [ScanOneCodeViewController LY_imageSizeWithScreenImage:info[UIImagePickerControllerOriginalImage]];
     // CIDetector(CIDetector可用于人脸识别)进行图片解析，从而使我们可以便捷的从相册中获取到二维码
     [self dismissViewControllerAnimated:YES completion:nil];
-    
-    [self getPartOfImage:image];
     //[self analyseRectImage:image];
     // 声明一个 CIDetector，并设定识别类型 CIDetectorTypeQRCode
     CIDetector *detector = [CIDetector detectorOfType:CIDetectorTypeQRCode context:nil options:@{CIDetectorAccuracy: CIDetectorAccuracyHigh}];
-
     // 取得识别结果
     NSArray *features = [detector featuresInImage:[CIImage imageWithCGImage:image.CGImage]];
-
     if (features.count == 0) {
         [self SystemAlert:@"识别不到二维码"];
         return;
     } else {
         CIQRCodeFeature *firstfeature = [features objectAtIndex:0];
         NSString *firstResult = firstfeature.messageString;
-        [self SystemAlert:firstResult];
+        //[self SystemAlert:firstResult];
+        if ([firstResult hasPrefix:@"FOSA"]) {
+            FoodInfoViewController *food = [[FoodInfoViewController alloc]init];
+            //分割字符串的测试
+            food.infoArray = [NSArray array];
+            food.infoArray = [firstResult componentsSeparatedByString:@"&"];
+            NSLog(@"%@",food.infoArray[3]);
+            food.foodID = food.infoArray[1];
+            food.deviceID = food.infoArray[2];
+            NSLog(@"%@---%@",food.foodID,food.deviceID);
+            
+            food.foodImage = [self getPartOfImage:image];
+            [self.navigationController pushViewController:food animated:YES];
+        }
     }
 
 }
 
-- (void)getPartOfImage:(UIImage *)img
+- (UIImage *)getPartOfImage:(UIImage *)img
 {
     CGFloat mainwidth = [UIScreen mainScreen].bounds.size.width;
     CGFloat mainHeight = [UIScreen mainScreen].bounds.size.height;
@@ -1152,6 +1157,8 @@
     UIImage *thumbScale = [UIImage imageWithCGImage:imageRef];
     CGImageRelease(imageRef);
      UIImageWriteToSavedPhotosAlbum(thumbScale, self,@selector(image:didFinishSavingWithError:contextInfo:),nil);
+    
+    return thumbScale;
 }
 #pragma mark - <保存到相册>
 -(void)image:(UIImage *)image didFinishSavingWithError:(NSError *)error contextInfo:(void *)contextInfo {
@@ -1162,9 +1169,6 @@
         msg = @"保存图片成功" ;
     }
 }
-
-
-
 - (void)getImageAndDetect
 {
     //根据设备输出获得连接

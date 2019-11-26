@@ -94,11 +94,10 @@
     //[self createNonInterpolatedUIImageFormCIImage:image withSize:];
     return [UIImage imageWithCIImage:image];
 }
+//获得高清的二维码图片
 - (UIImage *)createNonInterpolatedUIImageFormCIImage:(CIImage *)image withSize:(CGFloat) size {
-    
     CGRect extent = CGRectIntegral(image.extent);
     CGFloat scale = MIN(size/CGRectGetWidth(extent), size/CGRectGetHeight(extent));
-    
     // 1.创建bitmap;
     size_t width = CGRectGetWidth(extent) * scale;
     size_t height = CGRectGetHeight(extent) * scale;
@@ -109,15 +108,12 @@
     CGContextSetInterpolationQuality(bitmapRef, kCGInterpolationNone);
     CGContextScaleCTM(bitmapRef, scale, scale);
     CGContextDrawImage(bitmapRef, extent, bitmapImage);
-    
     // 2.保存bitmap到图片
     CGImageRef scaledImage = CGBitmapContextCreateImage(bitmapRef);
     CGContextRelease(bitmapRef);
     CGImageRelease(bitmapImage);
     return [UIImage imageWithCGImage:scaledImage];
 }
-
-
 
 -(void)initNotification{
     
@@ -139,8 +135,6 @@
            //do other things
         }
     }];
-    //移除一条通知
-   // [center removePendingNotificationRequestsWithIdentifiers:@[@"time interval request"]];
 }
 
 //代理回调方法，通知即将展示的时候
@@ -164,20 +158,20 @@ completionHandler(UNNotificationPresentationOptionBadge|UNNotificationPresentati
     UNNotificationContent *content = request.content; // 原始内容
     NSString *title = content.title;  // 标题
     NSString *body = content.body;    // 推送消息体
-   
-    UIImage *notificationImage = [self SaveViewAsPicture: [self CreatNotificatonView:title body:body]];
-    //[self beginShare:image];
-    UIImageWriteToSavedPhotosAlbum(notificationImage, self,@selector(image:didFinishSavingWithError:contextInfo:),nil);
-    
+
 //在此，可判断response的种类和request的触发器是什么，可根据远程通知和本地通知分别处理，再根据action进行后续回调
     if ([response isKindOfClass:[UNTextInputNotificationResponse class]]) {
         UNTextInputNotificationResponse * textResponse = (UNTextInputNotificationResponse*)response;
         NSString * text = textResponse.userText;
         NSLog(@"%@",text);
+        
     }
     else{
         if ([response.actionIdentifier isEqualToString:@"see1"]){
             NSLog(@"Save UIView as photo");
+            UIImage *notificationImage = [self SaveViewAsPicture: [self CreatNotificatonView:title body:body]];
+            //[self beginShare:image];
+            UIImageWriteToSavedPhotosAlbum(notificationImage, self,@selector(image:didFinishSavingWithError:contextInfo:),nil);
             
 //            ScanOneCodeViewController *scan = [[ScanOneCodeViewController alloc]init];
 //            scan.hidesBottomBarWhenPushed = YES;
@@ -254,8 +248,7 @@ completionHandler(UNNotificationPresentationOptionBadge|UNNotificationPresentati
     [self Savephoto:img name:photo];
 }
 
-
-- (void)sendNotification:(NSString *)foodName body:(NSString *)body path:(NSString *)photo deviceName:(NSString *)device{
+- (void)sendNotification:(NSString *)foodName body:(NSString *)body path:(UIImage *)image deviceName:(NSString *)device {
     NSLog(@"我将发送一个系统通知");
     UNMutableNotificationContent *content = [[UNMutableNotificationContent alloc] init];
     content.title = @"\"Reminding\"";
@@ -264,13 +257,8 @@ completionHandler(UNNotificationPresentationOptionBadge|UNNotificationPresentati
     content.badge = @0;
     //获取沙盒中的图片
     NSArray *paths =NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask,YES);
-    NSString *photopath = [NSString stringWithFormat:@"%@.png",photo];
+    NSString *photopath = [NSString stringWithFormat:@"%@.png",foodName];
     NSString *imagePath = [[paths objectAtIndex:0]stringByAppendingPathComponent:[NSString stringWithFormat:@"%@",photopath]];
-    UIImage *img = [UIImage imageWithContentsOfFile:imagePath];
-    self.image = img;
-    [self Savephoto:self.image name:photo];//重新保存图片
-    
-    NSLog(@">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>%@",imagePath);
     NSError *error = nil;
     //将本地图片的路径形成一个图片附件，加入到content中
     UNNotificationAttachment *img_attachment = [UNNotificationAttachment attachmentWithIdentifier:@"att1" URL:[NSURL fileURLWithPath:imagePath] options:nil error:&error];
@@ -285,13 +273,16 @@ completionHandler(UNNotificationPresentationOptionBadge|UNNotificationPresentati
     content.sound = sound;
     //设置时间间隔的触发器
     UNTimeIntervalNotificationTrigger *time_trigger = [UNTimeIntervalNotificationTrigger triggerWithTimeInterval:3 repeats:NO];
-    NSString *requestIdentifer = photo;
+    NSString *requestIdentifer = foodName;
         //content.categoryIdentifier = @"textCategory";
     content.categoryIdentifier = @"seeCategory";
     UNNotificationRequest *request = [UNNotificationRequest requestWithIdentifier:requestIdentifer content:content trigger:time_trigger];
     [[UNUserNotificationCenter currentNotificationCenter] addNotificationRequest:request withCompletionHandler:^(NSError * _Nullable error) {
         NSLog(@"%@",error);
     }];
+    UIImage *img = image;
+    self.image = img;
+    [self Savephoto:image name:foodName];//重新保存图片
     [self SelectSql:device foodname:foodName];
 }
 - (void)SelectSql:(NSString *)device foodname:(NSString *)name{
@@ -308,17 +299,17 @@ completionHandler(UNNotificationPresentationOptionBadge|UNNotificationPresentati
         const char *expired_date = (const char *)sqlite3_column_text(stmt,3);
         const char *remind_date = (const char*)sqlite3_column_text(stmt,4);
         const char *photo_path = (const char *)sqlite3_column_text(stmt,5);
+         NSLog(@"<<<<<<<<<<<<<<<<<<<<<<==========%@",[NSString stringWithUTF8String:photo_path]);
          NSString *foodName = [NSString stringWithUTF8String:food_name];
          NSString *deviceName = [NSString stringWithUTF8String:device_name];
          NSString *aboutFood = [NSString stringWithUTF8String:about_food];
          NSString *expireDate = [NSString stringWithUTF8String:expired_date];
          NSString *remindDate = [NSString stringWithUTF8String:remind_date];
-         NSString *FoodInfo = [NSString stringWithFormat:@"%@&%@&%@&%@&%@&",foodName,deviceName,aboutFood,expireDate,remindDate];
+         NSString *FoodInfo = [NSString stringWithFormat:@"FOSA&%@&%@&%@&%@&%@&",foodName,deviceName,aboutFood,expireDate,remindDate];
          NSLog(@"<<<<<<<<<<<<<<<<%@",FoodInfo);
          self.codeImage = [self GenerateQRCodeByMessage:FoodInfo];
          break;
             }
-
         }else{
             NSLog(@"查询失败");
         }
@@ -336,6 +327,7 @@ completionHandler(UNNotificationPresentationOptionBadge|UNNotificationPresentati
 }
 #pragma mark - <保存到相册>
 -(void)image:(UIImage *)image didFinishSavingWithError:(NSError *)error contextInfo:(void *)contextInfo {
+    NSLog(@"UIImage didFinishSavingWidthError");
     NSString *msg = nil ;
     if(error){
         msg = @"保存图片失败" ;
@@ -346,6 +338,7 @@ completionHandler(UNNotificationPresentationOptionBadge|UNNotificationPresentati
 }
 //保存到沙盒
 -(NSString *)Savephoto:(UIImage *)image name:(NSString *)foodname{
+    NSLog(@"^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
     NSArray *paths =NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask,YES);
     NSString *photoName = [NSString stringWithFormat:@"%@.png",foodname];
     NSString *filePath = [[paths objectAtIndex:0]stringByAppendingPathComponent: photoName];// 保存文件的路径
@@ -354,23 +347,21 @@ completionHandler(UNNotificationPresentationOptionBadge|UNNotificationPresentati
     if(result == YES) {
         NSLog(@"保存成功");
     }
+    NSLog(@"vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv");
     return filePath;
 }
 //弹出系统提示
 -(void)SystemAlert:(NSString *)message{
-   
+    NSLog(@"$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$SystemAlert");
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Notification" message:message preferredStyle:UIAlertControllerStyleAlert];
     [alert addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil]];
-
 }
-
 -(void)beginShare:(UIImage *)image{
     NSLog(@"点击了分享");
     //UIImage *sharephoto = [self getJPEGImagerImg:self.food_image];
     //UIImage *sharephoto1 = [self getJPEGImagerImg:[UIImage imageNamed:@"启动图2"]];
     NSArray *activityItems = @[image];
     UIActivityViewController *activityVC = [[UIActivityViewController alloc]initWithActivityItems:activityItems applicationActivities:nil];
-
 }
 #pragma mark - 压缩图片
 - (UIImage *)getJPEGImagerImg:(UIImage *)image{
