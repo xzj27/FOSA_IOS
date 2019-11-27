@@ -146,6 +146,7 @@
 
     
     self.deviceName = [[UITextView alloc]initWithFrame:CGRectMake(0, 0,headerWidth/2, headerheight/4-5)];
+    self.deviceName.userInteractionEnabled = NO;
     self.deviceName.backgroundColor = [UIColor clearColor];
     [self.headerView addSubview:_imageView1];   //添加图片视图
     [self.headerView addSubview:_deviceName];

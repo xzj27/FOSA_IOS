@@ -96,6 +96,7 @@
     //setting the rolling direction of the collectionViw
     [layout setScrollDirection:(UICollectionViewScrollDirectionVertical)];
     layout.itemSize = CGSizeMake((self.mainWidth*11/12-15)/2,self.mainWidth/3-5);
+    cellHeight = self.mainWidth/3-5;
     layout.minimumLineSpacing = 5;
     layout.minimumInteritemSpacing = 5;
     layout.sectionInset = UIEdgeInsetsMake(5, 5, 0, 5);
@@ -478,7 +479,6 @@ if (!_LeftOrRight) {//view 展开
 //每个cell的具体内容
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:( NSIndexPath *)indexPath {
     FoodCollectionViewCell *cell = [self.StorageItemView dequeueReusableCellWithReuseIdentifier:ID forIndexPath:indexPath];
-    cellHeight = cell.frame.size.height;//获取cell的高度
     //给自定义cell的model传值
     long int index = indexPath.section*2+indexPath.row;
     cell.model = self.storageArray[index];
