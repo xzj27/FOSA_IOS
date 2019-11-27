@@ -35,7 +35,6 @@
     self.deviceTable.delegate = self;
     self.deviceTable.dataSource = self;
     self.deviceTable.showsVerticalScrollIndicator = NO;
-    self.deviceTable.layer.borderWidth = 1;
     [self.deviceTable setSeparatorColor:[UIColor grayColor]];
     [self.view addSubview:self.deviceTable];
 

@@ -17,23 +17,33 @@
 #import "OtherViewController.h"
 
 
+
 @interface FosaProductViewController ()
 @property (nonatomic,strong) FosaScrollview *fosaScrollview;
 @property (nonatomic,strong) productView *productContent;
+
+@property (nonatomic, strong) UIPageViewController *pageViewController;
+@property (nonatomic, strong) NSMutableArray *controllersArr;/// 控制器数组
+@property (nonatomic, strong) NSMutableArray *titleArray; /// 标题数组
+@property (nonatomic, strong) UICollectionView *titleCollectionView; /// 标题collectionview
+
 @end
 
 @implementation FosaProductViewController
+/**随机颜色*/
 #define RandomColor ([UIColor colorWithRed:arc4random_uniform(255)/255.0 green:arc4random_uniform(255)/255.0 blue:arc4random_uniform(255)/255.0 alpha:1.0])
-#define SCREEN_WIDTH [UIScreen mainScreen].bounds.size.width
+/** 屏幕高度 */
+#define screen_height [UIScreen mainScreen].bounds.size.height
+/** 屏幕宽度 */
+#define screen_width [UIScreen mainScreen].bounds.size.width
 
 - (void)viewDidLayoutSubviews{
     [super viewDidLayoutSubviews];
-    
-    CGFloat productContentY = CGRectGetMaxY(self.fosaScrollview.frame);
-    
-    self.productContent.frame = CGRectMake(0, productContentY, SCREEN_WIDTH, self.view.frame.size.height - productContentY);
-}
 
+    CGFloat productContentY = CGRectGetMaxY(self.fosaScrollview.frame);
+
+    self.productContent.frame = CGRectMake(0, productContentY, screen_width, self.view.frame.size.height - productContentY);
+}
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
@@ -41,39 +51,42 @@
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithImage:[UIImage imageNamed:@"icon_add"] style:UIBarButtonItemStylePlain target:self action:@selector(addEvent)];
     [self InitContentView];
 }
-- (void)InitContentView{
-    self.rootView = [[UIView alloc]initWithFrame:CGRectMake(0, self.navHeight, self.mainWidth, self.mainHeight)];
-    _rootView.backgroundColor = [UIColor whiteColor];
-    [self.view addSubview:self.rootView];
+- (void)InitContentView
+{
+    //获取状态栏的rect
+    CGRect statusRect = [[UIApplication sharedApplication] statusBarFrame];
+    //获取导航栏的rect
+    CGRect navRect = self.navigationController.navigationBar.frame;
+    //那么导航栏+状态栏的高度
+    self.status_nav_height = statusRect.size.height+navRect.size.height;
     
-    self.navHeight = self.navigationController.navigationBar.frame.size.height;
-    NSLog(@"------%f",self.navHeight);
-    UIView *navV = [[UIView alloc] initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, self.navHeight)];
-    navV.backgroundColor = [UIColor redColor];
-    
-    [self.view addSubview:navV];
-    
-    NSLog(@"%f",CGRectGetMaxY(navV.frame));
+//    UIView *navV = [[UIView alloc] initWithFrame:CGRectMake(0, 0, screen_width, navigationBar_statusBar_height)];
+//    navV.backgroundColor = [UIColor redColor];
+
+    //[self.view addSubview:navV];
+
     NSArray *titles = @[@"Fosa Device",@"My Device"];
     self.fosaScrollview = [[FosaScrollview alloc] init];
-    [self.fosaScrollview configParameterFrame:CGRectMake(0,2*self.navHeight, [UIScreen mainScreen].bounds.size.width, 50) titles:titles index:0 block:^(NSInteger index) {
+    
+    [self.fosaScrollview configParameterFrame:CGRectMake(0,self.status_nav_height, [UIScreen mainScreen].bounds.size.width, 50) titles:titles index:0 block:^(NSInteger index) {
         [self.productContent updateTab:index];
     }];
-    self.fosaScrollview.bounces = NO;
-    [navV addSubview:self.fosaScrollview];
     
+    self.fosaScrollview.bounces = NO;
+    [self.view addSubview:self.fosaScrollview];
+
     self.productContent = [[productView alloc] init];
     [self.view addSubview:self.productContent];
-    
+
     NSMutableArray *contentM = [NSMutableArray array];
     MyDeviceViewController *mydevice = [[MyDeviceViewController alloc]init];
     mydevice.view.backgroundColor = RandomColor;
     [contentM addObject:mydevice];
-    
+
     OtherViewController *other = [[OtherViewController alloc]init];
     other.view.backgroundColor = RandomColor;
     [contentM addObject:other];
-    
+
     [self.productContent configParam:contentM index:0 block:^(NSInteger index) {
         [self.fosaScrollview tabOffset:index];
     }];
@@ -84,6 +97,10 @@
     
     [self.navigationController pushViewController:photo animated:YES];
 }
+- (void)didReceiveMemoryWarning {
+ [super didReceiveMemoryWarning];
+ // Dispose of any resources that can be recreated.
 
+}
 
 @end
