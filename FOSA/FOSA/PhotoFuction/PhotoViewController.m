@@ -117,12 +117,12 @@
     imgView.layer.borderColor = [[UIColor grayColor] CGColor];
     imgView.contentMode = UIViewContentModeScaleAspectFill;
     imgView.clipsToBounds = YES;
+    imgView.userInteractionEnabled = YES;
     [self.view addSubview:imgView];
-    _imgView = imgView;
     UITapGestureRecognizer *clickRevognizer = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(EnlargePhoto)];
-    [_imgView addSubview:_imgView];
+    [imgView addGestureRecognizer:clickRevognizer];
+    _imgView = imgView;
 }
-
 #pragma mark - 进入扫码界面
 -(void)ScanEvent{
     ScanOneCodeViewController *scan = [[ScanOneCodeViewController alloc]init];
@@ -132,7 +132,6 @@
     if (self.captureSession != nil) {
         NSLog(@"停止捕获");
         [self.captureSession stopRunning];
-       
     }
     [self removeNotification];
     [self.navigationController pushViewController:scan animated:YES];
@@ -279,8 +278,9 @@
 
 #pragma mark -  放大缩小图片
 - (void)EnlargePhoto{
-    self.navigationController.navigationBar.hidden = YES;
-[[UIApplication sharedApplication]setStatusBarHidden:YES withAnimation:UIStatusBarAnimationFade];
+    NSLog(@"***********************************");
+    self.navigationController.navigationBar.hidden = YES;   //隐藏导航栏
+    [UIApplication sharedApplication].statusBarHidden = YES;             //隐藏状态栏
     //底层视图
     self.backGround = [[UIView alloc]init];
     self.backGround.backgroundColor = [UIColor blackColor];
@@ -290,7 +290,7 @@
     _bigImage.frame = self.view.frame;
     self.bigImage.image = self.imgView.image;
     self.bigImage.userInteractionEnabled = YES;
-    self.bigImage.contentMode = UIViewContentModeScaleAspectFit;
+    self.bigImage.contentMode = UIViewContentModeScaleToFill;
     self.bigImage.clipsToBounds = YES;
     UITapGestureRecognizer *shrinkRecognizer = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(shirnkPhoto)];
     [self.bigImage addGestureRecognizer:shrinkRecognizer];
@@ -298,12 +298,12 @@
     [self.bigImage addGestureRecognizer:pinchGestureRecognizer];
     
     [self.backGround addSubview:self.bigImage];
-    //[self.view addSubview:self.backGround];
+    [self.view addSubview:self.backGround];
 }
 - (void)shirnkPhoto{
     [self.backGround removeFromSuperview];
     self.navigationController.navigationBar.hidden = NO;
-    [[UIApplication sharedApplication]setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
+    [UIApplication sharedApplication].statusBarHidden = NO;
 }
 - (void) handlePinch:(UIPinchGestureRecognizer*) recognizer {
 
@@ -322,9 +322,6 @@
      self.totalScale *=scale;
      recognizer.scale = 1.0;
 }
-
-
-
 #pragma mark - <保存到相册>
 -(void)image:(UIImage *)image didFinishSavingWithError:(NSError *)error contextInfo:(void *)contextInfo {
     NSString *msg = nil ;
@@ -525,6 +522,24 @@
         self.focusCursor.alpha = 0;
     }];
 }
+//拖动视图的方法
+- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event{
+    UITouch *touch = [touches anyObject];
+    // 当前触摸点
+    CGPoint currentPoint = [touch locationInView:self.bigImage];
+    // 上一个触摸点
+    CGPoint previousPoint = [touch previousLocationInView:self.bigImage];
+    // 当前view的中点
+    CGPoint center = self.bigImage.center;
+    
+    center.x += (currentPoint.x - previousPoint.x);
+    center.y += (currentPoint.y - previousPoint.y);
+    // 修改当前view的中点(中点改变view的位置就会改变)
+    self.bigImage.center = center;
+}
+
+
+
 - (void)dealloc
 {
     [self removeNotification];

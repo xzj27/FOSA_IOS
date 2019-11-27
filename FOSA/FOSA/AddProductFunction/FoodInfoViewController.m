@@ -260,7 +260,6 @@
     LocationLabel.font = [UIFont systemFontOfSize:13];
     [self.locationView addSubview:LocationLabel];
     
-    
     self.location = [[UITextView alloc]initWithFrame:CGRectMake(125, 5, headerWidth/2, 40)];
    // _location.text = @"Storage Location";
     _location.textColor =[UIColor blackColor];
@@ -269,7 +268,7 @@
     self.locationBtn = [[UIButton alloc]initWithFrame:CGRectMake(headerWidth-45, 5, 40, 40)];
     [_locationBtn setImage:[UIImage imageNamed:@"icon_location"] forState:UIControlStateNormal];
     [self.locationView addSubview:_locationBtn];
-    
+
     //重量视图
     self.weightView = [[UIView alloc]initWithFrame:CGRectMake(10, headerheight+320, headerWidth/2-10, 50)];
     _weightView.backgroundColor = [UIColor colorWithRed:180/255.0 green:180/255.0 blue:180/255.0 alpha:1.0];
@@ -306,7 +305,6 @@
 #pragma mark - 禁止视图与外界交互
 -(void)prohibitEdit{
     self.foodName.userInteractionEnabled = NO;
-    //self.share.userInteractionEnabled = NO;
     self.aboutFood.userInteractionEnabled = NO;
     self.expireBtn.userInteractionEnabled = NO;
     self.remindBtn.userInteractionEnabled = NO;
@@ -320,7 +318,6 @@
 }
 -(void)AllowEdit{
     self.foodName.userInteractionEnabled = YES;
-   // self.share.userInteractionEnabled = YES;
     self.aboutFood.userInteractionEnabled = YES;
     self.expireBtn.userInteractionEnabled = YES;
     self.remindBtn.userInteractionEnabled = YES;
@@ -400,13 +397,11 @@
     Ntitle.font  = [UIFont systemFontOfSize:12];
     Ntitle.textColor = [UIColor redColor];
     Ntitle.text = title;
-    
+
     Nbody.font   = [UIFont systemFontOfSize:5];
     Nbody.text = body;
-    
     return notification;
 }
-
 //将UIView转化为图片并保存在相册
 - (UIImage *)SaveViewAsPicture:(UIView *)view{
     NSLog(@"begin saving");
@@ -423,15 +418,11 @@
     CIFilter *filter = [CIFilter filterWithName:@"CIQRCodeGenerator"];
     // 滤镜恢复默认设置
     [filter setDefaults];
-    
     // 2. 给滤镜添加数据
     NSData *data = [message dataUsingEncoding:NSUTF8StringEncoding];
-    
     [filter setValue:data forKeyPath:@"inputMessage"];
-    
     // 3. 生成二维码
     CIImage *image = [filter outputImage];
-    
     //[self createNonInterpolatedUIImageFormCIImage:image withSize:];
     return [UIImage imageWithCIImage:image];
 }
@@ -447,15 +438,11 @@
         UIActivityViewController *activityVC = [[UIActivityViewController alloc]initWithActivityItems:activityItems applicationActivities:nil];
         [self presentViewController:activityVC animated:TRUE completion:nil];
     }
-//    UIImage *sharephoto = [self getJPEGImagerImg:self.food_image];
-//    UIImage *sharephoto1 = [self getJPEGImagerImg:[UIImage imageNamed:@"启动图2"]];
-   
 }
 #pragma mark -  放大缩小图片
 - (void)EnlargePhoto{
     self.navigationController.navigationBar.hidden = YES;
-    //[[UIApplication sharedApplication] setStatusBarHidden:YES];
-[[UIApplication sharedApplication]setStatusBarHidden:YES withAnimation:UIStatusBarAnimationFade];
+    [UIApplication sharedApplication].statusBarHidden = YES;
     //底层视图
     self.backGround = [[UIView alloc]init];
     self.backGround.backgroundColor = [UIColor blackColor];
@@ -480,21 +467,18 @@
 - (void)shirnkPhoto{
     [self.backGround removeFromSuperview];
     self.navigationController.navigationBar.hidden = NO;
-    [[UIApplication sharedApplication]setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
+    [UIApplication sharedApplication].statusBarHidden = NO;
 }
 - (void) handlePinch:(UIPinchGestureRecognizer*) recognizer {
-
     CGFloat scale = recognizer.scale;
      //放大情况
      if(scale > 1.0){
          if(self.totalScale > MaxSCale) return;
      }
-
      //缩小情况
      if (scale < 1.0) {
          if (self.totalScale < MinScale) return;
      }
-
      self.bigImage.transform = CGAffineTransformScale(self.bigImage.transform, scale, scale);
      self.totalScale *=scale;
      recognizer.scale = 1.0;
@@ -809,6 +793,23 @@ NSLog(@"dele fail");
     [UIView setAnimationDuration:animationDuration];
     self.rootScrollview.frame = newFrame;
     [UIView commitAnimations];
+}
+#pragma mark - 点击与拖动的方法
+
+//拖动视图的方法
+- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event{
+    UITouch *touch = [touches anyObject];
+    // 当前触摸点
+    CGPoint currentPoint = [touch locationInView:self.bigImage];
+    // 上一个触摸点
+    CGPoint previousPoint = [touch previousLocationInView:self.bigImage];
+    // 当前view的中点
+    CGPoint center = self.bigImage.center;
+    
+    center.x += (currentPoint.x - previousPoint.x);
+    center.y += (currentPoint.y - previousPoint.y);
+    // 修改当前view的中点(中点改变view的位置就会改变)
+    self.bigImage.center = center;
 }
 
 -(void)viewWillDisappear:(BOOL)animated

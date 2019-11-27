@@ -69,37 +69,5 @@
     NSLog(@"===%@", img);
     return img;
 }
-
-//- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
-//    _deleteIcon.image = [UIImage imageNamed:@"icon_deleteHL"];
-//    _cancelIcon.image = [UIImage imageNamed:@"icon_cancelHL"];
-//    self.alpha = 0.5;
-//}
-//- (void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
-//    _deleteIcon.image = [UIImage imageNamed:@"icon_delete"];
-//    _cancelIcon.image = [UIImage imageNamed:@"icon_cancel"];
-//    self.alpha = 1;
-//}
-//- (void)touchesCancelled:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
-//    _deleteIcon.image = [UIImage imageNamed:@"icon_delete"];
-//    _cancelIcon.image = [UIImage imageNamed:@"icon_cancel"];
-//    self.alpha = 1;
-//}
-
-//- (void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
-//     [super touchesMoved:touches withEvent:event];
-//       UITouch * touch = [touches anyObject];
-//       //本次触摸点
-//       CGPoint current = [touch locationInView:self];
-//       //上次触摸点
-//       CGPoint previous = [touch previousLocationInView:self];
-//       //未移动的中心点
-//       CGPoint center = self.center;
-//       //移动之后的中心点(未移动的点+本次触摸点-上次触摸点)
-//       center.x += current.x - previous.x;
-//       center.y += current.y - previous.y;
-//       //更新位置
-//       self.center = center;
-//}
 @end
 

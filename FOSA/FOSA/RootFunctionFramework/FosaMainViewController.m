@@ -122,20 +122,20 @@
     Crecognizer.delegate = self;
     [[self StorageItemView] addGestureRecognizer:Crecognizer];
 
-    if ([NSProcessInfo.processInfo isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion){10,0,0}])
-    {
-        //CGRect fresh = CGRectMake(0, 0, self.StorageItemView.frame.size.width,50);
-    //创建刷新控件
-    _refresh = [[UIRefreshControl alloc]init];
-        //refresh.frame = fresh;
-    //配置控件
-    _refresh.tintColor = [UIColor grayColor];
-    NSDictionary *attributes = @{NSForegroundColorAttributeName : [UIColor redColor]};
-    _refresh.attributedTitle = [[NSAttributedString alloc]initWithString:@"正在刷新界面" attributes:attributes];
-    //添加事件
-     [_refresh addTarget:self action:@selector(refresh:) forControlEvents:UIControlEventValueChanged];
-    _StorageItemView.refreshControl = _refresh;
-    }
+//    if ([NSProcessInfo.processInfo isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion){10,0,0}])
+//    {
+//        //CGRect fresh = CGRectMake(0, 0, self.StorageItemView.frame.size.width,50);
+//    //创建刷新控件
+//    _refresh = [[UIRefreshControl alloc]init];
+//        //refresh.frame = fresh;
+//    //配置控件
+//    _refresh.tintColor = [UIColor grayColor];
+//    NSDictionary *attributes = @{NSForegroundColorAttributeName : [UIColor redColor]};
+//    _refresh.attributedTitle = [[NSAttributedString alloc]initWithString:@"正在刷新界面" attributes:attributes];
+//    //添加事件
+//     [_refresh addTarget:self action:@selector(refresh:) forControlEvents:UIControlEventValueChanged];
+//    _StorageItemView.refreshControl = _refresh;
+//    }
     _StorageItemView.delegate = self;
     _StorageItemView.dataSource = self;
     [self.view addSubview:_StorageItemView];
@@ -148,7 +148,7 @@
     _CategoryMenu = [[UIView alloc]initWithFrame:CGRectMake(-self.mainWidth/4, self.navHeight,self.mainWidth/3,self.mainHeight)];
 
     [self.view insertSubview:_CategoryMenu atIndex:10];
-    
+
     self.CategoryScrollview = [[UIScrollView alloc]initWithFrame:CGRectMake(0,0, self.CategoryMenu.frame.size.width,self.CategoryMenu.frame.size.height)];
     
     self.CategoryScrollview.backgroundColor = [UIColor whiteColor];
@@ -184,7 +184,6 @@
     [add addSubview:add_icon];
     [self.CategoryScrollview addSubview:add];
 }
-
 - (void)InitAddView{
     //在UICollectionView最后添加一个addview
     CGFloat cellWidth = (self.StorageItemView.frame.size.width-15)/2;
@@ -293,7 +292,7 @@ NSLog(@"foodName=%@&&&&&&&expireDate=%@",_storageArray[i].foodName,_storageArray
 - (void)removeLoading{
     [self.circleview removeFromSuperview];
 }
-//跳转到扫码界面
+#pragma mark - 跳转到扫码界面
 - (void)Scan{
     
     ScanOneCodeViewController *fosa_scan = [[ScanOneCodeViewController alloc]init];
@@ -350,7 +349,7 @@ NSLog(@"foodName=%@&&&&&&&expireDate=%@",_storageArray[i].foodName,_storageArray
 - (void)ClickCategory:(UIGestureRecognizer *)recognizer{
     NSLog(@"%@",recognizer.accessibilityValue);
 }
-#pragma mark - UICollectionView 事件
+#pragma mark - UICollectionViewCell 长按事件
 - (void)lonePressMoving:(UILongPressGestureRecognizer *)longPress
 {
     NSLog(@"长按了item");
@@ -393,11 +392,6 @@ NSLog(@"foodName=%@&&&&&&&expireDate=%@",_storageArray[i].foodName,_storageArray
 //}
 - (void) moveMenu
 {
-//    if (_LeftOrRight) {//view 折叠
-//        _LeftOrRight = false;
-//        //view 向左移动
-//       _CategoryMenu.center = CGPointMake(self.CategoryMenu.frame.size.width/2, (self.CategoryMenu.frame.size.height)/2+self.navHeight);
-//   }
 if (!_LeftOrRight) {//view 展开
         _LeftOrRight = true;
         //向右移动
@@ -491,7 +485,7 @@ if (!_LeftOrRight) {//view 展开
         cell.userInteractionEnabled = YES;
         //给每一个cell添加长按手势
         _longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(lonePressMoving:)];
-        _longPress.minimumPressDuration = 2.0;
+        _longPress.minimumPressDuration = 0.5;
         [cell addGestureRecognizer:_longPress];
     
     if (index+1 == self.storageArray.count) {

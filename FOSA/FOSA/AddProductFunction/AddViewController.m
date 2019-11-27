@@ -10,10 +10,12 @@
 #import "ScanOneCodeViewController.h"
 #import "PhotoViewController.h"
 #import <UserNotifications/UserNotifications.h>
-#import <sqlite3.h>
+#import "SqliteManager.h"
 
-//图片宽高的最大值
-#define KCompressibilityFactor 1280.00
+#define KCompressibilityFactor 1280.00 //图片宽高的最大值
+
+#define MaxSCale 3.0  //最大缩放比例
+#define MinScale 0.5  //最小缩放比例
 
 @interface AddViewController ()<UITextFieldDelegate,UNUserNotificationCenterDelegate>{
     //日期选择
@@ -36,6 +38,12 @@
 
 //记录所选择的日期
 @property (nonatomic,assign) NSDate *exdate,*redate;
+
+//图片放大视图
+@property (nonatomic,strong) UIView *backGround;
+@property (nonatomic,strong) UIImageView *bigImage;
+@property (nonatomic,assign) CGFloat totalScale;
+
 @end
 
 @implementation AddViewController
@@ -137,6 +145,10 @@
     
     self.imageView1.contentMode = UIViewContentModeScaleAspectFill;
     self.imageView1.clipsToBounds = YES;
+    // 添加点击手势
+    self.imageView1.userInteractionEnabled = YES;
+    UITapGestureRecognizer *clickRecognizer = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(EnlargePhoto)];
+    [self.imageView1 addGestureRecognizer:clickRecognizer];
     
     self.share = [[UIButton alloc]initWithFrame:CGRectMake(headerWidth-35,5,30,30)];
     [_share setImage:[UIImage imageNamed:@"icon_share"] forState:UIControlStateNormal];
@@ -366,20 +378,9 @@
 //创建或打开数据库
 -(void)creatOrOpensql
 {
-    NSString *path = [self getPath];
-    char *erro = 0;
-    int sqlStatus = sqlite3_open_v2([path UTF8String], &_database,SQLITE_OPEN_CREATE|SQLITE_OPEN_READWRITE,NULL);
-    if (sqlStatus == SQLITE_OK) {
-        NSLog(@"数据库打开成功");
-    }
-    //创建数据库表 Fosa2(编号，食品名称，设备名称，描述，过期日期，提醒日期，重量，卡路里，地点)
-    const char *sql = "create table if not exists Fosa2(id integer primary key,foodName text,deviceName text,aboutFood text,expireDate text,remindDate text,photoPath text)";
-    int tabelStatus = sqlite3_exec(self.database, sql,NULL, NULL, &erro);//运行结果
-    if (tabelStatus == SQLITE_OK)
-    {
-        NSLog(@"表创建成功");
-    }
-    //数据库操作
+    self.database = [SqliteManager InitSqliteWithName:@"Fosa.db"];
+    NSString *creatSql = @"create table if not exists Fosa2(id integer primary key,foodName text,deviceName text,aboutFood text,expireDate text,remindDate text,photoPath text)";
+    [SqliteManager InitTableWithName:creatSql database:self.database];
 }
 //判断表是否已经存在
 -(BOOL)isTabelExist:(NSString *)name{
@@ -392,56 +393,36 @@
         return NO;
     }
 }
--(void) InsertDataIntoSqlite:(NSString *)ExpireDate remind:(NSString *)remindDate{
-    
-    //错误信息定义
-    char *erro = 0;
+-(void) InsertDataIntoSqlite{
     if(self.foodName.text != nil){
     //插入语句
     NSString *insertSql =[NSString stringWithFormat:@"insert into Fosa2(foodName,deviceName,aboutFood,expireDate,remindDate,photoPath)values('%@','%@','%@','%@','%@','%@')",_foodName.text,_deviceName.text,_aboutFood.text,self.expireDate.text,self.remindDate.text,self.foodName.text];
-        int insertResult = sqlite3_exec(self.database, insertSql.UTF8String,NULL, NULL,&erro);
-        if(insertResult == SQLITE_OK){
-            NSLog(@"添加数据成功");
-        }else{
-            NSLog(@"插入数据失败");
-        }
-    }else{
-        
+        [SqliteManager InsertDataIntoTable:insertSql database:self.database];
+//        int insertResult = sqlite3_exec(self.database, insertSql.UTF8String,NULL, NULL,&erro);
+//        if(insertResult == SQLITE_OK){
+//            NSLog(@"添加数据成功");
+//        }else{
+//            NSLog(@"插入数据失败");
+//        }
+//    }else{
+//
     }
     //查询数据库新添加的食物
-    const char *selsql = "select foodName,deviceName,aboutFood,expireDate,remindDate,photoPath from Fosa2";
-    int selresult = sqlite3_prepare_v2(self.database, selsql, -1,&_stmt, NULL);
-    if(selresult != SQLITE_OK){
-        NSLog(@"查询失败");
-    }else{
-        while (sqlite3_step(_stmt) == SQLITE_ROW) {
-            const char *food_name   = (const char*)sqlite3_column_text(_stmt, 5);
-            NSLog(@"查询到数据:%@",[NSString stringWithUTF8String:food_name]);
-//            const char *device_name = (const char*)sqlite3_column_text(_stmt,1);
-//            NSLog(@"查询到数据:%@",[NSString stringWithUTF8String:device_name]);
-//            const char *about_food  = (const char*)sqlite3_column_text(_stmt,2);
-//            NSLog(@"查询到数据:%@",[NSString stringWithUTF8String:about_food]);
-//            const char *expire_date = (const char*)sqlite3_column_text(_stmt,3);
-//            NSLog(@"查询到数据:%@",[NSString stringWithUTF8String:expire_date]);
-//            const char *remind_date = (const char*)sqlite3_column_text(_stmt,4);
-//            NSLog(@"查询到数据:%@",[NSString stringWithUTF8String:remind_date]);
-        }
-    }
-}
-
-#pragma mark - 获取DB数据库所在的document路径
--(NSString *)getPath
-{
-    NSString *filename = @"Fosa.db";
-    NSString *doc = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
-    NSString *filePath = [doc stringByAppendingPathComponent:filename];
-    NSLog(@"%@",filePath);
-    return filePath;
+//    const char *selsql = "select foodName,deviceName,aboutFood,expireDate,remindDate,photoPath from Fosa2";
+//    int selresult = sqlite3_prepare_v2(self.database, selsql, -1,&_stmt, NULL);
+//    if(selresult != SQLITE_OK){
+//        NSLog(@"查询失败");
+//    }else{
+//        while (sqlite3_step(_stmt) == SQLITE_ROW) {
+//            const char *food_name   = (const char*)sqlite3_column_text(_stmt, 5);
+//            NSLog(@"查询到数据:%@",[NSString stringWithUTF8String:food_name]);
+//        }
+//    }
 }
 #pragma mark - 完成输入，将数据写入数据库
 -(void)finish{
     [self creatOrOpensql];
-    [self InsertDataIntoSqlite:expire_Date remind:remind_Date];
+    [self InsertDataIntoSqlite];
     
     //[self SavePhotoIntoLibrary:self.imageView1.image];
     picturePath = [self Savephoto:[self fixOrientation:self.imageView1.image]];
@@ -454,7 +435,6 @@
     NSLog(@"%@",[formatter stringFromDate:Rdate]);
     //[self sendNotification:Edate idertifier:@"EXPIRE" body:@"Your food have expired"];
     //[self sendNotification:Rdate idertifier:@"REMIND" body:[NSString stringWithFormat:@"Your food will expire on %@",expire_Date]];
-    
     [self.navigationController popToRootViewControllerAnimated:YES];
 }
 
@@ -556,8 +536,6 @@
     CGImageRelease(cgimg);
     return img;
 }
-
-
 //取出保存在本地的图片
 //-(UIImage*)getImage{
 //    NSArray *paths =NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask,YES);
@@ -567,6 +545,53 @@
 //    NSLog(@"=== %@", img);
 //    return img;
 //}
+
+#pragma mark -  放大缩小图片
+- (void)EnlargePhoto{
+    self.navigationController.navigationBar.hidden = YES;
+    [UIApplication sharedApplication].statusBarHidden = YES;
+    //底层视图
+    self.backGround = [[UIView alloc]init];
+    self.backGround.backgroundColor = [UIColor blackColor];
+    self.backGround.frame = self.view.frame;
+    [self.view addSubview:self.backGround];
+    
+    self.totalScale = 1.0;
+    [self.foodName resignFirstResponder];
+    [self.aboutFood resignFirstResponder];
+    self.bigImage = [[UIImageView alloc]initWithFrame:CGRectMake(0, 0, self.mainWidth, self.mainheight)];
+    self.bigImage.image = self.imageView1.image;
+    self.bigImage.userInteractionEnabled = YES;
+    self.bigImage.contentMode = UIViewContentModeScaleToFill;
+    self.bigImage.clipsToBounds = YES;
+    UITapGestureRecognizer *shrinkRecognizer = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(shirnkPhoto)];
+    [self.bigImage addGestureRecognizer:shrinkRecognizer];
+    UIPinchGestureRecognizer *pinchGestureRecognizer = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(handlePinch:)];
+        
+    [self.bigImage addGestureRecognizer:pinchGestureRecognizer];
+    [self.backGround addSubview:self.bigImage];
+}
+- (void)shirnkPhoto{
+    [self.backGround removeFromSuperview];
+    self.navigationController.navigationBar.hidden = NO;
+    [UIApplication sharedApplication].statusBarHidden = NO;
+}
+- (void) handlePinch:(UIPinchGestureRecognizer*) recognizer {
+    CGFloat scale = recognizer.scale;
+     //放大情况
+     if(scale > 1.0){
+         if(self.totalScale > MaxSCale) return;
+     }
+     //缩小情况
+     if (scale < 1.0) {
+         if (self.totalScale < MinScale) return;
+     }
+     self.bigImage.transform = CGAffineTransformScale(self.bigImage.transform, scale, scale);
+     self.totalScale *=scale;
+     recognizer.scale = 1.0;
+}
+
+
 #pragma mark - 退出键盘
 - (BOOL)textFieldShouldReturn:(UITextField *)textField{
     [self.aboutFood resignFirstResponder];

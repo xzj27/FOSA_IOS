@@ -19,7 +19,6 @@
            NSLog(@"数据库打开成功");
        }
     return database;
-       
 }
 + (void)InitTableWithName:(NSString *)CreateSql database:(sqlite3 *)db{
     const char *sql = [CreateSql UTF8String];
@@ -30,7 +29,6 @@
         NSLog(@"表打开成功");
     }
 }
-
 + (void)InsertDataIntoTable:(NSString *)InsertSql database:(sqlite3 *)db{
     const char *sql = [InsertSql UTF8String];
     char *erro = 0;
@@ -41,7 +39,6 @@
         NSLog(@"插入数据失败");
     }
 }
-
 /// 根据选择语句与数据库进行选择操作
 /// @param SelectSql 选择语句
 /// @param db 数据库实例
