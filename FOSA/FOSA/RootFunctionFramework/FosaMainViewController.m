@@ -316,7 +316,7 @@ NSLog(@"foodName=%@&&&&&&&expireDate=%@",_storageArray[i].foodName,_storageArray
                     const char *remind_date = (const char*)sqlite3_column_text(_stmt,4);
                     const char *expired_date = (const char *)sqlite3_column_text(_stmt,3);
                     const char *photo_path = (const char *)sqlite3_column_text(_stmt,5);
-        
+
                     NSLog(@"查询到数据%@",[NSString stringWithUTF8String:food_name]);
                     NSLog(@"查询到数据%@",[NSString stringWithUTF8String:expired_date]);
                     NSLog(@"查询到数据%@",[NSString stringWithUTF8String:photo_path]);
@@ -335,15 +335,20 @@ NSLog(@"foodName=%@&&&&&&&expireDate=%@",_storageArray[i].foodName,_storageArray
 }
 //点击通知项的方法
 - (void)ClickNotification:(FoodCollectionViewCell *)cell{
-    if (!isEdit) {
-        FoodInfoViewController *info = [[FoodInfoViewController alloc]init];
-        info.hidesBottomBarWhenPushed = YES;
-        info.deviceID = cell.model.device;
-        info.name = cell.model.foodName;
-        [self.navigationController pushViewController:info animated:YES];
-    }else{
-        NSLog(@"正处于编辑状态无法跳转");
-    }
+//    if (!isEdit) {
+//        FoodInfoViewController *info = [[FoodInfoViewController alloc]init];
+//        info.hidesBottomBarWhenPushed = YES;
+//        info.deviceID = cell.model.device;
+//        info.name = cell.model.foodName;
+//        [self.navigationController pushViewController:info animated:YES];
+//    }else{
+//        NSLog(@"正处于编辑状态无法跳转");
+//    }
+    FoodInfoViewController *info = [[FoodInfoViewController alloc]init];
+    info.hidesBottomBarWhenPushed = YES;
+    info.deviceID = cell.model.device;
+    info.name = cell.model.foodName;
+    [self.navigationController pushViewController:info animated:YES];
 }
 //点击种类选项
 - (void)ClickCategory:(UIGestureRecognizer *)recognizer{

@@ -53,6 +53,7 @@
 		459E0089237E43A4006D0E59 /* MyDeviceViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 459E0088237E43A4006D0E59 /* MyDeviceViewController.m */; };
 		459E008C237E43BA006D0E59 /* OtherViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 459E008B237E43BA006D0E59 /* OtherViewController.m */; };
 		45D94513237BD41A000E2550 /* logo.png in Resources */ = {isa = PBXBuildFile; fileRef = 45D94512237BD419000E2550 /* logo.png */; };
+		45E14966238E46E6002B48E8 /* ScanUIView.m in Sources */ = {isa = PBXBuildFile; fileRef = 45E14965238E46E6002B48E8 /* ScanUIView.m */; };
 		45EF0E3C238768BD00C4FE1C /* LoadCircleView.m in Sources */ = {isa = PBXBuildFile; fileRef = 45EF0E3B238768BD00C4FE1C /* LoadCircleView.m */; };
 		45F821812383CA9200F0CD8A /* img_fosa.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 45F821802383CA9100F0CD8A /* img_fosa.jpg */; };
 		45F821832383CA9900F0CD8A /* img_pound.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 45F821822383CA9900F0CD8A /* img_pound.jpg */; };
@@ -180,6 +181,8 @@
 		45D944ED237B8AD1000E2550 /* UserNotifications.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotifications.framework; path = System/Library/Frameworks/UserNotifications.framework; sourceTree = SDKROOT; };
 		45D944EF237B8AD1000E2550 /* UserNotificationsUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotificationsUI.framework; path = System/Library/Frameworks/UserNotificationsUI.framework; sourceTree = SDKROOT; };
 		45D94512237BD419000E2550 /* logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = logo.png; sourceTree = "<group>"; };
+		45E14964238E46E6002B48E8 /* ScanUIView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ScanUIView.h; sourceTree = "<group>"; };
+		45E14965238E46E6002B48E8 /* ScanUIView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ScanUIView.m; sourceTree = "<group>"; };
 		45EF0E3A238768BD00C4FE1C /* LoadCircleView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LoadCircleView.h; sourceTree = "<group>"; };
 		45EF0E3B238768BD00C4FE1C /* LoadCircleView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LoadCircleView.m; sourceTree = "<group>"; };
 		45F821802383CA9100F0CD8A /* img_fosa.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = img_fosa.jpg; sourceTree = "<group>"; };
@@ -240,6 +243,7 @@
 		4551FD9D2378EA50007A2EFB /* FOSA */ = {
 			isa = PBXGroup;
 			children = (
+				4551FDF02378F283007A2EFB /* FosaView */,
 				45EF0E332387669100C4FE1C /* Animation */,
 				4551FDE42378F11B007A2EFB /* DataStruct */,
 				45FA9D21237D0723007A8E55 /* Notification */,
@@ -248,7 +252,6 @@
 				4551FDF12378F28E007A2EFB /* ScanFunction */,
 				4551FDF42378F2D6007A2EFB /* PhotoFuction */,
 				4551FDF32378F2AF007A2EFB /* Login&&Regist */,
-				4551FDF02378F283007A2EFB /* FosaView */,
 				459E0086237E4360006D0E59 /* Product */,
 				4551FDD32378EBDE007A2EFB /* RootFunctionFramework */,
 				4551FD9E2378EA50007A2EFB /* AppDelegate.h */,
@@ -320,6 +323,7 @@
 		4551FDF02378F283007A2EFB /* FosaView */ = {
 			isa = PBXGroup;
 			children = (
+				45E14963238E46AF002B48E8 /* ScanView */,
 				45F821862383D15100F0CD8A /* SealerCell */,
 				4551FE1B2378F937007A2EFB /* FoodCell */,
 				4551FE112378F6B9007A2EFB /* Food */,
@@ -444,6 +448,15 @@
 				45D944EF237B8AD1000E2550 /* UserNotificationsUI.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		45E14963238E46AF002B48E8 /* ScanView */ = {
+			isa = PBXGroup;
+			children = (
+				45E14964238E46E6002B48E8 /* ScanUIView.h */,
+				45E14965238E46E6002B48E8 /* ScanUIView.m */,
+			);
+			name = ScanView;
 			sourceTree = "<group>";
 		};
 		45EF0E332387669100C4FE1C /* Animation */ = {
@@ -625,6 +638,7 @@
 				4551FE332378FB22007A2EFB /* FoodInfoViewController.m in Sources */,
 				4551FE092378F57C007A2EFB /* ResultViewController.m in Sources */,
 				4551FDD92378ED96007A2EFB /* FosaMainViewController.m in Sources */,
+				45E14966238E46E6002B48E8 /* ScanUIView.m in Sources */,
 				45FA9D24237D0749007A8E55 /* FosaNotification.m in Sources */,
 				452465592384CD7A0034F392 /* SealerHeader.m in Sources */,
 				4551FE1E2378F971007A2EFB /* CellModel.m in Sources */,
