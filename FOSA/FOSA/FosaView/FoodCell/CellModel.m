@@ -22,4 +22,17 @@
         }
         return self;
     }
+
+/**the model of Sealer */
++ (instancetype)modelWithName:(NSString *)food_name expireDate:(NSString *)expireDate storageDate:(NSString *)storageDate{
+    return [[self alloc]initWithName:food_name expireDate:expireDate storageDate:storageDate];
+}
+- (instancetype)initWithName:(NSString *)food_name expireDate:(NSString *)expireDate storageDate:(NSString *)storageDate{
+    if (self == [super init]) {
+        self.foodName = food_name;
+        self.expireDate = expireDate;
+        self.storageDate = storageDate;
+    }
+    return self;
+}
 @end

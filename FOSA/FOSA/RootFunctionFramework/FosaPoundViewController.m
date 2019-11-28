@@ -9,13 +9,14 @@
 #import "FosaPoundViewController.h"
 #import <UserNotifications/UserNotifications.h>
 #import "ScanOneCodeViewController.h"
+#import "SqliteManager.h"
 
-#import "SealerTable.h"
+#import "CellModel.h"
 //图片宽高的最大值
 #define KCompressibilityFactor 1280.00
 @interface FosaPoundViewController ()<UITableViewDelegate,UITableViewDataSource,UIGestureRecognizerDelegate,AVCaptureMetadataOutputObjectsDelegate>{
     //数据数组
-    NSArray *arrayData;
+    NSMutableArray<CellModel *> *arrayData;
     //标记当前是否展开
     Boolean isExpand;
     //table cell的内容
@@ -23,8 +24,22 @@
     
     //标记当前是否正在扫码
     Boolean isScan;
+    //扫码相关
+    /**扫码相关*/
+    AVCaptureDevice * device;
+    AVCaptureDeviceInput * input;
+    AVCaptureMetadataOutput * output;//元数据输出流，需要指定他的输出类型及扫描范围
+    AVCaptureVideoDataOutput *VideoOutput;
+    AVCaptureSession * session; //AVFoundation框架捕获类的中心枢纽，协调输入输出设备以获得数据
+    AVCaptureVideoPreviewLayer * previewLayer;//展示捕获图像的图层，是CALayer的子类
+    UIImageView *activeImage;       //扫描框
+    UIImageView *scanImage;         //扫描线
+//    UIView *maskView;
+
 }
 @property (nonatomic,strong) UIButton *send;
+@property (nonatomic,assign) sqlite3 *database;
+@property (nonatomic,assign) sqlite3_stmt *stmt;
 @end
 
 @implementation FosaPoundViewController
@@ -69,51 +84,50 @@
 
 #pragma mark - 懒加载扫码相关属性
 - (AVCaptureDevice *)device{
-    if (_device == nil) {
-        _device = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
+    if (device == nil) {
+        device = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
         //检查相机是否有摄像头
-        if(!_device){
+        if(!device){
             NSLog(@"该设备没有摄像头");
         }
     }
-    return _device;
+    return device;
 }
 - (AVCaptureDeviceInput *)input{
-    if (_input == nil) {
+    if (input == nil) {
         //设备输入 初始化
-        _input = [[AVCaptureDeviceInput alloc]initWithDevice:self.device error:nil];
+        input = [[AVCaptureDeviceInput alloc]initWithDevice:self.device error:nil];
     }
-    return _input;
+    return input;
 }
 - (AVCaptureMetadataOutput *)output{
-    if (_output == nil) {
+    if (output == nil) {
         //设备输出
-        _output = [[AVCaptureMetadataOutput alloc]init];
+        output = [[AVCaptureMetadataOutput alloc]init];
         CGFloat ScreenWidth = self.rootScanView.frame.size.width;
         //设置扫描作用域范围(中间透明的扫描框)
         CGRect intertRect = [self.previewLayer metadataOutputRectOfInterestForRect:CGRectMake(ScreenWidth*0.1, ScreenWidth*0.1, ScreenWidth*0.8, ScreenWidth*0.8)];
-        _output.rectOfInterest = intertRect;
+        output.rectOfInterest = intertRect;
     }
-    return _output;
+    return output;
 }
 - (AVCaptureVideoDataOutput *)VideoOutput{
-    if (_VideoOutput == nil) {
-        _VideoOutput = [[AVCaptureVideoDataOutput alloc]init];
+    if (VideoOutput == nil) {
+        VideoOutput = [[AVCaptureVideoDataOutput alloc]init];
     }
-    return _VideoOutput;
+    return VideoOutput;
 }
-
 - (AVCaptureSession *)session{
-    if (_session == nil) {
-        _session = [[AVCaptureSession alloc]init];
+    if (session == nil) {
+        session = [[AVCaptureSession alloc]init];
     }
-    return _session;
+    return session;
 }
 - (AVCaptureVideoPreviewLayer *)previewLayer{
-    if (_previewLayer == nil) {
-        _previewLayer = [[AVCaptureVideoPreviewLayer alloc]initWithSession:self.session];
+    if (previewLayer == nil) {
+        previewLayer = [[AVCaptureVideoPreviewLayer alloc]initWithSession:self.session];
     }
-    return _previewLayer;
+    return previewLayer;
 }
 
 -(void)startScan{
@@ -131,7 +145,7 @@
     }];
      //会话添加设备的 输入 输出，建立连接
         if ([self.session canAddInput:self.input]) {
-            [_session addInput:self.input];
+            [session addInput:self.input];
         }else{
             NSLog(@"找不到摄像头设备");
         }
@@ -144,8 +158,8 @@
     //指定设备的识别类型
         self.output.metadataObjectTypes = @[AVMetadataObjectTypeQRCode,AVMetadataObjectTypeCode128Code,AVMetadataObjectTypeEAN8Code,AVMetadataObjectTypeAztecCode,AVMetadataObjectTypeCode39Code,AVMetadataObjectTypeCode93Code,AVMetadataObjectTypeUPCECode,AVMetadataObjectTypeCode39Mod43Code,AVMetadataObjectTypeEAN13Code,AVMetadataObjectTypePDF417Code];
     //设备输出 初始化，并设置代理和回调，当设备扫描到数据时通过该代理输出队列，一般输出队列都设置为主队列，也是设置了回调方法执行所在的队列环境
-    dispatch_queue_t queue = dispatch_queue_create("Sealerqueue", NULL);
-    [self.output setMetadataObjectsDelegate:self queue:queue];
+    //dispatch_queue_t queue = dispatch_queue_create("Sealerqueue", NULL);
+    [self.output setMetadataObjectsDelegate:self queue:dispatch_get_main_queue()];
     //添加预览图层
     self.previewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
     self.previewLayer.frame = self.rootScanView.bounds;
@@ -188,11 +202,9 @@
 //         [self.view addSubview:_scanImage];
 
          // 上下移动的扫描条
-         UIImageView *activeImage = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"saoyisao-3@3x"]];
+         activeImage = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"saoyisao-3@3x"]];
          activeImage.frame = CGRectMake(imageX, imageY, self.rootScanView.frame.size.width*0.7, 4);
          [self.rootScanView addSubview:activeImage];
-         self.activeImage = activeImage;
-
 //      //添加全屏的黑色半透明蒙版
 //        self.maskView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.rootScanView.frame.size.width+10, self.view.frame.size.height)];
 //        _maskView.backgroundColor = [UIColor colorWithWhite:0.0 alpha:0.5];
@@ -212,8 +224,8 @@
 //    //[self.view addSubview:self.flashBtn];
     
     //设置有效扫描区域
-    CGRect intertRect = [_previewLayer metadataOutputRectOfInterestForRect:CGRectMake(imageX, imageY, self.view.frame.size.width*0.8, self.view.frame.size.width*0.8)];
-    _output.rectOfInterest = intertRect;
+    CGRect intertRect = [previewLayer metadataOutputRectOfInterestForRect:CGRectMake(imageX, imageY, self.view.frame.size.width*0.8, self.view.frame.size.width*0.8)];
+    output.rectOfInterest = intertRect;
     
 //    //添加UISlider用于放大和缩小视图
 //    _ZoomSlider = [[UISlider alloc] initWithFrame:CGRectMake(imageX,imageY+self.view.frame.size.width*0.7,self.view.frame.size.width*0.7,20)];
@@ -224,7 +236,7 @@
 }
 #pragma mark - 加载扫描线动画
 -(void)timerFired {
-    [self.activeImage.layer addAnimation:[self moveY:2.5 Y:[NSNumber numberWithFloat:(self.rootScanView.frame.size.width-4)]] forKey:nil];
+    [activeImage.layer addAnimation:[self moveY:2.5 Y:[NSNumber numberWithFloat:(self.rootScanView.frame.size.width-4)]] forKey:nil];
 }
 /**
  *  @param time 单次滑动完成时间
@@ -242,7 +254,6 @@
     animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionLinear]; //匀速变化
     return animation;
 }
-
 #pragma mark - 主视图加载
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -252,10 +263,10 @@
     self.mainWidth = [UIScreen mainScreen].bounds.size.width;
     self.navheight = self.navigationController.navigationBar.frame.size.height;
     [self InitView];
-    [self InitData];
 }
 - (void)InitView{
     isScan = false; //扫码标记初始化
+    arrayData = [[NSMutableArray alloc]init];
     //rootView
     self.rootView.frame = CGRectMake(0, self.navheight, self.mainWidth, self.mainHeight);
     self.rootView.bounces = NO;
@@ -280,18 +291,17 @@
     
     //初始化 扫码的底部视图
     self.rootScanView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, self.sealerView.frame.size.width-50, self.sealerView.frame.size.height*5/6-5)];
-    
     //列表
     self.InfoMenu = [[UIView alloc]initWithFrame:CGRectMake(0, self.sealerView.frame.size.height*5/6, self.sealerView.frame.size.width,self.sealerView.frame.size.height/6)];
     _InfoMenu.backgroundColor = [UIColor colorWithRed:80/255.0 green:200/255.0 blue:240/255.0 alpha:1.0];
     self.indicator = [[UIImageView alloc]initWithFrame:CGRectMake(0, 0, self.InfoMenu.frame.size.height, self.InfoMenu.frame.size.height)];
     _indicator.image = [UIImage imageNamed:@"caret"];
-    UITapGestureRecognizer *recognizer = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(ExpandList:)];
+    UITapGestureRecognizer *recognizer = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(ExpandList)];
     self.indicator.userInteractionEnabled = YES;
     [self.indicator addGestureRecognizer:recognizer];
     [self.InfoMenu addSubview:_indicator];
     [self.sealerView addSubview:self.InfoMenu];
-   // [self setupView];
+    
     [self InitFoodTable];
     
     //分割线
@@ -340,7 +350,7 @@
     [self.calorieView addSubview:self.calorie];
 }
 #pragma mark - 食物列表
-- (void)ExpandList:(UITapGestureRecognizer *)sender{
+- (void)ExpandList{
     if (!isExpand) {
         self.indicator.image = [UIImage imageNamed:@"caret_open"];
         self.foodTable.hidden = NO;
@@ -359,8 +369,11 @@
         isExpand = false;
     }
 }
-- (void)InitData{
-    arrayData = @[@"猪肉",@"牛肉",@"三文鱼",@"鲍鱼"];
+- (void)InitData:(NSString *)foodName expireDate:(NSString *)expireDate storageDate:(NSString *)storageDate{
+    //arrayData = @[@"猪肉",@"牛肉",@"三文鱼",@"鲍鱼"];
+    CellModel *model = [CellModel modelWithName:foodName expireDate:expireDate storageDate:storageDate];
+    [arrayData addObject:model];
+    
 }
 
 //food table
@@ -401,15 +414,19 @@
         //创建cell
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:cellIdentifier];
     }
+    NSInteger row = indexPath.row;
     //取消点击cell时显示的背景色
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
-    cell.textLabel.text = arrayData[indexPath.row];
-    cell.detailTextLabel.text = @"2019/11/20";
+    cell.textLabel.text =  arrayData[row].foodName;
+    cell.detailTextLabel.text = [NSString stringWithFormat:@"存储日期: %@",arrayData[row].storageDate];
     
+    UILabel *expireLabel = [[UILabel alloc]initWithFrame:CGRectMake(cell.contentView.frame.size.width/2, cell.contentView.frame.size.height/4, cell.contentView.frame.size.width/2, cell.contentView.frame.size.height/2)];
+    expireLabel.font = [UIFont systemFontOfSize:10];
+    expireLabel.text =  [NSString stringWithFormat:@"有效日期: %@",arrayData[row].expireDate];
+    [cell.contentView addSubview:expireLabel];
     //返回cell
     return cell;
 }
-
 - (void)ScanAction{
     if (!isScan) {
         [self startScan];
@@ -424,13 +441,69 @@
 
 #pragma mark - 扫码结果
 - (void)captureOutput:(AVCaptureOutput *)output didOutputMetadataObjects:(NSArray<__kindof AVMetadataObject *> *)metadataObjects fromConnection:(AVCaptureConnection *)connection{
+    [arrayData removeAllObjects];
+    [session stopRunning];
     AVMetadataMachineReadableCodeObject *object = metadataObjects.firstObject;
     NSString *result = object.stringValue;
     NSLog(@"%@",result);
+    if ([result hasPrefix:@"FOSASealer"]) {
+        self.database = [SqliteManager InitSqliteWithName:@"Fosa.db"];
+        NSString *sealerSql = [NSString stringWithFormat:@"select foodName,deviceName,aboutFood,expireDate,remindDate,storageDate,photoPath from Fosa3 where deviceName ='%@'",result];
+        _stmt = [SqliteManager SelectDataFromTable:sealerSql database:self.database];
+        if (_stmt != NULL) {
+            NSLog(@"********");
+            while (sqlite3_step(_stmt) == SQLITE_ROW) {
+                NSLog(@"^^^^^^^^^^^^^^");
+                const char *food_name = (const char *)sqlite3_column_text(_stmt, 0);
+                const char *device_name = (const char*)sqlite3_column_text(_stmt,1);
+                const char *about_food = (const char*)sqlite3_column_text(_stmt, 2);
+                const char *expired_date = (const char *)sqlite3_column_text(_stmt,3);
+                const char *remind_date = (const char*)sqlite3_column_text(_stmt,4);
+                const char *storage_date = (const char*)sqlite3_column_text(_stmt, 5);
+                const char *photo_path = (const char *)sqlite3_column_text(_stmt,6);
+                NSLog(@"查询到数据1:%@",[NSString stringWithUTF8String:food_name]);
+                NSLog(@"查询到数据2:%@",[NSString stringWithUTF8String:device_name]);
+                NSLog(@"查询到数据3:%@",[NSString stringWithUTF8String:about_food]);
+                NSLog(@"查询到数据4:%@",[NSString stringWithUTF8String:expired_date]);
+                NSLog(@"查询到数据5:%@",[NSString stringWithUTF8String:remind_date]);
+                NSLog(@"查询到数据6:%@",[NSString stringWithUTF8String:storage_date]);
+                NSLog(@"查询到数据7:%@",[NSString stringWithUTF8String:photo_path]);
+                [self InitData:[NSString stringWithUTF8String:food_name] expireDate:[NSString stringWithUTF8String:expired_date] storageDate:[NSString stringWithUTF8String:storage_date]];
+            }
+            
+            [self.foodTable reloadData];
+            [self ExpandList];
+            [self StopAndRelease];
+        }else{
+            NSLog(@"查询失败");
+        }
+    }else{
+        [self SystemAlert:@"This is not belong to FosaSealer!"];
+    }
+}
+//弹出系统提示
+- (void)SystemAlert:(NSString *)message{
+    [self.session stopRunning];
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Notification" message:message preferredStyle:UIAlertControllerStyleAlert];
+    [alert addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil]];
+    [self presentViewController:alert animated:true completion:^{
+        //回掉
+        NSLog(@"SystemAlert------我把捕获打开了");
+        [self.session startRunning];
+    }];
 }
 
+- (void)StopAndRelease{
+    [self.session stopRunning];
+    [self.previewLayer removeFromSuperlayer];
+    [self.rootScanView removeFromSuperview];
+}
 - (void)viewWillDisappear:(BOOL)animated{
     [super viewWillDisappear:animated];
-    [self.rootScanView removeFromSuperview];
+    if (isScan) {
+        isScan = false;
+        [self.scanBtn setImage:[UIImage imageNamed:@"icon_scan"] forState:UIControlStateNormal];
+    }
+    [self StopAndRelease];
 }
 @end

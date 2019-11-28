@@ -379,45 +379,45 @@
 -(void)creatOrOpensql
 {
     self.database = [SqliteManager InitSqliteWithName:@"Fosa.db"];
-    NSString *creatSql = @"create table if not exists Fosa2(id integer primary key,foodName text,deviceName text,aboutFood text,expireDate text,remindDate text,photoPath text)";
-    [SqliteManager InitTableWithName:creatSql database:self.database];
+    //创建fosa食品盒数据库表
+    NSString *creatFosaSql = @"create table if not exists Fosa2(id integer primary key,foodName text,deviceName text,aboutFood text,expireDate text,remindDate text,photoPath text)";
+    [SqliteManager InitTableWithName:creatFosaSql database:self.database];
+
+    //创建fosasealer数据库表
+    NSString *creatSealerSql = @"create table if not exists Fosa3(id integer primary key,foodName text,deviceName text,aboutFood text,expireDate text,remindDate text,storageDate text,photoPath text)";
+    [SqliteManager InitTableWithName:creatSealerSql database:self.database];
 }
-//判断表是否已经存在
--(BOOL)isTabelExist:(NSString *)name{
-    char *err;
-    NSString *sql = [NSString stringWithFormat:@"SELECT COUNT(*) FROM sqlite_master where type='table' and name='%@';",name];
-    const char *sql_stmt = [sql UTF8String];
-    if(sqlite3_exec(_database, sql_stmt, NULL, NULL, &err) == 1){
-        return YES;
-    }else{
-        return NO;
-    }
-}
+////判断表是否已经存在
+//-(BOOL)isTabelExist:(NSString *)name{
+//    char *err;
+//    NSString *sql = [NSString stringWithFormat:@"SELECT COUNT(*) FROM sqlite_master where type='table' and name='%@';",name];
+//    const char *sql_stmt = [sql UTF8String];
+//    if(sqlite3_exec(_database, sql_stmt, NULL, NULL, &err) == 1){
+//        return YES;
+//    }else{
+//        return NO;
+//    }
+//}
 -(void) InsertDataIntoSqlite{
     if(self.foodName.text != nil){
-    //插入语句
-    NSString *insertSql =[NSString stringWithFormat:@"insert into Fosa2(foodName,deviceName,aboutFood,expireDate,remindDate,photoPath)values('%@','%@','%@','%@','%@','%@')",_foodName.text,_deviceName.text,_aboutFood.text,self.expireDate.text,self.remindDate.text,self.foodName.text];
-        [SqliteManager InsertDataIntoTable:insertSql database:self.database];
-//        int insertResult = sqlite3_exec(self.database, insertSql.UTF8String,NULL, NULL,&erro);
-//        if(insertResult == SQLITE_OK){
-//            NSLog(@"添加数据成功");
-//        }else{
-//            NSLog(@"插入数据失败");
-//        }
-//    }else{
-//
+        if ([self.deviceName.text hasPrefix:@"FOSASealer"]) {
+            NSLog(@"************");
+            //获取当前日期
+            NSDate *currentDate = [[NSDate alloc]init];
+            NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+            [formatter setDateFormat:@"yyyy-MM-dd"];
+            NSString *str = [formatter stringFromDate:currentDate];
+            //currentDate = [formatter dateFromString:str];
+            NSLog(@"%@",str);
+            NSString *SealerInsertSql = [NSString stringWithFormat:@"insert into Fosa3(foodName,deviceName,aboutFood,expireDate,remindDate,storageDate,photoPath)values('%@','%@','%@','%@','%@','%@','%@')",_foodName.text,_deviceName.text,_aboutFood.text,self.expireDate.text,self.remindDate.text,str,self.foodName.text];
+            [SqliteManager InsertDataIntoTable:SealerInsertSql database:self.database];
+        }else{
+        //插入语句
+        NSString *FosaInsertSql =[NSString stringWithFormat:@"insert into Fosa2(foodName,deviceName,aboutFood,expireDate,remindDate,photoPath)values('%@','%@','%@','%@','%@','%@')",_foodName.text,_deviceName.text,_aboutFood.text,self.expireDate.text,self.remindDate.text,self.foodName.text];
+        [SqliteManager InsertDataIntoTable:FosaInsertSql database:self.database];
+        }
     }
-    //查询数据库新添加的食物
-//    const char *selsql = "select foodName,deviceName,aboutFood,expireDate,remindDate,photoPath from Fosa2";
-//    int selresult = sqlite3_prepare_v2(self.database, selsql, -1,&_stmt, NULL);
-//    if(selresult != SQLITE_OK){
-//        NSLog(@"查询失败");
-//    }else{
-//        while (sqlite3_step(_stmt) == SQLITE_ROW) {
-//            const char *food_name   = (const char*)sqlite3_column_text(_stmt, 5);
-//            NSLog(@"查询到数据:%@",[NSString stringWithUTF8String:food_name]);
-//        }
-//    }
+
 }
 #pragma mark - 完成输入，将数据写入数据库
 -(void)finish{

@@ -312,18 +312,17 @@ NSLog(@"foodName=%@&&&&&&&expireDate=%@",_storageArray[i].foodName,_storageArray
     self.stmt = [SqliteManager SelectDataFromTable:sql database:self.database];
     if (self.stmt != NULL) {
         while (sqlite3_step(_stmt) == SQLITE_ROW) {
-                    const char *food_name = (const char *)sqlite3_column_text(_stmt, 0);
-                    const char *device_name = (const char*)sqlite3_column_text(_stmt,1);
-                    const char *remind_date = (const char*)sqlite3_column_text(_stmt,4);
-                    const char *expired_date = (const char *)sqlite3_column_text(_stmt,3);
-                    const char *photo_path = (const char *)sqlite3_column_text(_stmt,5);
-
-                    NSLog(@"查询到数据%@",[NSString stringWithUTF8String:food_name]);
-                    NSLog(@"查询到数据%@",[NSString stringWithUTF8String:expired_date]);
-                    NSLog(@"查询到数据%@",[NSString stringWithUTF8String:photo_path]);
-                    NSLog(@"********************************");
-                    [self CreatFoodViewWithName:[NSString stringWithUTF8String:food_name] fdevice:[NSString stringWithUTF8String:device_name] remindDate:[NSString stringWithUTF8String:remind_date] foodPhoto:[NSString stringWithUTF8String:photo_path]] ;
-                }
+                const char *food_name = (const char *)sqlite3_column_text(_stmt, 0);
+                const char *device_name = (const char*)sqlite3_column_text(_stmt,1);
+                const char *remind_date = (const char*)sqlite3_column_text(_stmt,4);
+                const char *expired_date = (const char *)sqlite3_column_text(_stmt,3);
+                const char *photo_path = (const char *)sqlite3_column_text(_stmt,5);
+                NSLog(@"查询到数据%@",[NSString stringWithUTF8String:food_name]);
+                NSLog(@"查询到数据%@",[NSString stringWithUTF8String:expired_date]);
+                NSLog(@"查询到数据%@",[NSString stringWithUTF8String:photo_path]);
+                NSLog(@"********************************");
+        [self CreatFoodViewWithName:[NSString stringWithUTF8String:food_name] fdevice:[NSString stringWithUTF8String:device_name] remindDate:[NSString stringWithUTF8String:remind_date] foodPhoto:[NSString stringWithUTF8String:photo_path]];
+            }
     }else{
         NSLog(@"查询失败");
     }
