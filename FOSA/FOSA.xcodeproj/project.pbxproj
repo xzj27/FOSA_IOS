@@ -47,6 +47,7 @@
 		4551FE302378FB0F007A2EFB /* AddViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4551FE2F2378FB0F007A2EFB /* AddViewController.m */; };
 		4551FE332378FB22007A2EFB /* FoodInfoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4551FE322378FB22007A2EFB /* FoodInfoViewController.m */; };
 		4551FE3B2379605E007A2EFB /* SqliteManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4551FE3A2379605E007A2EFB /* SqliteManager.m */; };
+		4587FF6E238FAAF500DB795E /* SealerCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4587FF6D238FAAF500DB795E /* SealerCell.m */; };
 		459E0089237E43A4006D0E59 /* MyDeviceViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 459E0088237E43A4006D0E59 /* MyDeviceViewController.m */; };
 		459E008C237E43BA006D0E59 /* OtherViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 459E008B237E43BA006D0E59 /* OtherViewController.m */; };
 		45D94513237BD41A000E2550 /* logo.png in Resources */ = {isa = PBXBuildFile; fileRef = 45D94512237BD419000E2550 /* logo.png */; };
@@ -164,6 +165,8 @@
 		4551FE322378FB22007A2EFB /* FoodInfoViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FoodInfoViewController.m; sourceTree = "<group>"; };
 		4551FE392379605E007A2EFB /* SqliteManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SqliteManager.h; sourceTree = "<group>"; };
 		4551FE3A2379605E007A2EFB /* SqliteManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SqliteManager.m; sourceTree = "<group>"; };
+		4587FF6C238FAAF500DB795E /* SealerCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SealerCell.h; sourceTree = "<group>"; };
+		4587FF6D238FAAF500DB795E /* SealerCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SealerCell.m; sourceTree = "<group>"; };
 		459E0087237E43A4006D0E59 /* MyDeviceViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MyDeviceViewController.h; sourceTree = "<group>"; };
 		459E0088237E43A4006D0E59 /* MyDeviceViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MyDeviceViewController.m; sourceTree = "<group>"; };
 		459E008A237E43BA006D0E59 /* OtherViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OtherViewController.h; sourceTree = "<group>"; };
@@ -400,6 +403,8 @@
 				4551FE1D2378F971007A2EFB /* CellModel.m */,
 				4551FE1F2378F9B1007A2EFB /* FoodCollectionViewCell.h */,
 				4551FE202378F9B1007A2EFB /* FoodCollectionViewCell.m */,
+				4587FF6C238FAAF500DB795E /* SealerCell.h */,
+				4587FF6D238FAAF500DB795E /* SealerCell.m */,
 			);
 			path = FoodCell;
 			sourceTree = "<group>";
@@ -607,6 +612,7 @@
 			files = (
 				4551FDE72378F17E007A2EFB /* Fosa_QRCode_Queue.m in Sources */,
 				4551FE272378FA14007A2EFB /* LoginViewController.m in Sources */,
+				4587FF6E238FAAF500DB795E /* SealerCell.m in Sources */,
 				4551FE332378FB22007A2EFB /* FoodInfoViewController.m in Sources */,
 				4551FE092378F57C007A2EFB /* ResultViewController.m in Sources */,
 				4551FDD92378ED96007A2EFB /* FosaMainViewController.m in Sources */,

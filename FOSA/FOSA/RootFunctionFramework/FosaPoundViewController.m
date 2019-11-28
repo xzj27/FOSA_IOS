@@ -12,6 +12,7 @@
 #import "SqliteManager.h"
 
 #import "CellModel.h"
+#import "SealerCell.h"
 //图片宽高的最大值
 #define KCompressibilityFactor 1280.00
 @interface FosaPoundViewController ()<UITableViewDelegate,UITableViewDataSource,UIGestureRecognizerDelegate,AVCaptureMetadataOutputObjectsDelegate>{
@@ -369,9 +370,9 @@
         isExpand = false;
     }
 }
-- (void)InitData:(NSString *)foodName expireDate:(NSString *)expireDate storageDate:(NSString *)storageDate{
+- (void)InitData:(NSString *)foodName expireDate:(NSString *)expireDate storageDate:(NSString *)storageDate deviceID:(NSString *)deviceID{
     //arrayData = @[@"猪肉",@"牛肉",@"三文鱼",@"鲍鱼"];
-    CellModel *model = [CellModel modelWithName:foodName expireDate:expireDate storageDate:storageDate];
+    CellModel *model = [CellModel modelWithName:foodName expireDate:expireDate storageDate:storageDate fdevice:deviceID];
     [arrayData addObject:model];
     
 }
@@ -408,24 +409,32 @@
 {
     static NSString *cellIdentifier = @"cell";
     //初始化cell，并指定其类型
-    UITableViewCell *cell = [tableView  dequeueReusableCellWithIdentifier:cellIdentifier];
+    SealerCell *cell = [tableView  dequeueReusableCellWithIdentifier:cellIdentifier];
     
     if (cell == nil) {
         //创建cell
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:cellIdentifier];
+        cell = [[SealerCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:cellIdentifier];
     }
     NSInteger row = indexPath.row;
     //取消点击cell时显示的背景色
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
     cell.textLabel.text =  arrayData[row].foodName;
     cell.detailTextLabel.text = [NSString stringWithFormat:@"存储日期: %@",arrayData[row].storageDate];
-    
-    UILabel *expireLabel = [[UILabel alloc]initWithFrame:CGRectMake(cell.contentView.frame.size.width/2, cell.contentView.frame.size.height/4, cell.contentView.frame.size.width/2, cell.contentView.frame.size.height/2)];
-    expireLabel.font = [UIFont systemFontOfSize:10];
-    expireLabel.text =  [NSString stringWithFormat:@"有效日期: %@",arrayData[row].expireDate];
-    [cell.contentView addSubview:expireLabel];
+
+    cell.expireLabel.font = [UIFont systemFontOfSize:10];
+    cell.expireLabel.textAlignment = NSTextAlignmentCenter;
+    cell.expireLabel.text =  [NSString stringWithFormat:@"有效日期: %@",arrayData[row].expireDate];
+
+    //添加点击手势
+    UITapGestureRecognizer *recognizer = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(cellAction:)];
+    recognizer.accessibilityValue = arrayData[row].device;
+    [cell addGestureRecognizer:recognizer];
     //返回cell
     return cell;
+}
+/**cell的点击事件*/
+- (void)cellAction:(UITapGestureRecognizer *)sender{
+    NSLog(@"%@",sender.accessibilityValue);
 }
 - (void)ScanAction{
     if (!isScan) {
@@ -438,7 +447,6 @@
         isScan = false;
     }
 }
-
 #pragma mark - 扫码结果
 - (void)captureOutput:(AVCaptureOutput *)output didOutputMetadataObjects:(NSArray<__kindof AVMetadataObject *> *)metadataObjects fromConnection:(AVCaptureConnection *)connection{
     [arrayData removeAllObjects];
@@ -468,7 +476,7 @@
                 NSLog(@"查询到数据5:%@",[NSString stringWithUTF8String:remind_date]);
                 NSLog(@"查询到数据6:%@",[NSString stringWithUTF8String:storage_date]);
                 NSLog(@"查询到数据7:%@",[NSString stringWithUTF8String:photo_path]);
-                [self InitData:[NSString stringWithUTF8String:food_name] expireDate:[NSString stringWithUTF8String:expired_date] storageDate:[NSString stringWithUTF8String:storage_date]];
+                [self InitData:[NSString stringWithUTF8String:food_name] expireDate:[NSString stringWithUTF8String:expired_date] storageDate:[NSString stringWithUTF8String:storage_date] deviceID:[NSString stringWithUTF8String:device_name]];
             }
             
             [self.foodTable reloadData];
@@ -497,6 +505,8 @@
     [self.session stopRunning];
     [self.previewLayer removeFromSuperlayer];
     [self.rootScanView removeFromSuperview];
+    [self.scanBtn setImage:[UIImage imageNamed:@"icon_scan"] forState:UIControlStateNormal];
+    isScan = false;
 }
 - (void)viewWillDisappear:(BOOL)animated{
     [super viewWillDisappear:animated];

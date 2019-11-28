@@ -24,14 +24,15 @@
     }
 
 /**the model of Sealer */
-+ (instancetype)modelWithName:(NSString *)food_name expireDate:(NSString *)expireDate storageDate:(NSString *)storageDate{
-    return [[self alloc]initWithName:food_name expireDate:expireDate storageDate:storageDate];
++ (instancetype)modelWithName:(NSString *)food_name expireDate:(NSString *)expireDate storageDate:(NSString *)storageDate fdevice:(NSString *)device{
+    return [[self alloc]initWithName:food_name expireDate:expireDate storageDate:storageDate fdevice:device];
 }
-- (instancetype)initWithName:(NSString *)food_name expireDate:(NSString *)expireDate storageDate:(NSString *)storageDate{
+- (instancetype)initWithName:(NSString *)food_name expireDate:(NSString *)expireDate storageDate:(NSString *)storageDate fdevice:(NSString *)device{
     if (self == [super init]) {
         self.foodName = food_name;
         self.expireDate = expireDate;
         self.storageDate = storageDate;
+        self.device = device;
     }
     return self;
 }
