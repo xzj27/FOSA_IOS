@@ -53,7 +53,16 @@
         return stmt;
     }
 }
-+ (void)DeleteDataFromTable:(NSString *)DeleteSql database:(sqlite3 *)db{}
++ (void)DeleteDataFromTable:(NSString *)DeleteSql database:(sqlite3 *)db{
+    char * errmsg;
+    sqlite3_exec(db, DeleteSql.UTF8String, NULL, NULL, &errmsg);
+    if (errmsg) {
+        NSLog(@"删除失败--%s",errmsg);
+    }else{
+        NSLog(@"删除成功");
+    }
+}
+
 + (void)UpdataDataFromTable:(NSString *)UpdateSql database:(sqlite3 *)db{}
 + (NSString *)getPathWithName:(NSString *)databaseName{
     NSString *doc = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];

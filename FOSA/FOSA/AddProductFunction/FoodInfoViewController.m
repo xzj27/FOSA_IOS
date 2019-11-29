@@ -609,18 +609,18 @@
 }
 -(void)deleteFile:(NSString *)path {
 NSFileManager* fileManager=[NSFileManager defaultManager];
-BOOL blHave=[[NSFileManager defaultManager] fileExistsAtPath:path];
-if (!blHave) {
-NSLog(@"no  have");
-}else {
-NSLog(@" have");
-BOOL blDele= [fileManager removeItemAtPath:path error:nil];
-if (blDele) {
-NSLog(@"dele success");
-}else {
-NSLog(@"dele fail");
-}
-}
+    BOOL blHave=[[NSFileManager defaultManager] fileExistsAtPath:path];
+    if (!blHave) {
+        NSLog(@"no  have");
+    }else {
+        NSLog(@" have");
+        BOOL blDele= [fileManager removeItemAtPath:path error:nil];
+        if (blDele) {
+            NSLog(@"dele success");
+        }else {
+            NSLog(@"dele fail");
+        }
+    }
 }
 //数据库操作
 #pragma mark - 创建或打开数据库
@@ -628,22 +628,42 @@ NSLog(@"dele fail");
 {
     self.database = [SqliteManager InitSqliteWithName:@"Fosa.db"];
 }
-#pragma mark - 更新数据
+#pragma mark - 重新插入数据
 - (void) UpdateInfo{
-    NSString *sql = [NSString stringWithFormat:@"UPDATE Fosa2 SET foodName = '%@',aboutFood = '%@',expireDate = '%@',remindDate = '%@',photoPath = '%@'  WHERE deviceName = '%@'",self.foodName.text,self.aboutFood.text,self.expireDate.text,self.remindDate.text,self.foodName.text,self.deviceID];
-    const char *updateSql = [sql UTF8String];
-    int updateResult = sqlite3_exec(_database,updateSql,NULL,NULL,NULL);
-    if (updateResult != SQLITE_OK) {
-        [self SystemAlert:@"保存内容失败"];
+    //更新之前先删除原来的，然后再插入新的数据
+    NSString *deleteSql;
+    if ([self.deviceID hasPrefix:@"FOSASealer"]) {
+        deleteSql = [NSString stringWithFormat:@"delete from Fosa3 where deviceName = '%@' and foodName = '%@'",self.deviceID,self.name];
     }else{
-        [self.navigationController popToRootViewControllerAnimated:YES];
+        deleteSql = [NSString stringWithFormat:@"delete from Fosa2 where deviceName = '%@' and foodName = '%@'",self.deviceID,self.name];
+    }
+    [SqliteManager DeleteDataFromTable:deleteSql database:self.database];
+    
+    if ([self.deviceID hasPrefix:@"FOSASealer"]) {
+       //获取当前日期
+        NSDate *currentDate = [[NSDate alloc]init];
+        NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+        [formatter setDateFormat:@"yyyy-MM-dd"];
+        NSString *str = [formatter stringFromDate:currentDate];
+        //currentDate = [formatter dateFromString:str];
+        NSLog(@"%@",str);
+        NSString *SealerInsertSql = [NSString stringWithFormat:@"insert into Fosa3(foodName,deviceName,aboutFood,expireDate,remindDate,storageDate,photoPath)values('%@','%@','%@','%@','%@','%@','%@')",_foodName.text,_deviceName.text,_aboutFood.text,self.expireDate.text,self.remindDate.text,str,self.foodName.text];
+        [SqliteManager InsertDataIntoTable:SealerInsertSql database:self.database];
+    }else{
+        NSString *sql =[NSString stringWithFormat:@"insert into Fosa2(foodName,deviceName,aboutFood,expireDate,remindDate,photoPath)values('%@','%@','%@','%@','%@','%@')",_foodName.text,_deviceName.text,_aboutFood.text,self.expireDate.text,self.remindDate.text,self.foodName.text];
+        [SqliteManager InsertDataIntoTable:sql database:self.database];
     }
 }
 #pragma mark - 根据存储设备编号查找所存储内容的信息
 - (void) SelectDataFromSqlite{
     //查询数据库里对应食物的详细信息
     NSLog(@"$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
-    NSString *sql = [NSString stringWithFormat:@"select aboutFood,expireDate,remindDate,photoPath from Fosa2 where deviceName = '%@' and foodName = '%@' ",self.deviceID,self.name];
+    NSString *sql;
+    if ([self.deviceID hasPrefix:@"FOSASealer"]) {
+        sql = [NSString stringWithFormat:@"select aboutFood,expireDate,remindDate,photoPath from Fosa3 where deviceName = '%@' and foodName = '%@'",self.deviceID,self.name];
+    }else{
+        sql = [NSString stringWithFormat:@"select aboutFood,expireDate,remindDate,photoPath from Fosa2 where deviceName = '%@' and foodName = '%@' ",self.deviceID,self.name];
+    }
     self.stmt = [SqliteManager SelectDataFromTable:sql database:self.database];
     if (self.stmt != NULL) {
         NSLog(@"&*&**&*&*&*&*&*&*&*&*&");
@@ -673,7 +693,7 @@ NSLog(@"dele fail");
         UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Notification" message:message preferredStyle:UIAlertControllerStyleAlert];
         [alert addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
             NSLog(@"<<<<<<<<<YES");
-             NSString *insertSql =[NSString stringWithFormat:@"insert into Fosa2(foodName,deviceName,aboutFood,expireDate,remindDate,photoPath)values('%@','%@','%@','%@','%@','%@')",self.name,self.deviceID,self.infoArray[3],self.infoArray[4],self.infoArray[5],self.name];
+             NSString *insertSql = [NSString stringWithFormat:@"insert into Fosa2(foodName,deviceName,aboutFood,expireDate,remindDate,photoPath)values('%@','%@','%@','%@','%@','%@')",self.name,self.deviceID,self.infoArray[3],self.infoArray[4],self.infoArray[5],self.name];
             [self InsertData:insertSql];
         }]];
         [alert addAction:[UIAlertAction actionWithTitle:@"NO" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {

@@ -20,6 +20,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    NSLog(@"RootView Begin");
     // Do any additional setup after loading the view.
     [self addChildWithVCName:@"FosaMainViewController" title:@"Fosa" image:@"tabbar_logo" selectImage:@"tabbar_logoHL"];
     [self addChildWithVCName:@"FosaProductViewController" title:@"Product" image:@"tabbar_product" selectImage:@"tabbar_productHL"];

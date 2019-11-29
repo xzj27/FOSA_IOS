@@ -657,7 +657,7 @@
                     }
                 }
             }else{  //UIImage不为空则说明现在正处于添加功能中拍照完成后的扫码阶段
-                if([result hasPrefix:@"FOSASealer"]||[result hasPrefix:@"Fosa"]){//判断所扫描的二维码属于fosa产品
+                if([result hasPrefix:@"FOSASealer"]||[result hasPrefix:@"FS9"]){//判断所扫描的二维码属于fosa产品
                     [self.session stopRunning];
                     if (!isJump) {
                         [self ScanSuccess:@"ding.wav"];

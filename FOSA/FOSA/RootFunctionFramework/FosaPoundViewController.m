@@ -10,6 +10,7 @@
 #import <UserNotifications/UserNotifications.h>
 #import "ScanOneCodeViewController.h"
 #import "SqliteManager.h"
+#import "FoodInfoViewController.h"
 
 #import "CellModel.h"
 #import "SealerCell.h"
@@ -25,6 +26,7 @@
     
     //标记当前是否正在扫码
     Boolean isScan;
+    NSString *result;
     //扫码相关
     /**扫码相关*/
     AVCaptureDevice * device;
@@ -255,6 +257,16 @@
     animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionLinear]; //匀速变化
     return animation;
 }
+//局部更新
+- (void)viewWillAppear:(BOOL)animated{
+    if (self.foodTable != NULL) {
+        isExpand = false;
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self->arrayData removeAllObjects];
+            [self SelectData];
+        });
+    }
+}
 #pragma mark - 主视图加载
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -371,7 +383,6 @@
     }
 }
 - (void)InitData:(NSString *)foodName expireDate:(NSString *)expireDate storageDate:(NSString *)storageDate deviceID:(NSString *)deviceID{
-    //arrayData = @[@"猪肉",@"牛肉",@"三文鱼",@"鲍鱼"];
     CellModel *model = [CellModel modelWithName:foodName expireDate:expireDate storageDate:storageDate fdevice:deviceID];
     [arrayData addObject:model];
     
@@ -392,7 +403,7 @@
 //行高度
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    return 40;
+    return 50;
 }
 //每组多少行
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
@@ -415,6 +426,7 @@
         //创建cell
         cell = [[SealerCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:cellIdentifier];
     }
+    //cell.backgroundColor = [UIColor redColor];
     NSInteger row = indexPath.row;
     //取消点击cell时显示的背景色
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
@@ -422,22 +434,32 @@
     cell.detailTextLabel.text = [NSString stringWithFormat:@"存储日期: %@",arrayData[row].storageDate];
 
     cell.expireLabel.font = [UIFont systemFontOfSize:10];
-    cell.expireLabel.textAlignment = NSTextAlignmentCenter;
     cell.expireLabel.text =  [NSString stringWithFormat:@"有效日期: %@",arrayData[row].expireDate];
+    NSArray *tag = @[arrayData[row].foodName,arrayData[row].device];
+    cell.checkBtn.accessibilityElements = tag;
 
-    //添加点击手势
-    UITapGestureRecognizer *recognizer = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(cellAction:)];
-    recognizer.accessibilityValue = arrayData[row].device;
-    [cell addGestureRecognizer:recognizer];
+//    //添加点击手势
+//    UITapGestureRecognizer *recognizer = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(cellAction:)];
+//    recognizer.accessibilityValue = arrayData[row].device;
+//    [cell addGestureRecognizer:recognizer];
+    [cell.checkBtn addTarget:self action:@selector(cellAction:) forControlEvents:UIControlEventTouchUpInside];
     //返回cell
     return cell;
 }
 /**cell的点击事件*/
-- (void)cellAction:(UITapGestureRecognizer *)sender{
-    NSLog(@"%@",sender.accessibilityValue);
+- (void)cellAction:(id)sender{
+    UIButton *btn = (UIButton *)sender;
+    NSLog(@"%@----%@",btn.accessibilityElements[0],btn.accessibilityElements[1]);
+    FoodInfoViewController *info = [[FoodInfoViewController alloc]init];
+    info.name = btn.accessibilityElements[0];
+    info.deviceID = btn.accessibilityElements[1];
+    [self.navigationController pushViewController:info animated:YES];
 }
 - (void)ScanAction{
     if (!isScan) {
+        if (isExpand) {
+            [self ExpandList];
+        }
         [self startScan];
         [self.scanBtn setImage:[UIImage imageNamed:@"icon_finish"] forState:UIControlStateNormal];
         isScan = true;
@@ -452,43 +474,49 @@
     [arrayData removeAllObjects];
     [session stopRunning];
     AVMetadataMachineReadableCodeObject *object = metadataObjects.firstObject;
-    NSString *result = object.stringValue;
+    result = object.stringValue;
     NSLog(@"%@",result);
     if ([result hasPrefix:@"FOSASealer"]) {
-        self.database = [SqliteManager InitSqliteWithName:@"Fosa.db"];
-        NSString *sealerSql = [NSString stringWithFormat:@"select foodName,deviceName,aboutFood,expireDate,remindDate,storageDate,photoPath from Fosa3 where deviceName ='%@'",result];
-        _stmt = [SqliteManager SelectDataFromTable:sealerSql database:self.database];
-        if (_stmt != NULL) {
-            NSLog(@"********");
-            while (sqlite3_step(_stmt) == SQLITE_ROW) {
-                NSLog(@"^^^^^^^^^^^^^^");
-                const char *food_name = (const char *)sqlite3_column_text(_stmt, 0);
-                const char *device_name = (const char*)sqlite3_column_text(_stmt,1);
-                const char *about_food = (const char*)sqlite3_column_text(_stmt, 2);
-                const char *expired_date = (const char *)sqlite3_column_text(_stmt,3);
-                const char *remind_date = (const char*)sqlite3_column_text(_stmt,4);
-                const char *storage_date = (const char*)sqlite3_column_text(_stmt, 5);
-                const char *photo_path = (const char *)sqlite3_column_text(_stmt,6);
-                NSLog(@"查询到数据1:%@",[NSString stringWithUTF8String:food_name]);
-                NSLog(@"查询到数据2:%@",[NSString stringWithUTF8String:device_name]);
-                NSLog(@"查询到数据3:%@",[NSString stringWithUTF8String:about_food]);
-                NSLog(@"查询到数据4:%@",[NSString stringWithUTF8String:expired_date]);
-                NSLog(@"查询到数据5:%@",[NSString stringWithUTF8String:remind_date]);
-                NSLog(@"查询到数据6:%@",[NSString stringWithUTF8String:storage_date]);
-                NSLog(@"查询到数据7:%@",[NSString stringWithUTF8String:photo_path]);
-                [self InitData:[NSString stringWithUTF8String:food_name] expireDate:[NSString stringWithUTF8String:expired_date] storageDate:[NSString stringWithUTF8String:storage_date] deviceID:[NSString stringWithUTF8String:device_name]];
-            }
-            
-            [self.foodTable reloadData];
-            [self ExpandList];
-            [self StopAndRelease];
-        }else{
-            NSLog(@"查询失败");
-        }
+        [self SelectData];
     }else{
         [self SystemAlert:@"This is not belong to FosaSealer!"];
     }
 }
+//查询数据库
+- (void)SelectData{
+    self.database = [SqliteManager InitSqliteWithName:@"Fosa.db"];
+    NSString *sealerSql = [NSString stringWithFormat:@"select foodName,deviceName,aboutFood,expireDate,remindDate,storageDate,photoPath from Fosa3 where deviceName ='%@'",result];
+    _stmt = [SqliteManager SelectDataFromTable:sealerSql database:self.database];
+    if (_stmt != NULL) {
+        NSLog(@"********");
+        while (sqlite3_step(_stmt) == SQLITE_ROW) {
+            NSLog(@"^^^^^^^^^^^^^^");
+            const char *food_name = (const char *)sqlite3_column_text(_stmt, 0);
+            const char *device_name = (const char*)sqlite3_column_text(_stmt,1);
+            const char *about_food = (const char*)sqlite3_column_text(_stmt, 2);
+            const char *expired_date = (const char *)sqlite3_column_text(_stmt,3);
+            const char *remind_date = (const char*)sqlite3_column_text(_stmt,4);
+            const char *storage_date = (const char*)sqlite3_column_text(_stmt, 5);
+            const char *photo_path = (const char *)sqlite3_column_text(_stmt,6);
+            NSLog(@"查询到数据1:%@",[NSString stringWithUTF8String:food_name]);
+            NSLog(@"查询到数据2:%@",[NSString stringWithUTF8String:device_name]);
+            NSLog(@"查询到数据3:%@",[NSString stringWithUTF8String:about_food]);
+            NSLog(@"查询到数据4:%@",[NSString stringWithUTF8String:expired_date]);
+            NSLog(@"查询到数据5:%@",[NSString stringWithUTF8String:remind_date]);
+            NSLog(@"查询到数据6:%@",[NSString stringWithUTF8String:storage_date]);
+            NSLog(@"查询到数据7:%@",[NSString stringWithUTF8String:photo_path]);
+            [self InitData:[NSString stringWithUTF8String:food_name] expireDate:[NSString stringWithUTF8String:expired_date] storageDate:[NSString stringWithUTF8String:storage_date] deviceID:[NSString stringWithUTF8String:device_name]];
+            }
+        [self.foodTable reloadData];
+        [self ExpandList];
+        [self StopAndRelease];
+    }else{
+        NSLog(@"查询失败");
+    }
+
+}
+
+
 //弹出系统提示
 - (void)SystemAlert:(NSString *)message{
     [self.session stopRunning];
