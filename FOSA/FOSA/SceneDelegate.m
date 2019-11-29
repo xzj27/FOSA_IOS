@@ -21,8 +21,6 @@
             [self.window makeKeyAndVisible];
         }
 }
-
-
 - (void)sceneDidDisconnect:(UIScene *)scene  API_AVAILABLE(ios(13.0)){
     // Called as the scene is being released by the system.
     // This occurs shortly after the scene enters the background, or when its session is discarded.

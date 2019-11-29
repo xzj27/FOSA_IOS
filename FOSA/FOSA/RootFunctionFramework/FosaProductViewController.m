@@ -59,12 +59,6 @@
     CGRect navRect = self.navigationController.navigationBar.frame;
     //那么导航栏+状态栏的高度
     self.status_nav_height = statusRect.size.height+navRect.size.height;
-    
-//    UIView *navV = [[UIView alloc] initWithFrame:CGRectMake(0, 0, screen_width, navigationBar_statusBar_height)];
-//    navV.backgroundColor = [UIColor redColor];
-
-    //[self.view addSubview:navV];
-
     NSArray *titles = @[@"Fosa Device",@"My Device"];
     self.fosaScrollview = [[FosaScrollview alloc] init];
     
