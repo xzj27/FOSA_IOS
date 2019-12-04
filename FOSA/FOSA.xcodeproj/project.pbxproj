@@ -48,6 +48,7 @@
 		4551FE302378FB0F007A2EFB /* AddViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4551FE2F2378FB0F007A2EFB /* AddViewController.m */; };
 		4551FE332378FB22007A2EFB /* FoodInfoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4551FE322378FB22007A2EFB /* FoodInfoViewController.m */; };
 		4551FE3B2379605E007A2EFB /* SqliteManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4551FE3A2379605E007A2EFB /* SqliteManager.m */; };
+		4570579D23978D29006FA588 /* CalorieTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4570579C23978D29006FA588 /* CalorieTableViewCell.m */; };
 		4581C3852394AAAE009C7CD1 /* CategoryViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4581C3842394AAAE009C7CD1 /* CategoryViewController.m */; };
 		4581C3882394AADF009C7CD1 /* CategoryModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 4581C3872394AADF009C7CD1 /* CategoryModel.m */; };
 		4581C38B2394E09D009C7CD1 /* CategoryCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4581C38A2394E09D009C7CD1 /* CategoryCollectionViewCell.m */; };
@@ -171,6 +172,8 @@
 		4551FE322378FB22007A2EFB /* FoodInfoViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FoodInfoViewController.m; sourceTree = "<group>"; };
 		4551FE392379605E007A2EFB /* SqliteManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SqliteManager.h; sourceTree = "<group>"; };
 		4551FE3A2379605E007A2EFB /* SqliteManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SqliteManager.m; sourceTree = "<group>"; };
+		4570579B23978D29006FA588 /* CalorieTableViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CalorieTableViewCell.h; sourceTree = "<group>"; };
+		4570579C23978D29006FA588 /* CalorieTableViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CalorieTableViewCell.m; sourceTree = "<group>"; };
 		4581C3832394AAAE009C7CD1 /* CategoryViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CategoryViewController.h; sourceTree = "<group>"; };
 		4581C3842394AAAE009C7CD1 /* CategoryViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CategoryViewController.m; sourceTree = "<group>"; };
 		4581C3862394AADF009C7CD1 /* CategoryModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CategoryModel.h; sourceTree = "<group>"; };
@@ -418,6 +421,8 @@
 				4551FE202378F9B1007A2EFB /* FoodCollectionViewCell.m */,
 				4587FF6C238FAAF500DB795E /* SealerCell.h */,
 				4587FF6D238FAAF500DB795E /* SealerCell.m */,
+				4570579B23978D29006FA588 /* CalorieTableViewCell.h */,
+				4570579C23978D29006FA588 /* CalorieTableViewCell.m */,
 			);
 			path = FoodCell;
 			sourceTree = "<group>";
@@ -641,6 +646,7 @@
 				4551FDE72378F17E007A2EFB /* Fosa_QRCode_Queue.m in Sources */,
 				4551FE272378FA14007A2EFB /* LoginViewController.m in Sources */,
 				4587FF6E238FAAF500DB795E /* SealerCell.m in Sources */,
+				4570579D23978D29006FA588 /* CalorieTableViewCell.m in Sources */,
 				4551FE332378FB22007A2EFB /* FoodInfoViewController.m in Sources */,
 				4581C3852394AAAE009C7CD1 /* CategoryViewController.m in Sources */,
 				4551FE092378F57C007A2EFB /* ResultViewController.m in Sources */,

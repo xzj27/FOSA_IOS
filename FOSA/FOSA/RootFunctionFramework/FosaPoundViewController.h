@@ -23,9 +23,15 @@ NS_ASSUME_NONNULL_BEGIN
 //pound
 @property (nonatomic,strong) UIView *weightView,*calorieView;
 @property (nonatomic,strong) UITextView *weight,*calorie;
-@property (nonatomic,strong) UILabel *units;
 @property (nonatomic,assign) CGFloat mainWidth,mainHeight,navheight;
-@property (nonatomic,strong) UIButton *connect,*select;
+@property (nonatomic,strong) UIButton *connect,*select,*units;
+
+//clorieResult
+@property (nonatomic,strong) UIView *calorieResultView;
+@property (nonatomic,strong) UILabel *totalcalorieLabel;
+@property (nonatomic,strong) UITextView *Allcalorie;
+@property (nonatomic,strong) UIButton *addCalorie;
+@property (nonatomic,strong) UITableView *calorieTable;
 ///**扫码相关*/
 @property (nonatomic,strong) UIView *rootScanView;
 @end

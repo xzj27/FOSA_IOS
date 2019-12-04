@@ -16,11 +16,14 @@
 
 #import "CellModel.h"
 #import "SealerCell.h"
+#import "CalorieTableViewCell.h"
 //图片宽高的最大值
 #define KCompressibilityFactor 1280.00
 @interface FosaPoundViewController ()<UITableViewDelegate,UITableViewDataSource,UIGestureRecognizerDelegate,AVCaptureMetadataOutputObjectsDelegate>{
-    //数据数组
+    //Sealer数据数组
     NSMutableArray<CellModel *> *arrayData;
+    //计算卡路里的食物数量
+    int calorieNumber;
     //标记当前是否展开
     Boolean isExpand;
     //table cell的内容
@@ -54,6 +57,27 @@
 @end
 
 @implementation FosaPoundViewController
+/** 屏幕高度 */
+#define screen_height [UIScreen mainScreen].bounds.size.height
+/** 屏幕宽度 */
+#define screen_width [UIScreen mainScreen].bounds.size.width
+//判断是否是iPad
+#define ISIPAD [[UIDevice currentDevice] userInterfaceIdiom] ==UIUserInterfaceIdiomPad
+//判断手机型号为X
+#define is_IPHONEX [[UIScreen mainScreen] bounds].size.width == 375.0f &&([[UIScreen mainScreen] bounds].size.height == 812.0f)
+//获取状态栏的高度 iPhone X - 44pt 其他20pt
+#define StatusBarHeight [[UIApplication sharedApplication] statusBarFrame].size.height
+//获取导航栏的高度 - （不包含状态栏高度） 44pt
+#define NavigationBarHeight self.navigationController.navigationBar.frame.size.height
+//屏幕底部 tabBar高度49pt + 安全视图高度34pt(iPhone X)
+#define TabbarHeight self.tabBarController.tabBar.frame.size.height
+//屏幕顶部 导航栏高度（包含状态栏高度）
+#define NavigationHeight (StatusBarHeight + NavigationBarHeight)
+//屏幕底部安全视图高度 - 适配iPhone X底部
+#define TOOLH (is_IPHONEX ? 34 : 0)
+//屏幕底部 toolbar高度 + 安全视图高度34pt
+#define ToolbarHeight self.navigationController.toolbar.frame.size.height
+
 
 #pragma mark - 主视图懒加载
 - (UIScrollView *)rootView{
@@ -378,10 +402,10 @@
     
     [self InitFoodTable];
     
-    self.poundView.frame = CGRectMake(5, self.mainHeight/3+30, self.mainWidth-10, self.mainHeight/3);
+    self.poundView.frame = CGRectMake(5, self.mainHeight/3+30, self.mainWidth-10, self.mainHeight/6);
     self.poundView.backgroundColor = [UIColor colorWithRed:254/255.0 green:0/255.0 blue:151/255.0 alpha:1.0];
     [self.rootView addSubview:self.poundView];
-    self.poundImage.frame = CGRectMake(5, 5, self.poundView.frame.size.height/2, self.poundView.frame.size.height/2);
+    self.poundImage.frame = CGRectMake(5, 5, self.poundView.frame.size.height-10, self.poundView.frame.size.height-10);
     self.poundImage.image = [UIImage imageNamed:@"img_pound.jpg"];
     [self.poundView addSubview:self.poundImage];
     //连接开关
@@ -396,12 +420,14 @@
     self.weight.layer.borderWidth = 1;
     self.weight.text = @"weight";
     self.weight.userInteractionEnabled = NO;
-    self.units = [[UILabel alloc]initWithFrame:CGRectMake(self.weightView.frame.size.width*2/3, 0, self.weightView.frame.size.width/3, self.weightView.frame.size.height)];
-    _units.text = @"g";
-    _units.font = [UIFont systemFontOfSize:30];
-    [self.poundView addSubview:self.weightView];
-    [self.weightView addSubview:self.weight];
-    [self.weightView addSubview:self.units];
+    self.units = [[UIButton alloc]initWithFrame:CGRectMake(self.weightView.frame.size.width*2/3, 0, self.weightView.frame.size.width/3, self.weightView.frame.size.height)];
+    [_units setTitle:@"g" forState:UIControlStateNormal];
+    _units.layer.cornerRadius = 5;
+    _units.backgroundColor = [UIColor colorWithRed:254/255.0 green:0/255.0 blue:200/255.0 alpha:1.0];
+    
+    //[self.poundView addSubview:self.weightView];
+    //[self.weightView addSubview:self.weight];
+    //[self.weightView addSubview:self.units];
     
     self.calorieView = [[UIView alloc]initWithFrame:CGRectMake(5, self.poundView.frame.size.height*3/4+5, self.poundView.frame.size.width*3/4, (self.poundView.frame.size.height-40)/4)];
     self.calorie = [[UITextView alloc]initWithFrame:CGRectMake(0, 0, self.calorieView.frame.size.width*2/3, self.calorieView.frame.size.height)];
@@ -417,11 +443,32 @@
     self.select.backgroundColor = [UIColor colorWithRed:254/255.0 green:0/255.0 blue:200/255.0 alpha:1.0];
     //添加点击响应
     [self.select addTarget:self action:@selector(showCategory) forControlEvents:UIControlEventTouchUpInside];
+
+    //[self.calorieView addSubview:self.select];
+    //[self.poundView addSubview:self.calorieView];
+    //[self.calorieView addSubview:self.calorie];
+    //添加底部卡路里总量视图
+    self.calorieResultView = [[UIView alloc]initWithFrame:CGRectMake(0, screen_height-TabbarHeight-50, screen_width, 50)];
+    _calorieResultView.backgroundColor = [UIColor colorWithRed:208/255.0 green:208/255.0 blue:208/255.0 alpha:1.0];
+    self.totalcalorieLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, screen_width/4, 40)];
+    _totalcalorieLabel.text = @"卡路里总量:";
+    _totalcalorieLabel.font = [UIFont systemFontOfSize:11];
+    [_calorieResultView addSubview:_totalcalorieLabel];
+    self.Allcalorie = [[UITextView alloc]initWithFrame:CGRectMake(screen_width/4, 5, screen_width/2, 40)];
+    _Allcalorie.userInteractionEnabled = NO;
+    _Allcalorie.layer.cornerRadius = 5;
+    _Allcalorie.backgroundColor = [UIColor colorWithRed:228/255.0 green:228/255.0 blue:228/255.0 alpha:1.0];
     
+    [_calorieResultView addSubview:_Allcalorie];
     
-    [self.calorieView addSubview:self.select];
-    [self.poundView addSubview:self.calorieView];
-    [self.calorieView addSubview:self.calorie];
+    self.addCalorie = [[UIButton alloc]initWithFrame:CGRectMake(screen_width*3/4, 0, screen_width/4, 50)];
+    [_addCalorie setImage:[UIImage imageNamed:@"icon_add"] forState:UIControlStateNormal];
+    [_calorieResultView addSubview:_addCalorie];
+    [_addCalorie addTarget:self action:@selector(addAction) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:_calorieResultView];
+    calorieNumber = 1;
+    [self InitCalorieTable];
+    
 }
 #pragma mark - 食物列表
 - (void)ExpandList{
@@ -430,18 +477,17 @@
         self.foodTable.hidden = NO;
         CGPoint center = CGPointZero;
         center.x = self.mainWidth/2;
-        if (arrayData.count*50 <= _mainHeight*2/3) {
-            center.y = _mainHeight;
-        }else{
-            center.y = self.sealerView.frame.size.height+arrayData.count*40+self.poundView.frame.size.height/2+45;
-        }
+        center.y = screen_height+self.poundView.frame.size.height/2-TabbarHeight-50;
         self.poundView.center = center;
+        NSLog(@"%f*******%f",center.x,center.y);
+        NSLog(@"%f-------%f",_poundView.frame.origin.x,_poundView.frame.origin.y);
+        NSLog(@"%f&&&&&&&%f",_poundView.frame.origin.x,_poundView.frame.origin.y+self.poundView.frame.size.height);
         isExpand = true;
     }else{
         self.indicator.image = [UIImage imageNamed:@"caret"];
         CGPoint center = CGPointZero;
         center.x = self.mainWidth/2;
-        center.y = self.mainHeight/2+30;
+        center.y = self.mainHeight/3+30+_poundView.frame.size.height/2;
         self.poundView.center = center;
         self.foodTable.hidden = YES;
         isExpand = false;
@@ -452,10 +498,9 @@
     [arrayData addObject:model];
     
 }
-
 //food table
 - (void)InitFoodTable{
-    self.foodTable = [[UITableView alloc]initWithFrame:CGRectMake(5, self.sealerView.frame.size.height+10, self.sealerView.frame.size.width,self.sealerView.frame.size.height) style:UITableViewStylePlain];
+    self.foodTable = [[UITableView alloc]initWithFrame:CGRectMake(5, self.sealerView.frame.size.height+10, self.sealerView.frame.size.width,_mainHeight*2/3-NavigationHeight-TabbarHeight-50) style:UITableViewStylePlain];
     _foodTable.delegate = self;
     _foodTable.dataSource = self;
     _foodTable.hidden = YES;
@@ -465,51 +510,93 @@
 
     [self.rootView insertSubview:_foodTable atIndex:10];
 }
+//calorie table
+- (void)InitCalorieTable{
+    self.calorieTable = [[UITableView alloc]initWithFrame:CGRectMake(_poundView.frame.origin.x, _poundView.frame.origin.y+self.poundView.frame.size.height, _poundView.frame.size.width,100*4) style:UITableViewStylePlain];
+    _calorieTable.delegate = self;
+    _calorieTable.dataSource = self;
+    _calorieTable.hidden = YES;
+    _calorieTable.showsVerticalScrollIndicator = NO;
+    [_calorieTable setSeparatorColor:[UIColor grayColor]];
+    [self.rootView addSubview:_calorieTable];
+}
+- (void)addAction{
+    self.calorieTable.hidden = NO;
+    calorieNumber++;
+    [_calorieTable reloadData];
+}
+
 //行高度
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    return 50;
+    if ([tableView isEqual:_foodTable]) {
+        return 50;
+    }else if([tableView isEqual:_calorieTable]){
+        return 100;
+    }else{
+        return 0;
+    }
 }
 //每组多少行
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return arrayData.count;
+    if ([tableView isEqual:_foodTable]) {
+        return arrayData.count;
+    }else{
+        return calorieNumber;
+    }
+    
 }
 //多少组
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
     return 1;
 }
-
 //每行显示的内容
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    static NSString *cellIdentifier = @"cell";
-    //初始化cell，并指定其类型
-    SealerCell *cell = [tableView  dequeueReusableCellWithIdentifier:cellIdentifier];
-    
-    if (cell == nil) {
-        //创建cell
-        cell = [[SealerCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:cellIdentifier];
+    if ([tableView isEqual:_foodTable]) {
+        static NSString *cellIdentifier = @"cell";
+            //初始化cell，并指定其类型
+            SealerCell *cell = [tableView  dequeueReusableCellWithIdentifier:cellIdentifier];
+            
+            if (cell == nil) {
+                //创建cell
+                cell = [[SealerCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:cellIdentifier];
+            }
+            //cell.backgroundColor = [UIColor redColor];
+            NSInteger row = indexPath.row;
+            //取消点击cell时显示的背景色
+            cell.selectionStyle = UITableViewCellSelectionStyleNone;
+            cell.textLabel.text =  arrayData[row].foodName;
+            cell.detailTextLabel.text = [NSString stringWithFormat:@"存储日期: %@",arrayData[row].storageDate];
+
+            cell.expireLabel.font = [UIFont systemFontOfSize:10];
+            cell.expireLabel.text =  [NSString stringWithFormat:@"有效日期: %@",arrayData[row].expireDate];
+            NSArray *tag = @[arrayData[row].foodName,arrayData[row].device];
+            cell.checkBtn.accessibilityElements = tag;
+
+        //    //添加点击手势
+        //    UITapGestureRecognizer *recognizer = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(cellAction:)];
+        //    recognizer.accessibilityValue = arrayData[row].device;
+        //    [cell addGestureRecognizer:recognizer];
+            [cell.checkBtn addTarget:self action:@selector(cellAction:) forControlEvents:UIControlEventTouchUpInside];
+            //返回cell
+            return cell;
+    }else{
+        static NSString *cellIndentify = @"cell";
+        //初始化cell，并指定其类型
+            CalorieTableViewCell *cell = [tableView  dequeueReusableCellWithIdentifier:cellIndentify];
+            if (cell == nil) {
+                //创建cell
+                cell = [[CalorieTableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:cellIndentify];
+            }
+            cell.backgroundColor = [UIColor colorWithRed:254/255.0 green:100/255.0 blue:151/255.0 alpha:1.0];
+            //取消点击cell时显示的背景色
+            cell.selectionStyle = UITableViewCellSelectionStyleNone;
+            //返回cell
+            return cell;
     }
-    //cell.backgroundColor = [UIColor redColor];
-    NSInteger row = indexPath.row;
-    //取消点击cell时显示的背景色
-    cell.selectionStyle = UITableViewCellSelectionStyleNone;
-    cell.textLabel.text =  arrayData[row].foodName;
-    cell.detailTextLabel.text = [NSString stringWithFormat:@"存储日期: %@",arrayData[row].storageDate];
-
-    cell.expireLabel.font = [UIFont systemFontOfSize:10];
-    cell.expireLabel.text =  [NSString stringWithFormat:@"有效日期: %@",arrayData[row].expireDate];
-    NSArray *tag = @[arrayData[row].foodName,arrayData[row].device];
-    cell.checkBtn.accessibilityElements = tag;
-
-//    //添加点击手势
-//    UITapGestureRecognizer *recognizer = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(cellAction:)];
-//    recognizer.accessibilityValue = arrayData[row].device;
-//    [cell addGestureRecognizer:recognizer];
-    [cell.checkBtn addTarget:self action:@selector(cellAction:) forControlEvents:UIControlEventTouchUpInside];
-    //返回cell
-    return cell;
+    
 }
 /**cell的点击事件*/
 - (void)cellAction:(id)sender{
@@ -597,7 +684,6 @@
         [self SystemAlert:@"此二维码的设备没有食物记录"];
     }
 }
-
 //弹出系统提示
 - (void)SystemAlert:(NSString *)message{
     [self.session stopRunning];
