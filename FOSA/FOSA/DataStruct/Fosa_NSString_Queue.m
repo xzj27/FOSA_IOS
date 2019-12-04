@@ -72,6 +72,10 @@
     [_array removeAllObjects];
 }
 
+- (void)DeleObjectByIndex:(NSInteger)i{
+    [_array removeObjectAtIndex:i];
+}
+
 - (NSInteger)size {
     return _array.count;
 }

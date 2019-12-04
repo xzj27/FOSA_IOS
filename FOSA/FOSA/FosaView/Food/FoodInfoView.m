@@ -9,15 +9,7 @@
 #import "FoodInfoView.h"
 #import "FoodModel.h"
 @interface FoodInfoView()<UITextFieldDelegate>
-/*
- 添加子控件属性
- */
-@property (nonatomic,weak) UIImageView *iconImageView;
-@property (nonatomic,weak) UILabel *nameLabel,*foodLabel,*expireLabel,*remindLabel;
-@property (nonatomic,weak) UITextField *foodName,*expireDate,*remindDate;
-
 @property (nonatomic,assign) BOOL isEditOK;
-
 @end
 
 @implementation FoodInfoView
@@ -124,23 +116,6 @@
     //edit button
     self.edited.frame = CGRectMake(0, self.bounds.size.height-60,self.bounds.size.width, 60);
 }
-
-//
-//- (void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
-//     [super touchesMoved:touches withEvent:event];
-//       UITouch * touch = [touches anyObject];
-//       //本次触摸点
-//       CGPoint current = [touch locationInView:self];
-//       //上次触摸点
-//       CGPoint previous = [touch previousLocationInView:self];
-//       //未移动的中心点
-//       CGPoint center = self.center;
-//       //移动之后的中心点(未移动的点+本次触摸点-上次触摸点)
-//       center.x += current.x - previous.x;
-//       center.y += current.y - previous.y;
-//       //更新位置
-//       self.center = center;
-//}
 /*
  取出模型属性
  */

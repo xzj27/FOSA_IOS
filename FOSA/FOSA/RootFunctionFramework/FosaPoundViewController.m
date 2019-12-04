@@ -12,6 +12,8 @@
 #import "SqliteManager.h"
 #import "FoodInfoViewController.h"
 
+#import "CategoryViewController.h"
+
 #import "CellModel.h"
 #import "SealerCell.h"
 //图片宽高的最大值
@@ -27,6 +29,9 @@
     //标记当前是否正在扫码
     Boolean isScan;
     NSString *result;
+    
+    //标记是否局部更新
+    Boolean isUpdate;
     //扫码相关
     /**扫码相关*/
     AVCaptureDevice * device;
@@ -37,12 +42,15 @@
     AVCaptureVideoPreviewLayer * previewLayer;//展示捕获图像的图层，是CALayer的子类
     UIImageView *activeImage;       //扫描框
     UIImageView *scanImage;         //扫描线
+    AVMetadataMachineReadableCodeObject *object; //二维码对象
 //    UIView *maskView;
 
 }
 @property (nonatomic,strong) UIButton *send;
 @property (nonatomic,assign) sqlite3 *database;
 @property (nonatomic,assign) sqlite3_stmt *stmt;
+
+@property (nonatomic,strong) UIImageView *focusCursor;       //标记二维码的位置
 @end
 
 @implementation FosaPoundViewController
@@ -190,16 +198,66 @@
     }
     [self.input.device unlockForConfiguration];
     
+    //扫码标识
+    //聚焦图片
+    UIImageView *focusCursor = [[UIImageView alloc] initWithFrame:CGRectMake(50, 50, 50, 50)];
+    focusCursor.alpha = 0;
+    focusCursor.image = [UIImage imageNamed:@"camera_focus_red"];
+    [self.rootScanView addSubview:focusCursor];
+    _focusCursor = focusCursor;
     
     [self ScanOneByOne_ScanView];
     // 开始动画，扫描条上下移动
     [self performSelectorOnMainThread:@selector(timerFired) withObject:nil waitUntilDone:NO];
+    
 }
+#pragma mark - 获取在扫描框中的二维码的中心坐标
+-(CGPoint)getCenterOfQRcode:(AVMetadataMachineReadableCodeObject *)objc
+{
+        CGPoint center = CGPointZero;
+        // 扫码区域的坐标计算是以横屏为基准，应以右上角为（0，0），根据二维码的同一个点的y坐标来进行判断每个二维码的位置关系
+        NSArray *array = objc.corners;
+        NSLog(@"cornersArray = %@",array);
+        CGPoint point = CGPointZero;
+        int index = 0;
+        CFDictionaryRef dict = (__bridge CFDictionaryRef)(array[index++]);
+        // 把字典转换为点，存在point里，成功返回true 其他false
+        CGPointMakeWithDictionaryRepresentation(dict, &point);
+        CGPoint point2 = CGPointZero;
+        CGPointMakeWithDictionaryRepresentation((__bridge CFDictionaryRef)array[index++], &point2);
+        center.x=(point.x+point2.x)/2;
+        CGPoint point3 = CGPointZero;
+        CGPointMakeWithDictionaryRepresentation((__bridge CFDictionaryRef)array[index++], &point3);
+        center.y = (point2.y+point3.y)/2;
+        CGPoint point4 = CGPointZero;
+        CGPointMakeWithDictionaryRepresentation((__bridge CFDictionaryRef)array[index++], &point4);
 
+    return center;
+}
+#pragma mark - 设置在二维码位置显示聚焦光标
+- (void)setFocusCursorWithPoint:(AVMetadataMachineReadableCodeObject *)objc
+{
+    
+    CGPoint point = [self getCenterOfQRcode:objc];
+    CGPoint center = CGPointZero;
+   
+    center.x = self.rootScanView.frame.size.width*(1-point.y);
+    center.y = self.rootScanView.frame.size.height*(point.x);
+    NSLog(@"******************************************%f",center.y);
+    self.focusCursor.center = center;
+    self.focusCursor.transform = CGAffineTransformMakeScale(3,3);
+    self.focusCursor.alpha = 1.0;
+    [UIView animateWithDuration:2.0 animations:^{
+        self.focusCursor.transform = CGAffineTransformIdentity;
+    } completion:^(BOOL finished) {
+        //self.focusCursor.alpha = 0;
+    }];
+}
 #pragma mark - 单个扫码模式
 -(void)ScanOneByOne_ScanView{
     CGFloat imageX = self.rootScanView.frame.size.width*0.1;
-    CGFloat imageY = self.rootScanView.frame.size.width*0.1;         // 扫描框中的四个边角的背景图
+    CGFloat imageY = self.rootScanView.frame.size.width*0.1;
+    // 扫描框中的四个边角的背景图
 //         self.scanImage = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"saoyisao@3x"]];
 //         _scanImage.frame = CGRectMake(imageX, imageY, self.view.frame.size.width*0.7, self.view.frame.size.width*0.7);
 //         [self.view addSubview:_scanImage];
@@ -257,9 +315,11 @@
     animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionLinear]; //匀速变化
     return animation;
 }
+
+#pragma mark - 主视图加载
 //局部更新
 - (void)viewWillAppear:(BOOL)animated{
-    if (self.foodTable != NULL) {
+    if (isUpdate) {
         isExpand = false;
         dispatch_async(dispatch_get_main_queue(), ^{
             [self->arrayData removeAllObjects];
@@ -267,7 +327,7 @@
         });
     }
 }
-#pragma mark - 主视图加载
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
@@ -279,13 +339,14 @@
 }
 - (void)InitView{
     isScan = false; //扫码标记初始化
+    isUpdate = false;
     arrayData = [[NSMutableArray alloc]init];
     //rootView
     self.rootView.frame = CGRectMake(0, self.navheight, self.mainWidth, self.mainHeight);
     self.rootView.bounces = NO;
     self.rootView.showsVerticalScrollIndicator = NO;
     self.rootView.showsHorizontalScrollIndicator = NO;
-    self.rootView.contentSize = CGSizeMake(self.mainWidth,self.mainHeight*2);
+    self.rootView.contentSize = CGSizeMake(self.mainWidth,self.mainHeight*1.5);
     [self.view addSubview:self.rootView];
     //SealerView
     self.sealerView.frame = CGRectMake(5,10,self.mainWidth-10,self.mainHeight/3);
@@ -316,11 +377,6 @@
     [self.sealerView addSubview:self.InfoMenu];
     
     [self InitFoodTable];
-    
-    //分割线
-//    UIView *line = [[UIView alloc]initWithFrame:CGRectMake(0, self.mainHeight/2, self.mainWidth, 2)];
-//    line.backgroundColor = [UIColor grayColor];
-//    [self.rootView addSubview:line];
     
     self.poundView.frame = CGRectMake(5, self.mainHeight/3+30, self.mainWidth-10, self.mainHeight/3);
     self.poundView.backgroundColor = [UIColor colorWithRed:254/255.0 green:0/255.0 blue:151/255.0 alpha:1.0];
@@ -354,10 +410,15 @@
     self.calorie.layer.borderWidth = 0.5;
     self.calorie.text = @"calorie";
     self.calorie.userInteractionEnabled = NO;
+    
     self.select = [[UIButton alloc]initWithFrame:CGRectMake(self.calorieView.frame.size.width*2/3, 0, self.calorieView.frame.size.width/3, self.calorieView.frame.size.height)];
     self.select.layer.cornerRadius = 5;
     [self.select setTitle:@"select" forState:UIControlStateNormal];
     self.select.backgroundColor = [UIColor colorWithRed:254/255.0 green:0/255.0 blue:200/255.0 alpha:1.0];
+    //添加点击响应
+    [self.select addTarget:self action:@selector(showCategory) forControlEvents:UIControlEventTouchUpInside];
+    
+    
     [self.calorieView addSubview:self.select];
     [self.poundView addSubview:self.calorieView];
     [self.calorieView addSubview:self.calorie];
@@ -369,7 +430,11 @@
         self.foodTable.hidden = NO;
         CGPoint center = CGPointZero;
         center.x = self.mainWidth/2;
-        center.y = self.sealerView.frame.size.height+arrayData.count*40+self.poundView.frame.size.height/2+45;
+        if (arrayData.count*50 <= _mainHeight*2/3) {
+            center.y = _mainHeight;
+        }else{
+            center.y = self.sealerView.frame.size.height+arrayData.count*40+self.poundView.frame.size.height/2+45;
+        }
         self.poundView.center = center;
         isExpand = true;
     }else{
@@ -454,7 +519,10 @@
     info.name = btn.accessibilityElements[0];
     info.deviceID = btn.accessibilityElements[1];
     [self.navigationController pushViewController:info animated:YES];
+    isUpdate = true;
 }
+#pragma mark - 点击事件
+//扫描按钮
 - (void)ScanAction{
     if (!isScan) {
         if (isExpand) {
@@ -469,16 +537,28 @@
         isScan = false;
     }
 }
+//食物选择按钮
+- (void)showCategory{
+    NSLog(@"选择食物");
+    CategoryViewController *category = [[CategoryViewController alloc]init];
+    category.hidesBottomBarWhenPushed = YES;
+    [self.navigationController pushViewController:category animated:YES];
+    isUpdate = true;
+}
 #pragma mark - 扫码结果
 - (void)captureOutput:(AVCaptureOutput *)output didOutputMetadataObjects:(NSArray<__kindof AVMetadataObject *> *)metadataObjects fromConnection:(AVCaptureConnection *)connection{
     [arrayData removeAllObjects];
     [session stopRunning];
-    AVMetadataMachineReadableCodeObject *object = metadataObjects.firstObject;
+    object = metadataObjects.firstObject;
     result = object.stringValue;
     NSLog(@"%@",result);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self setFocusCursorWithPoint:self->object];
+    });
     if ([result hasPrefix:@"FOSASealer"]) {
         [self SelectData];
     }else{
+        //[self setFocusCursorWithPoint:object];
         [self SystemAlert:@"This is not belong to FosaSealer!"];
     }
 }
@@ -513,26 +593,23 @@
     }else{
         NSLog(@"查询失败");
     }
-
+    if (arrayData.count == 0) {
+        [self SystemAlert:@"此二维码的设备没有食物记录"];
+    }
 }
-
 
 //弹出系统提示
 - (void)SystemAlert:(NSString *)message{
     [self.session stopRunning];
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Notification" message:message preferredStyle:UIAlertControllerStyleAlert];
-    [alert addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil]];
-    [self presentViewController:alert animated:true completion:^{
-        //回掉
-        NSLog(@"SystemAlert------我把捕获打开了");
+    [alert addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        self.focusCursor.alpha = 0;
         [self.session startRunning];
-    }];
+    }]];
+    [self presentViewController:alert animated:true completion:nil];
 }
-
 - (void)StopAndRelease{
     [self.session stopRunning];
-    [self.previewLayer removeFromSuperlayer];
-    [self.rootScanView removeFromSuperview];
     [self.scanBtn setImage:[UIImage imageNamed:@"icon_scan"] forState:UIControlStateNormal];
     isScan = false;
 }
@@ -543,5 +620,7 @@
         [self.scanBtn setImage:[UIImage imageNamed:@"icon_scan"] forState:UIControlStateNormal];
     }
     [self StopAndRelease];
+    [self.previewLayer removeFromSuperlayer];
+    [self.rootScanView removeFromSuperview];
 }
 @end

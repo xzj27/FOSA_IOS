@@ -19,6 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)enqueue:(NSString *)obj; ///入队列
 - (id) dequeue; ///出队列
 - (void) removeAllObjects; ///移除队列里边所有元素
+- (void) DeleObjectByIndex:(NSInteger)i;
 - (NSMutableArray *)returnArray;  //
 - (int)getTheSameObjectIndex:(NSString *)obj;
 -(Boolean)isContainObject:(NSString *)obj;

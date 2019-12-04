@@ -14,7 +14,7 @@
 #define KCompressibilityFactor 1280.00
 #define MaxSCale 3.0  //最大缩放比例
 #define MinScale 0.5  //最小缩放比例
-@interface FoodInfoViewController ()<UITextFieldDelegate,UINavigationControllerDelegate,UNUserNotificationCenterDelegate,UITextViewDelegate,UIImagePickerControllerDelegate>{
+@interface FoodInfoViewController ()<UITextFieldDelegate,UINavigationControllerDelegate,UNUserNotificationCenterDelegate,UITextViewDelegate,UIImagePickerControllerDelegate,UIScrollViewDelegate>{
     //日期选择
     UIDatePicker *datePicker;
     //日期选择器的容器
@@ -40,7 +40,7 @@
 @property (nonatomic,assign) NSDate *exdate,*redate;
 
 //图片放大视图
-@property (nonatomic,strong) UIView *backGround;
+@property (nonatomic,strong) UIScrollView *backGround;
 @property (nonatomic,strong) UIImageView *bigImage;
 @property (nonatomic,assign) CGFloat totalScale;
 @end
@@ -61,7 +61,6 @@
     [self creatOrOpensql];
     [self SelectDataFromSqlite];
 }
-
 
 -(void)viewWillAppear:(BOOL)animated
 {
@@ -442,47 +441,73 @@
 }
 #pragma mark -  放大缩小图片
 - (void)EnlargePhoto{
-    self.navigationController.navigationBar.hidden = YES;
-    [UIApplication sharedApplication].statusBarHidden = YES;
+    NSLog(@"***********************************");
+    self.navigationController.navigationBar.hidden = YES;   //隐藏导航栏
+    [UIApplication sharedApplication].statusBarHidden = YES;             //隐藏状态栏
     //底层视图
-    self.backGround = [[UIView alloc]init];
-    self.backGround.backgroundColor = [UIColor blackColor];
-    self.backGround.frame = self.view.frame;
-    [self.view addSubview:self.backGround];
-    
-    self.totalScale = 1.0;
-    [self.foodName resignFirstResponder];
-    [self.aboutFood resignFirstResponder];
-    self.bigImage = [[UIImageView alloc]initWithFrame:CGRectMake(0, 0, self.mainWidth, self.mainheight)];
-    self.bigImage.image = self.imageView1.image;
-    self.bigImage.userInteractionEnabled = YES;
-    self.bigImage.contentMode = UIViewContentModeScaleAspectFit;
-    self.bigImage.clipsToBounds = YES;
+    self.backGround = [[UIScrollView alloc]init];
+    _backGround.backgroundColor = [UIColor blackColor];
+    _backGround.contentSize = CGSizeMake(self.view.frame.size.width, self.view.frame.size.height);
+    _backGround.frame = self.view.frame;
+    _backGround.showsHorizontalScrollIndicator = NO;
+    _backGround.showsVerticalScrollIndicator = NO;
+    _backGround.multipleTouchEnabled = YES;
+    _backGround.maximumZoomScale = 5;
+    _backGround.minimumZoomScale = 1;
+    _backGround.delegate = self;
+
+    self.totalScale = 1;
+    self.bigImage = [[UIImageView alloc]init];
+    _bigImage.frame = self.view.frame;
+    _bigImage.image = self.imageView1.image;
+    _bigImage.userInteractionEnabled = YES;
+    _bigImage.contentMode = UIViewContentModeScaleToFill;
+    _bigImage.clipsToBounds = YES;
     UITapGestureRecognizer *shrinkRecognizer = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(shirnkPhoto)];
-    [self.bigImage addGestureRecognizer:shrinkRecognizer];
-    UIPinchGestureRecognizer *pinchGestureRecognizer = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(handlePinch:)];
-        
-    [self.bigImage addGestureRecognizer:pinchGestureRecognizer];
-    [self.backGround addSubview:self.bigImage];
+    [shrinkRecognizer setNumberOfTapsRequired:1];
+    [_bigImage addGestureRecognizer:shrinkRecognizer];
+    //添加双击事件
+    UITapGestureRecognizer *doubleTapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleDoubleTap:)];
+    [doubleTapGesture setNumberOfTapsRequired:2];
+    [_bigImage addGestureRecognizer:doubleTapGesture];
+    
+    [shrinkRecognizer requireGestureRecognizerToFail:doubleTapGesture];
+    
+    [_backGround addSubview:self.bigImage];
+    [self.view addSubview:self.backGround];
 }
+#pragma mark -  scrollview代理
+- (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView{
+    return self.bigImage;
+}
+//- (void)scrollViewDidZoom:(UIScrollView *)scrollView{
+//    self.bigImage.center = self.view.center;
+//}
+
+/**双击定点放大*/
+- (void)handleDoubleTap:(UIGestureRecognizer *)gesture
+{
+    CGFloat zoomScale = self.backGround.zoomScale;
+    NSLog(@"%f",self.backGround.zoomScale);
+    zoomScale = (zoomScale == 1.0) ? 3.0 : 1.0;
+    CGRect zoomRect = [self zoomRectForScale:zoomScale withCenter:[gesture locationInView:gesture.view]];
+    [self.backGround zoomToRect:zoomRect animated:YES];
+}
+
+- (CGRect)zoomRectForScale:(float)scale withCenter:(CGPoint)center
+{
+    CGRect zoomRect;
+    zoomRect.size.height =self.view.frame.size.height / scale;
+    zoomRect.size.width  =self.view.frame.size.width  / scale;
+    zoomRect.origin.x = center.x - (zoomRect.size.width  /2.0);
+    zoomRect.origin.y = center.y - (zoomRect.size.height /2.0);
+    return zoomRect;
+}
+//点击缩小视图
 - (void)shirnkPhoto{
     [self.backGround removeFromSuperview];
     self.navigationController.navigationBar.hidden = NO;
     [UIApplication sharedApplication].statusBarHidden = NO;
-}
-- (void) handlePinch:(UIPinchGestureRecognizer*) recognizer {
-    CGFloat scale = recognizer.scale;
-     //放大情况
-     if(scale > 1.0){
-         if(self.totalScale > MaxSCale) return;
-     }
-     //缩小情况
-     if (scale < 1.0) {
-         if (self.totalScale < MinScale) return;
-     }
-     self.bigImage.transform = CGAffineTransformScale(self.bigImage.transform, scale, scale);
-     self.totalScale *=scale;
-     recognizer.scale = 1.0;
 }
 
 #pragma mark - 压缩图片
@@ -715,10 +740,11 @@ NSFileManager* fileManager=[NSFileManager defaultManager];
         NSLog(@"插入数据失败");
     }
 }
-//完成输入，将数据写入数据库
+#pragma mark - 编辑与完成
 -(void)BeginEditing{
     if (_CanEdit) {
         _CanEdit = false;
+        [self prohibitEdit];        //禁止交互
         [self.edit setImage:[UIImage imageNamed:@"icon_edit"] forState:UIControlStateNormal];
         [self Savephoto];
         [self UpdateInfo];
@@ -737,7 +763,7 @@ NSFileManager* fileManager=[NSFileManager defaultManager];
     }else{
         [self AllowEdit];
         self.edit.alpha = 0.5;
-         [self.edit setImage:[UIImage imageNamed:@"icon_editHL"] forState:UIControlStateNormal];
+         [self.edit setImage:[UIImage imageNamed:@"icon_ok"] forState:UIControlStateNormal];
         self.edit.alpha = 1;
         _CanEdit = true;
     }

@@ -11,10 +11,7 @@
 #import <AVFoundation/AVFoundation.h>
 #import <UserNotifications/UserNotifications.h>
 
-#define MaxSCale 3.0  //最大缩放比例
-#define MinScale 0.5  //最小缩放比例
-
-@interface PhotoViewController ()
+@interface PhotoViewController ()<UIScrollViewDelegate>
 
 @property (nonatomic, strong) AVCaptureSession *captureSession;//负责输入和输出设备之间的数据传递
 @property (nonatomic, strong) AVCaptureDeviceInput *captureDeviceInput;//负责从AVCaptureDevice获得输入数据
@@ -29,7 +26,7 @@
 @property (nonatomic, strong) UIImage *image;
 
 //图片放大视图
-@property (nonatomic,strong) UIView *backGround;
+@property (nonatomic,strong) UIScrollView *backGround;
 @property (nonatomic,strong) UIImageView *bigImage;
 @property (nonatomic,assign) CGFloat totalScale;
 @end
@@ -38,29 +35,25 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-
     self.navigationItem.title = @"拍照";
-    self.view.backgroundColor = [UIColor whiteColor];
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithImage:[UIImage imageNamed:@"icon_scan"] style:UIBarButtonItemStylePlain target:nil action:nil];
-    self.navigationItem.rightBarButtonItem.target = self;     self.navigationItem.rightBarButtonItem.action = @selector(ScanEvent);    //创建控件
+    self.navigationItem.rightBarButtonItem.target = self;     self.navigationItem.rightBarButtonItem.action = @selector(ScanEvent);
+    self.view.backgroundColor = [UIColor blackColor];
+    //创建控件
     [self creatControl];
 }
 
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    
     //初始化信息
     [self initPhotoInfo];
 }
-
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
-    
     [self.captureSession startRunning];
 }
-
 - (void)viewDidDisappear:(BOOL)animated
 {
     [super viewDidDisappear:animated];
@@ -217,12 +210,10 @@
        if(captureDevice.isFocusPointOfInterestSupported &&[captureDevice isFocusModeSupported:AVCaptureFocusModeAutoFocus]){
            [_captureDeviceInput.device setFocusMode:AVCaptureFocusModeContinuousAutoFocus];
        }
-    
        //自动曝光
        if([captureDevice isExposureModeSupported:AVCaptureExposureModeContinuousAutoExposure]){
            [_captureDeviceInput.device setExposureMode:AVCaptureExposureModeContinuousAutoExposure];
        }
-       
        [_captureDeviceInput.device unlockForConfiguration];
 }
 
@@ -282,46 +273,71 @@
     self.navigationController.navigationBar.hidden = YES;   //隐藏导航栏
     [UIApplication sharedApplication].statusBarHidden = YES;             //隐藏状态栏
     //底层视图
-    self.backGround = [[UIView alloc]init];
-    self.backGround.backgroundColor = [UIColor blackColor];
-    self.backGround.frame = self.view.frame;
-    self.totalScale = 1.0;
+    self.backGround = [[UIScrollView alloc]init];
+    _backGround.backgroundColor = [UIColor blackColor];
+    _backGround.contentSize = CGSizeMake(self.view.frame.size.width, self.view.frame.size.height);
+    _backGround.frame = self.view.frame;
+    _backGround.showsHorizontalScrollIndicator = NO;
+    _backGround.showsVerticalScrollIndicator = NO;
+    _backGround.multipleTouchEnabled = YES;
+    _backGround.maximumZoomScale = 5;
+    _backGround.minimumZoomScale = 1;
+    _backGround.delegate = self;
+
     self.bigImage = [[UIImageView alloc]init];
     _bigImage.frame = self.view.frame;
-    self.bigImage.image = self.imgView.image;
-    self.bigImage.userInteractionEnabled = YES;
-    self.bigImage.contentMode = UIViewContentModeScaleToFill;
-    self.bigImage.clipsToBounds = YES;
+    _bigImage.image = self.imgView.image;
+    _bigImage.userInteractionEnabled = YES;
+    _bigImage.contentMode = UIViewContentModeScaleToFill;
+    _bigImage.clipsToBounds = YES;
     UITapGestureRecognizer *shrinkRecognizer = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(shirnkPhoto)];
-    [self.bigImage addGestureRecognizer:shrinkRecognizer];
-    UIPinchGestureRecognizer *pinchGestureRecognizer = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(handlePinch:)];
-    [self.bigImage addGestureRecognizer:pinchGestureRecognizer];
+    [shrinkRecognizer setNumberOfTapsRequired:1];
+    [_bigImage addGestureRecognizer:shrinkRecognizer];
+    //添加双击事件
+    UITapGestureRecognizer *doubleTapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleDoubleTap:)];
+    [doubleTapGesture setNumberOfTapsRequired:2];
+    [_bigImage addGestureRecognizer:doubleTapGesture];
     
-    [self.backGround addSubview:self.bigImage];
+    [shrinkRecognizer requireGestureRecognizerToFail:doubleTapGesture];
+    
+    [_backGround addSubview:self.bigImage];
     [self.view addSubview:self.backGround];
 }
+#pragma mark -  scrollview代理
+- (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView{
+    return self.bigImage;
+}
+//- (void)scrollViewDidZoom:(UIScrollView *)scrollView{
+//    self.bigImage.center = self.view.center;
+//}
+
+/**双击定点放大*/
+- (void)handleDoubleTap:(UIGestureRecognizer *)gesture
+{
+    CGFloat zoomScale = self.backGround.zoomScale;
+    NSLog(@"%f",self.backGround.zoomScale);
+    zoomScale = (zoomScale == 1.0) ? 3.0 : 1.0;
+    CGRect zoomRect = [self zoomRectForScale:zoomScale withCenter:[gesture locationInView:gesture.view]];
+    [self.backGround zoomToRect:zoomRect animated:YES];
+}
+
+- (CGRect)zoomRectForScale:(float)scale withCenter:(CGPoint)center
+{
+    CGRect zoomRect;
+    zoomRect.size.height =self.view.frame.size.height / scale;
+    zoomRect.size.width  =self.view.frame.size.width  / scale;
+    zoomRect.origin.x = center.x - (zoomRect.size.width  /2.0);
+    zoomRect.origin.y = center.y - (zoomRect.size.height /2.0);
+    return zoomRect;
+}
+//点击缩小视图
 - (void)shirnkPhoto{
     [self.backGround removeFromSuperview];
     self.navigationController.navigationBar.hidden = NO;
     [UIApplication sharedApplication].statusBarHidden = NO;
 }
-- (void) handlePinch:(UIPinchGestureRecognizer*) recognizer {
 
-    CGFloat scale = recognizer.scale;
-     //放大情况
-     if(scale > 1.0){
-         if(self.totalScale > MaxSCale) return;
-     }
 
-     //缩小情况
-     if (scale < 1.0) {
-         if (self.totalScale < MinScale) return;
-     }
-
-     self.bigImage.transform = CGAffineTransformScale(self.bigImage.transform, scale, scale);
-     self.totalScale *=scale;
-     recognizer.scale = 1.0;
-}
 #pragma mark - <保存到相册>
 -(void)image:(UIImage *)image didFinishSavingWithError:(NSError *)error contextInfo:(void *)contextInfo {
     NSString *msg = nil ;
@@ -522,23 +538,21 @@
         self.focusCursor.alpha = 0;
     }];
 }
-//拖动视图的方法
-- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event{
-    UITouch *touch = [touches anyObject];
-    // 当前触摸点
-    CGPoint currentPoint = [touch locationInView:self.bigImage];
-    // 上一个触摸点
-    CGPoint previousPoint = [touch previousLocationInView:self.bigImage];
-    // 当前view的中点
-    CGPoint center = self.bigImage.center;
-    
-    center.x += (currentPoint.x - previousPoint.x);
-    center.y += (currentPoint.y - previousPoint.y);
-    // 修改当前view的中点(中点改变view的位置就会改变)
-    self.bigImage.center = center;
-}
-
-
+////拖动视图的方法
+//- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event{
+//    UITouch *touch = [touches anyObject];
+//    // 当前触摸点
+//    CGPoint currentPoint = [touch locationInView:self.bigImage];
+//    // 上一个触摸点
+//    CGPoint previousPoint = [touch previousLocationInView:self.bigImage];
+//    // 当前view的中点
+//    CGPoint center = self.bigImage.center;
+//
+//    center.x += (currentPoint.x - previousPoint.x);
+//    center.y += (currentPoint.y - previousPoint.y);
+//    // 修改当前view的中点(中点改变view的位置就会改变)
+//    self.bigImage.center = center;
+//}
 
 - (void)dealloc
 {

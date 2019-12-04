@@ -18,7 +18,7 @@
 #import "Fosa_NSString_queue.h"
 #import "SqliteManager.h"
 #import "FoodInfoViewController.h"
-@interface ScanOneCodeViewController ()<AVCaptureMetadataOutputObjectsDelegate,UINavigationControllerDelegate,AVCaptureVideoDataOutputSampleBufferDelegate,UIImagePickerControllerDelegate>{
+@interface ScanOneCodeViewController ()<AVCaptureMetadataOutputObjectsDelegate,UINavigationControllerDelegate,AVCaptureVideoDataOutputSampleBufferDelegate,UIImagePickerControllerDelegate,UIScrollViewDelegate>{
     //用于初始化数据模型的数据
     NSString *food,*fdevice,*expire,*remind,*photoPath;
     //GCD定时器
@@ -72,6 +72,11 @@
 @property(nonatomic,assign)sqlite3 *database;
 //结果集定义
 @property(nonatomic,assign)sqlite3_stmt *stmt;
+
+//通知的图片放大视图
+@property (nonatomic,strong) UIScrollView *backGround;
+@property (nonatomic,strong) UIImageView *bigImage;
+
 @end
 
 @implementation ScanOneCodeViewController
@@ -281,7 +286,7 @@
      //聚焦图片
     UIImageView *focusCursor = [[UIImageView alloc] initWithFrame:CGRectMake(50, 50, 50, 50)];
     focusCursor.alpha = 0;
-    focusCursor.image = [UIImage imageNamed:@"icon_focusBlue"];
+    focusCursor.image = [UIImage imageNamed:@"camera_focus_red"];
     
     self.focusCursor1 = [[UIImageView alloc] initWithFrame:CGRectMake(50, 50, 50, 50)];
     self.focusCursor1.alpha = 0;
@@ -318,6 +323,7 @@
     }else if(scanmodel == 1){
         [self ScanMore_ScanView];
     }
+    [self.session startRunning];
 }
 #pragma mark - 多个扫码模式
 -(void)ScanMore_ScanView{
@@ -580,11 +586,10 @@
         
     return center;
 }
-#pragma mark - 原本用于点击放大镜头
+#pragma mark - 点击扫码区域重新扫码
 -(void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
-    
-    //UITouch *touch = [touches anyObject];
-    //[self processTouch:touch];
+    UITouch *touch = [touches anyObject];
+    [self processTouch:touch];
 }
 -(void)processTouch:(UITouch *)touch{
     //获取点击处的坐标
@@ -592,15 +597,12 @@
     CGFloat x = touchPoint.x;
     CGFloat y = touchPoint.y;
     NSLog(@"%f,%f",x,y);
-    if(x > self.view.frame.size.width*0.15 && x<self.view.frame.size.width*0.85){
-        if(y > self.view.frame.size.width*0.15+64 && y<self.view.frame.size.width*0.85+64){
-            self.scale = _scale+0.8;
-            if(self.scale > [self maxZoomFactor]){
-                self.scale = [self maxZoomFactor];
-            }
-            [self.device lockForConfiguration:nil];
-            [_device setVideoZoomFactor:self.scale];
-            [self.device unlockForConfiguration];
+    if(x > [UIScreen mainScreen].bounds.size.width*0.45 && x < [UIScreen mainScreen].bounds.size.width-10){
+        if(y > self.navigationController.navigationBar.frame.size.height+80 && y< [UIScreen mainScreen].bounds.size.height-160){
+            self.focusCursor1.alpha = 0;
+            self.focusCursor2.alpha = 0;
+            self.focusCursor3.alpha = 0;
+            [self.session startRunning];
         }
     }
 }
@@ -659,9 +661,12 @@
             }else{  //UIImage不为空则说明现在正处于添加功能中拍照完成后的扫码阶段
                 if([result hasPrefix:@"FOSASealer"]||[result hasPrefix:@"FS9"]){//判断所扫描的二维码属于fosa产品
                     [self.session stopRunning];
+                    [self performSelectorOnMainThread:@selector(setFocusCursorWithPoint:) withObject:(AVMetadataMachineReadableCodeObject *) mobject waitUntilDone:NO];
                     if (!isJump) {
                         [self ScanSuccess:@"ding.wav"];
-                         [self performSelectorOnMainThread:@selector(JumpToAdd:) withObject:result waitUntilDone:NO];
+                    //标记识别到的二维码
+                        [self performSelectorOnMainThread:@selector(JumpToAdd:) withObject:result waitUntilDone:NO];
+                        
                         isJump = true;
                     }
                 }else{
@@ -733,6 +738,10 @@
 //                           AVMetadataMachineReadableCodeObject *temp = [_codeQueue returnArray][i];
 //                           [_codeQueue returnArray][i] = [_codeQueue returnArray][j];
 //                           [_codeQueue returnArray][j] = temp;
+//
+//                           NSString *str = [_QRcode returnArray][i];
+//                           [_QRcode returnArray][i] = [_QRcode returnArray][j];
+//                           [_QRcode returnArray][j] = str;
 //                       }
 //                   }
 //               }
@@ -765,6 +774,8 @@
 }
 //跳转到添加界面
 - (void)JumpToAdd:(NSString *)massage{
+    
+    [NSThread sleepForTimeInterval: 2.0];
     AddViewController *add = [[AddViewController alloc]init];
      
     CGFloat headerWidth = [UIScreen mainScreen].bounds.size.width-20;
@@ -846,7 +857,6 @@
             [self ScanSuccess:@"ding.wav"];
         }
     }
-    
 }
 - (void)showMoreMessage:(AVMetadataMachineReadableCodeObject *)code{
     NSLog(@"%d",AlertCount);
@@ -894,7 +904,7 @@
     }
     
     self.count = (self.count+1)%3;
-    
+    //[NSThread sleepForTimeInterval:0.5];
     //NSLog(@"%d",self.count);
 }
 
@@ -906,11 +916,19 @@
     FoodModel *model =  [self OpenAndSelectsql:message];
     [_fosaAlertView setModel:model];
     _fosaAlertView.frame = CGRectMake(0, [UIScreen mainScreen].bounds.size.height-250,[UIScreen mainScreen].bounds.size.width,250);
-    //添加点击事件
+    //为通知关闭添加点击事件
     [_fosaAlertView.edited addTarget:self action:@selector(removeCurrentAlert) forControlEvents:UIControlEventTouchUpInside];
+    //为通知中的食物图片添加点击手势
+    if (_fosaAlertView.iconImageView.image != NULL) {
+        _fosaAlertView.iconImageView.userInteractionEnabled = YES;
+        UITapGestureRecognizer *zoomRecognizer = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(EnlargePhoto:)];
+        NSArray<UIImage *> *array = @[_fosaAlertView.iconImageView.image];
+        zoomRecognizer.accessibilityElements = array;
+        
+        [_fosaAlertView.iconImageView addGestureRecognizer:zoomRecognizer];
+    }
     [self.view addSubview:_fosaAlertView];
 }
-
 #pragma mark - remove fosaAlertView
 -(void)removeView{
     [_circleAlertView1 removeFromSuperview];
@@ -947,18 +965,19 @@
     UITapGestureRecognizer *tap = (UITapGestureRecognizer *)sender;
     if (tap.view.tag == 0) {
         [_circleAlertView1 removeFromSuperview];
+        self.focusCursor1.alpha = 0;
     }else if (tap.view.tag == 1){
         [_circleAlertView2 removeFromSuperview];
+        self.focusCursor2.alpha = 0;
     }else if (tap.view.tag == 2){
         [_circleAlertView3 removeFromSuperview];
+        self.focusCursor3.alpha = 0;
     }
-    [self.QRcode removeAllObjects];
-    [self.codeQueue removeAllObjects];
-    AlertCount = 0;
-    [self.session startRunning];
-    [self removeView];
+    AlertCount--;
+    if (AlertCount == 0) {
+        [self.session startRunning];
+    }
 }
-
 #pragma mark - 用于移除当前点开的具体内容弹窗
 -(void)removeCurrentAlert{
     [self.fosaAlertView removeFromSuperview];
@@ -982,7 +1001,7 @@
     [UIView animateWithDuration:2.0 animations:^{
         self.focusCursor.transform = CGAffineTransformIdentity;
     } completion:^(BOOL finished) {
-        self.focusCursor.alpha = 0;
+        //self.focusCursor.alpha = 0;
     }];
 }
 
@@ -1076,6 +1095,78 @@
     //NSLog(@"%@",filePath);
     return filePath;
 }
+#pragma mark -  放大缩小生成单个通知的图片
+- (void)EnlargePhoto:(UITapGestureRecognizer *)recognize{
+    UIImage *image = recognize.accessibilityElements[0];
+    NSLog(@"***********************************");
+    self.navigationController.navigationBar.hidden = YES;   //隐藏导航栏
+    [UIApplication sharedApplication].statusBarHidden = YES;             //隐藏状态栏
+    //底层视图
+    self.backGround = [[UIScrollView alloc]init];
+    _backGround.backgroundColor = [UIColor blackColor];
+    _backGround.contentSize = CGSizeMake(self.view.frame.size.width, self.view.frame.size.height);
+    _backGround.frame = self.view.frame;
+    _backGround.showsHorizontalScrollIndicator = NO;
+    _backGround.showsVerticalScrollIndicator = NO;
+    _backGround.multipleTouchEnabled = YES;
+    _backGround.maximumZoomScale = 5;
+    _backGround.minimumZoomScale = 1;
+    _backGround.delegate = self;
+
+    self.bigImage = [[UIImageView alloc]init];
+    _bigImage.frame = self.view.frame;
+    _bigImage.image = image;
+    _bigImage.userInteractionEnabled = YES;
+    _bigImage.contentMode = UIViewContentModeScaleToFill;
+    _bigImage.clipsToBounds = YES;
+    UITapGestureRecognizer *shrinkRecognizer = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(shirnkPhoto)];
+    [shrinkRecognizer setNumberOfTapsRequired:1];
+    [_bigImage addGestureRecognizer:shrinkRecognizer];
+    //添加双击事件
+    UITapGestureRecognizer *doubleTapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleDoubleTap:)];
+    [doubleTapGesture setNumberOfTapsRequired:2];
+    [_bigImage addGestureRecognizer:doubleTapGesture];
+    
+    [shrinkRecognizer requireGestureRecognizerToFail:doubleTapGesture];
+    
+    [_backGround addSubview:self.bigImage];
+    [self.view addSubview:self.backGround];
+}
+#pragma mark -  scrollview代理
+- (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView{
+    return self.bigImage;
+}
+//- (void)scrollViewDidZoom:(UIScrollView *)scrollView{
+//    self.bigImage.center = self.view.center;
+//}
+
+/**双击定点放大*/
+- (void)handleDoubleTap:(UIGestureRecognizer *)gesture
+{
+    CGFloat zoomScale = self.backGround.zoomScale;
+    NSLog(@"%f",self.backGround.zoomScale);
+    zoomScale = (zoomScale == 1.0) ? 3.0 : 1.0;
+    CGRect zoomRect = [self zoomRectForScale:zoomScale withCenter:[gesture locationInView:gesture.view]];
+    [self.backGround zoomToRect:zoomRect animated:YES];
+}
+
+- (CGRect)zoomRectForScale:(float)scale withCenter:(CGPoint)center
+{
+    CGRect zoomRect;
+    zoomRect.size.height =self.view.frame.size.height / scale;
+    zoomRect.size.width  =self.view.frame.size.width  / scale;
+    zoomRect.origin.x = center.x - (zoomRect.size.width  /2.0);
+    zoomRect.origin.y = center.y - (zoomRect.size.height /2.0);
+    return zoomRect;
+}
+//点击缩小视图
+- (void)shirnkPhoto{
+    [self.backGround removeFromSuperview];
+    self.navigationController.navigationBar.hidden = NO;
+    [UIApplication sharedApplication].statusBarHidden = NO;
+}
+
+
 #pragma mark - 识别图片中的矩形
 -(void)analyseRectImage:(UIImage *)image{
     //创建上下文对象

@@ -480,16 +480,16 @@ if (!_LeftOrRight) {//view 展开
     FoodCollectionViewCell *cell = [self.StorageItemView dequeueReusableCellWithReuseIdentifier:ID forIndexPath:indexPath];
     //给自定义cell的model传值
     long int index = indexPath.section*2+indexPath.row;
-    cell.model = self.storageArray[index];
+    //cell.model = self.storageArray[index];
     
-    [cell setModel:cell.model];
+    [cell setModel:self.storageArray[index]];
         //cell.backgroundColor = [UIColor colorWithRed:arc4random()%255/255.0 green:arc4random()%255/255.0 blue:arc4random()%255/255.0 alpha:1];
     cell.backgroundColor = [UIColor colorWithRed:155/255.0 green:251/255.5 blue:241/255.0 alpha:1.0];
         cell.layer.cornerRadius = 10;
         cell.userInteractionEnabled = YES;
         //给每一个cell添加长按手势
         _longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(lonePressMoving:)];
-        _longPress.minimumPressDuration = 0.5;
+        _longPress.minimumPressDuration = 1; //长按时间
         [cell addGestureRecognizer:_longPress];
     
     if (index+1 == self.storageArray.count) {

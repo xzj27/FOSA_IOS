@@ -13,4 +13,10 @@
 
 @property (nonatomic,strong)FoodModel *model;
 @property (nonatomic,weak) UIButton *edited;
+/*
+ 添加子控件属性
+ */
+@property (nonatomic,weak) UIImageView *iconImageView;
+@property (nonatomic,weak) UILabel *nameLabel,*foodLabel,*expireLabel,*remindLabel;
+@property (nonatomic,weak) UITextField *foodName,*expireDate,*remindDate;
 @end

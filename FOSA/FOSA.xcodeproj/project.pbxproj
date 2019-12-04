@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		4524655F238522D00034F392 /* FosaScrollview.m in Sources */ = {isa = PBXBuildFile; fileRef = 4524655E238522D00034F392 /* FosaScrollview.m */; };
 		45246562238524040034F392 /* productView.m in Sources */ = {isa = PBXBuildFile; fileRef = 45246561238524040034F392 /* productView.m */; };
+		453C1D8F23960B0F00902B4D /* FoodListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 453C1D8E23960B0F00902B4D /* FoodListViewController.m */; };
 		4551FDA02378EA50007A2EFB /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 4551FD9F2378EA50007A2EFB /* AppDelegate.m */; };
 		4551FDA32378EA50007A2EFB /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 4551FDA22378EA50007A2EFB /* SceneDelegate.m */; };
 		4551FDA62378EA50007A2EFB /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4551FDA52378EA50007A2EFB /* ViewController.m */; };
@@ -47,6 +48,9 @@
 		4551FE302378FB0F007A2EFB /* AddViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4551FE2F2378FB0F007A2EFB /* AddViewController.m */; };
 		4551FE332378FB22007A2EFB /* FoodInfoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4551FE322378FB22007A2EFB /* FoodInfoViewController.m */; };
 		4551FE3B2379605E007A2EFB /* SqliteManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4551FE3A2379605E007A2EFB /* SqliteManager.m */; };
+		4581C3852394AAAE009C7CD1 /* CategoryViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4581C3842394AAAE009C7CD1 /* CategoryViewController.m */; };
+		4581C3882394AADF009C7CD1 /* CategoryModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 4581C3872394AADF009C7CD1 /* CategoryModel.m */; };
+		4581C38B2394E09D009C7CD1 /* CategoryCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4581C38A2394E09D009C7CD1 /* CategoryCollectionViewCell.m */; };
 		4587FF6E238FAAF500DB795E /* SealerCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4587FF6D238FAAF500DB795E /* SealerCell.m */; };
 		459E0089237E43A4006D0E59 /* MyDeviceViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 459E0088237E43A4006D0E59 /* MyDeviceViewController.m */; };
 		459E008C237E43BA006D0E59 /* OtherViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 459E008B237E43BA006D0E59 /* OtherViewController.m */; };
@@ -94,6 +98,8 @@
 		4524655E238522D00034F392 /* FosaScrollview.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FosaScrollview.m; sourceTree = "<group>"; };
 		45246560238524040034F392 /* productView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = productView.h; sourceTree = "<group>"; };
 		45246561238524040034F392 /* productView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = productView.m; sourceTree = "<group>"; };
+		453C1D8D23960B0F00902B4D /* FoodListViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FoodListViewController.h; sourceTree = "<group>"; };
+		453C1D8E23960B0F00902B4D /* FoodListViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FoodListViewController.m; sourceTree = "<group>"; };
 		4551FD9B2378EA50007A2EFB /* FOSA.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FOSA.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4551FD9E2378EA50007A2EFB /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		4551FD9F2378EA50007A2EFB /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -165,6 +171,12 @@
 		4551FE322378FB22007A2EFB /* FoodInfoViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FoodInfoViewController.m; sourceTree = "<group>"; };
 		4551FE392379605E007A2EFB /* SqliteManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SqliteManager.h; sourceTree = "<group>"; };
 		4551FE3A2379605E007A2EFB /* SqliteManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SqliteManager.m; sourceTree = "<group>"; };
+		4581C3832394AAAE009C7CD1 /* CategoryViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CategoryViewController.h; sourceTree = "<group>"; };
+		4581C3842394AAAE009C7CD1 /* CategoryViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CategoryViewController.m; sourceTree = "<group>"; };
+		4581C3862394AADF009C7CD1 /* CategoryModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CategoryModel.h; sourceTree = "<group>"; };
+		4581C3872394AADF009C7CD1 /* CategoryModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CategoryModel.m; sourceTree = "<group>"; };
+		4581C3892394E09D009C7CD1 /* CategoryCollectionViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CategoryCollectionViewCell.h; sourceTree = "<group>"; };
+		4581C38A2394E09D009C7CD1 /* CategoryCollectionViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CategoryCollectionViewCell.m; sourceTree = "<group>"; };
 		4587FF6C238FAAF500DB795E /* SealerCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SealerCell.h; sourceTree = "<group>"; };
 		4587FF6D238FAAF500DB795E /* SealerCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SealerCell.m; sourceTree = "<group>"; };
 		459E0087237E43A4006D0E59 /* MyDeviceViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MyDeviceViewController.h; sourceTree = "<group>"; };
@@ -234,6 +246,7 @@
 		4551FD9D2378EA50007A2EFB /* FOSA */ = {
 			isa = PBXGroup;
 			children = (
+				4581C3822394AA5F009C7CD1 /* HttpFunction */,
 				4551FDF02378F283007A2EFB /* FosaView */,
 				45EF0E332387669100C4FE1C /* Animation */,
 				4551FDE42378F11B007A2EFB /* DataStruct */,
@@ -416,6 +429,21 @@
 				4551FE3A2379605E007A2EFB /* SqliteManager.m */,
 			);
 			name = SqliteFunction;
+			sourceTree = "<group>";
+		};
+		4581C3822394AA5F009C7CD1 /* HttpFunction */ = {
+			isa = PBXGroup;
+			children = (
+				4581C3832394AAAE009C7CD1 /* CategoryViewController.h */,
+				4581C3842394AAAE009C7CD1 /* CategoryViewController.m */,
+				4581C3862394AADF009C7CD1 /* CategoryModel.h */,
+				4581C3872394AADF009C7CD1 /* CategoryModel.m */,
+				4581C3892394E09D009C7CD1 /* CategoryCollectionViewCell.h */,
+				4581C38A2394E09D009C7CD1 /* CategoryCollectionViewCell.m */,
+				453C1D8D23960B0F00902B4D /* FoodListViewController.h */,
+				453C1D8E23960B0F00902B4D /* FoodListViewController.m */,
+			);
+			path = HttpFunction;
 			sourceTree = "<group>";
 		};
 		459E0086237E4360006D0E59 /* Product */ = {
@@ -614,6 +642,7 @@
 				4551FE272378FA14007A2EFB /* LoginViewController.m in Sources */,
 				4587FF6E238FAAF500DB795E /* SealerCell.m in Sources */,
 				4551FE332378FB22007A2EFB /* FoodInfoViewController.m in Sources */,
+				4581C3852394AAAE009C7CD1 /* CategoryViewController.m in Sources */,
 				4551FE092378F57C007A2EFB /* ResultViewController.m in Sources */,
 				4551FDD92378ED96007A2EFB /* FosaMainViewController.m in Sources */,
 				45E14966238E46E6002B48E8 /* ScanUIView.m in Sources */,
@@ -621,6 +650,8 @@
 				4551FE1E2378F971007A2EFB /* CellModel.m in Sources */,
 				4551FE102378F6A7007A2EFB /* FosaMenu.m in Sources */,
 				4551FDE22378EECA007A2EFB /* FosaPoundViewController.m in Sources */,
+				453C1D8F23960B0F00902B4D /* FoodListViewController.m in Sources */,
+				4581C3882394AADF009C7CD1 /* CategoryModel.m in Sources */,
 				4551FE2A2378FA46007A2EFB /* RegisterViewController.m in Sources */,
 				45EF0E3C238768BD00C4FE1C /* LoadCircleView.m in Sources */,
 				4551FE3B2379605E007A2EFB /* SqliteManager.m in Sources */,
@@ -638,6 +669,7 @@
 				4551FE032378F54D007A2EFB /* ScanOneCodeViewController.m in Sources */,
 				459E008C237E43BA006D0E59 /* OtherViewController.m in Sources */,
 				4551FE062378F55E007A2EFB /* ScanMoreCodeViewController.m in Sources */,
+				4581C38B2394E09D009C7CD1 /* CategoryCollectionViewCell.m in Sources */,
 				4551FDDC2378EDBB007A2EFB /* FosaProductViewController.m in Sources */,
 				4551FE172378F7A1007A2EFB /* FoodMoreInfoView.m in Sources */,
 				4551FE1A2378F7FF007A2EFB /* FoodModel.m in Sources */,
