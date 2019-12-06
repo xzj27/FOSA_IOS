@@ -35,7 +35,10 @@
        [NSThread sleepForTimeInterval:3];
        return YES;
        }
-    
+}
+//禁止应用屏幕自动旋转
+- (BOOL)shouldAutorotate{
+    return NO;
 }
 //
 //// 获得Device Token

@@ -42,26 +42,21 @@
     //创建控件
     [self creatControl];
 }
-
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    dispatch_async(dispatch_get_main_queue(), ^{
-        //初始化信息
-        [self initPhotoInfo];
-    });
+    //初始化信息
+    [self initPhotoInfo];
 }
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
-    [self.captureSession startRunning];
 }
 - (void)viewDidDisappear:(BOOL)animated
 {
     [super viewDidDisappear:animated];
     [self.captureSession stopRunning];
 }
-
 - (void)creatControl
 {
     CGFloat marginY = self.navigationController.navigationBar.frame.size.height;
@@ -193,7 +188,7 @@
     _captureVideoPreviewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
     //将视频预览层添加到界面中
     [layer insertSublayer:_captureVideoPreviewLayer below:self.focusCursor.layer];
-    
+    [self.captureSession startRunning];
     [self addNotificationToCaptureDevice:captureDevice];
     [self addGenstureRecognizer];
     
@@ -216,6 +211,7 @@
            [_captureDeviceInput.device setExposureMode:AVCaptureExposureModeContinuousAutoExposure];
        }
        [_captureDeviceInput.device unlockForConfiguration];
+    
 }
 
 - (void)btnOnClick:(UIButton *)btn
