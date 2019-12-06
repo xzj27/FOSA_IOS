@@ -23,7 +23,6 @@ NS_ASSUME_NONNULL_BEGIN
 //pound
 @property (nonatomic,strong) UIView *weightView,*calorieView;
 @property (nonatomic,strong) UITextView *weight,*calorie;
-@property (nonatomic,assign) CGFloat mainWidth,mainHeight,navheight;
 @property (nonatomic,strong) UIButton *connect,*select,*units;
 
 //clorieResult

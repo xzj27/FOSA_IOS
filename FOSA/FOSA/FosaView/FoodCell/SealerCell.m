@@ -23,6 +23,7 @@
 - (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     if (self) {
+        NSLog(@"%f#################%f",self.bounds.size.width,self.bounds.size.height);
          self.expireLabel = [[UILabel alloc]initWithFrame:CGRectMake(self.bounds.size.width/2-15, self.bounds.size.height/2, self.bounds.size.width/2-self.bounds.size.height, self.bounds.size.height/2)];
             [self addSubview:_expireLabel];
         self.checkBtn = [[UIButton alloc]initWithFrame:CGRectMake(self.bounds.size.width-self.bounds.size.height, self.bounds.size.height/6, self.bounds.size.height*2/3, self.bounds.size.height*2/3)];

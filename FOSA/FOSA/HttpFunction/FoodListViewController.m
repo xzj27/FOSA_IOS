@@ -7,10 +7,12 @@
 //
 
 #import "FoodListViewController.h"
+#import "NutrientViewController.h"
 
 @interface FoodListViewController ()<UITableViewDelegate,UITableViewDataSource>{
-    NSMutableArray<NSString *> *arrayData;
+    NSMutableArray *arrayData;
     NSMutableArray *dict;
+    NSDictionary *nutrientData;
 }
 
 @end
@@ -38,24 +40,31 @@
     NSString *serverAddr;
     switch (self.foodType) {
         case 0:
-            serverAddr = @"http://192.168.3.109/fosa/HttpSelectCereal.php";
+            NSLog(@"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%ld",self.foodType);
+            serverAddr = @"http://192.168.3.110/fosa/HttpSelectCereal.php";
             break;
         case 1:
-            serverAddr = @"http://192.168.3.109/fosa/HttpSelectCereal.php";
+            NSLog(@"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%ld",self.foodType);
+            serverAddr = @"http://192.168.3.110/fosa/HttpSelectCereal.php";
             break;
         case 2:
-            serverAddr = @"http://192.168.3.109/fosa/HttpSelectCereal.php";
+            NSLog(@"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%ld",self.foodType);
+            serverAddr = @"http://192.168.3.110/fosa/HttpSelectMeat.php";
             break;
         case 3:
-            serverAddr = @"http://192.168.3.109/fosa/HttpSelectCereal.php";
+            NSLog(@"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%ld",self.foodType);
+            serverAddr = @"http://192.168.3.110/fosa/HttpSelectCereal.php";
             break;
         case 4:
-            serverAddr = @"http://192.168.3.109/fosa/HttpSelectCereal.php";
+            NSLog(@"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%ld",self.foodType);
+            serverAddr = @"http://192.168.3.110/fosa/HttpSelectCereal.php";
             break;
         case 5:
-            serverAddr = @"http://192.168.3.109/fosa/HttpSelectCereal.php";
+            NSLog(@"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%ld",self.foodType);
+            serverAddr = @"http://192.168.3.110/fosa/HttpSelectFruit.php";
             break;
         case 6:
+            NSLog(@"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%ld",self.foodType);
             serverAddr = @"http://192.168.3.109/fosa/HttpSelectCereal.php";
             break;
         default:
@@ -71,10 +80,10 @@
         NSLog(@"%@",self->dict);
         
         for (NSInteger i = 0; i < self->dict.count; i++) {
-            [self->arrayData addObject:self->dict[i][@"foodName"]];
+            [self->arrayData addObject:self->dict[i]];
         }
         for (NSInteger j = 0; j < self->arrayData.count; j++) {
-            NSLog(@"$$$$$$$$$$$%@",self->arrayData[j]);
+            NSLog(@"$$$$$$$$$$$%@",self->arrayData[j][@"protein"]);
         }
            
         //在主线程更新UI
@@ -99,7 +108,7 @@
 //行高度
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    return 50;
+    return 60;
 }
 //每组多少行
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
@@ -118,25 +127,31 @@
     static NSString *cellIdentifier = @"cell";
     //初始化cell，并指定其类型
     UITableViewCell *cell = [tableView  dequeueReusableCellWithIdentifier:cellIdentifier];
-    
     if (cell == nil) {
         //创建cell
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:cellIdentifier];
     }
     //cell.backgroundColor = [UIColor redColor];
     NSInteger row = indexPath.row;
-    cell.textLabel.text = arrayData[row];
+    cell.textLabel.text = arrayData[row][@"foodName"];
     
     //取消点击cell时显示的背景色
-    cell.selectionStyle = UITableViewCellSelectionStyleNone;
-  
-
-//    //添加点击手势
-//    UITapGestureRecognizer *recognizer = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(cellAction:)];
-//    recognizer.accessibilityValue = arrayData[row].device;
-//    [cell addGestureRecognizer:recognizer];
-
+    //cell.selectionStyle = UITableViewCellSelectionStyleNone;
+    //添加点击手势
+    UITapGestureRecognizer *recognizer = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(cellAction:)];
+    recognizer.view.tag = row;
+    [cell addGestureRecognizer:recognizer];
     //返回cell
     return cell;
+}
+
+- (void)cellAction:(UITapGestureRecognizer *)sender{
+    NSLog(@"%@",arrayData[sender.view.tag][@"protein"]);
+    NutrientViewController *nutrient = [[NutrientViewController alloc]init];
+    nutrient.nutrientData = [[NSMutableArray alloc]init];
+    nutrient.nutrientData = arrayData[sender.view.tag];
+    NSLog(@"%@",nutrient.nutrientData);
+    //[self.navigationController pushViewController:nutrient animated:YES];
+    
 }
 @end

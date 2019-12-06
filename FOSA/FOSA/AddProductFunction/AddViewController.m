@@ -68,8 +68,6 @@
     //添加键盘弹出与收回的事件
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
-    
-
 }
 #pragma mark - 初始化日期选择器
 -(void)InitialDatePicker{

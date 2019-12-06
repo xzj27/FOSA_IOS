@@ -66,7 +66,7 @@
     NSLog(@"@@@@@@@@@@@@@@@");
     DataArray = [[NSMutableArray alloc]init];
     //服务器地址
-    NSString *serverAddr = @"http://192.168.3.109/fosa/HttpComunication.php";
+    NSString *serverAddr = @"http://192.168.3.110/fosa/HttpComunication.php";
     
     NSURL *url = [NSURL URLWithString:serverAddr];
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
@@ -74,7 +74,7 @@
     NSURLSessionDataTask *dataTask = [[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
             //解析JSon数据
             NSMutableArray *dict =  [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
-                    //NSLog(@"%@",(NSString *)dict[0][@"CategoryName"]);
+                    NSLog(@"%@",(NSString *)dict[0][@"CategoryName"]);
             for (int i = 0; i < [dict count]; i++) {
                 CategoryModel *model = [CategoryModel modelWithName:(NSString *)dict[i][@"CategoryName"] categoryIcon:dict[i][@"CategoryIcon"]];
                     [self->DataArray addObject:model];

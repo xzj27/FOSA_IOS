@@ -46,8 +46,10 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    //初始化信息
-    [self initPhotoInfo];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        //初始化信息
+        [self initPhotoInfo];
+    });
 }
 - (void)viewDidAppear:(BOOL)animated
 {
@@ -57,7 +59,6 @@
 - (void)viewDidDisappear:(BOOL)animated
 {
     [super viewDidDisappear:animated];
-    
     [self.captureSession stopRunning];
 }
 

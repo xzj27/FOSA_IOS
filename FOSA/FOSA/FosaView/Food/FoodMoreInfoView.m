@@ -52,7 +52,6 @@
         self.nameLabel = nameLabel;
         [self addSubview:self.nameLabel];
         
-        
         UITextField *food = [[UITextField alloc]init];
         food.textAlignment = NSTextAlignmentCenter;
         food.font = [UIFont systemFontOfSize:10];

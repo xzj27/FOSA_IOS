@@ -14,7 +14,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic,strong) UIButton *delete_cell,*select,*units;
 @property (nonatomic,strong) UILabel *foodName;
-@property (nonatomic,strong) UITextView *weight,*calorie;
+@property (nonatomic,strong) UITextField *weight;
+@property (nonatomic,strong) UITextView *calorie;
 
 @end
 
