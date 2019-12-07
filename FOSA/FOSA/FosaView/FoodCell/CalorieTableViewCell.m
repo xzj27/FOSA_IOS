@@ -7,8 +7,9 @@
 //
 
 #import "CalorieTableViewCell.h"
+#import "CalorieModel.h"
 
-@interface CalorieTableViewCell()
+@interface CalorieTableViewCell()<UITextFieldDelegate>
 @property (nonatomic,assign) CGFloat cellHeight,cellWidth;
 @end
 @implementation CalorieTableViewCell
@@ -38,8 +39,8 @@
         _foodName.font = [UIFont systemFontOfSize:14];
         
         self.weight = [[UITextField alloc]initWithFrame:CGRectMake(width/4+10, 5, width/2-50, height/2-10)];
-        _weight.backgroundColor = [UIColor colorWithRed:254/255.0 green:150/255.0 blue:151/255.0 alpha:1.0];
-        _weight.layer.borderWidth = 0.5;
+        self.weight.backgroundColor = [UIColor colorWithRed:254/255.0 green:150/255.0 blue:151/255.0 alpha:1.0];
+        self.weight.layer.borderWidth = 0.5;
         self.units = [[UIButton alloc]initWithFrame:CGRectMake(width*3/4-40, 5, 50, height/2-10)];
         _units.backgroundColor = [UIColor colorWithRed:254/255.0 green:150/255.0 blue:151/255.0 alpha:1.0];
         _units.layer.cornerRadius = 5;
@@ -55,17 +56,16 @@
         _calorie.userInteractionEnabled = NO;
         self.delete_cell = [[UIButton alloc]initWithFrame:CGRectMake(width-50, 25, 50, 50)];
         [_delete_cell setImage:[UIImage imageNamed:@"icon_deleteHL"] forState:UIControlStateNormal];
-        
         [self addSubview:_foodName];
-        [self addSubview:_weight];
+        [self addSubview:self.weight];
         [self addSubview:_units];
         [self addSubview:_select];
         [self addSubview:_calorie];
         [self addSubview:_delete_cell];
-        
     }
     return self;
 }
+
 //- (void)setFrame:(CGRect)frame{
 //
 //    NSLog(@"%f^^^^^^^^^^^%f",frame.size.width,frame.size.height);

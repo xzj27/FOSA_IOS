@@ -13,7 +13,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CalorieModel : NSObject
 
-@property (nonatomic,copy) UITextField *weight,*calorie;
+@property (nonatomic,copy) NSString *weight,*calorie;
+
+
++ (instancetype)modelWithTextValue:(NSString *)weight calorie:(NSString *) calorie;
+- (instancetype)initwithTextValue:(NSString *)weight calorie:(NSString *) calorie;
+
 
 @end
 

@@ -6,11 +6,11 @@
 //  Copyright © 2019 hs. All rights reserved.
 //
 
-#import "ViewController.h"
+#import <UIKit/UIKit.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface MyDeviceViewController : ViewController
+@interface MyDeviceViewController : UIViewController
 
 @property (nonatomic,strong) UITableView *deviceTable;
 @property (nonatomic,strong) UIView *contentView;

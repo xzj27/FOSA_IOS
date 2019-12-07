@@ -11,29 +11,25 @@
 
 @interface FosaUserViewController ()<PassValueDelegate>
 @end
-
 @implementation FosaUserViewController
-
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
     self.view.backgroundColor = [UIColor whiteColor];
-    
     [self InitDataAndView];
 }
-
 -(void)InitDataAndView{
     self.mainWidth = [UIScreen mainScreen].bounds.size.width;
     self.mainHeigh = [UIScreen mainScreen].bounds.size.height;
     self.navHeigh  = self.navigationController.navigationBar.frame.size.height;
     self.isFosaOpen= false;
     self.isAppsOpen= false;
-    
+
     //底层视图
     self.rootScrollview = [[UIScrollView alloc]initWithFrame:CGRectMake(0, self.navHeigh,self.mainWidth,self.mainHeigh)];
     _rootScrollview.contentSize = CGSizeMake(self.view.frame.size.width,self.mainHeigh*1.5);
     [self.view addSubview:_rootScrollview];
-    
+
     //顶部视图
     self.headerView = [[UIView alloc]initWithFrame:CGRectMake(0,0,self.mainWidth,self.mainHeigh/4)];
     _headerView.backgroundColor = [UIColor colorWithRed:208/255.0 green:208/255.0 blue:208/255.0 alpha:1.0];

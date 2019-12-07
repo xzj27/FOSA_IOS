@@ -12,7 +12,6 @@
 		453C1D8F23960B0F00902B4D /* FoodListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 453C1D8E23960B0F00902B4D /* FoodListViewController.m */; };
 		4551FDA02378EA50007A2EFB /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 4551FD9F2378EA50007A2EFB /* AppDelegate.m */; };
 		4551FDA32378EA50007A2EFB /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 4551FDA22378EA50007A2EFB /* SceneDelegate.m */; };
-		4551FDA62378EA50007A2EFB /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4551FDA52378EA50007A2EFB /* ViewController.m */; };
 		4551FDA92378EA50007A2EFB /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4551FDA72378EA50007A2EFB /* Main.storyboard */; };
 		4551FDAB2378EA51007A2EFB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4551FDAA2378EA51007A2EFB /* Assets.xcassets */; };
 		4551FDAE2378EA51007A2EFB /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4551FDAC2378EA51007A2EFB /* LaunchScreen.storyboard */; };
@@ -56,6 +55,7 @@
 		459E0089237E43A4006D0E59 /* MyDeviceViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 459E0088237E43A4006D0E59 /* MyDeviceViewController.m */; };
 		459E008C237E43BA006D0E59 /* OtherViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 459E008B237E43BA006D0E59 /* OtherViewController.m */; };
 		45B38E122399E784004FB56A /* CalorieModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B38E112399E784004FB56A /* CalorieModel.m */; };
+		45B38E15239A499C004FB56A /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B38E14239A499C004FB56A /* ViewController.m */; };
 		45D94513237BD41A000E2550 /* logo.png in Resources */ = {isa = PBXBuildFile; fileRef = 45D94512237BD419000E2550 /* logo.png */; };
 		45E14966238E46E6002B48E8 /* ScanUIView.m in Sources */ = {isa = PBXBuildFile; fileRef = 45E14965238E46E6002B48E8 /* ScanUIView.m */; };
 		45EBE4E92398D47800A98F05 /* NutrientViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 45EBE4E82398D47800A98F05 /* NutrientViewController.m */; };
@@ -108,8 +108,6 @@
 		4551FD9F2378EA50007A2EFB /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		4551FDA12378EA50007A2EFB /* SceneDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SceneDelegate.h; sourceTree = "<group>"; };
 		4551FDA22378EA50007A2EFB /* SceneDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SceneDelegate.m; sourceTree = "<group>"; };
-		4551FDA42378EA50007A2EFB /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
-		4551FDA52378EA50007A2EFB /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
 		4551FDA82378EA50007A2EFB /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		4551FDAA2378EA51007A2EFB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		4551FDAD2378EA51007A2EFB /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -190,6 +188,8 @@
 		459E008B237E43BA006D0E59 /* OtherViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OtherViewController.m; sourceTree = "<group>"; };
 		45B38E102399E784004FB56A /* CalorieModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CalorieModel.h; sourceTree = "<group>"; };
 		45B38E112399E784004FB56A /* CalorieModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CalorieModel.m; sourceTree = "<group>"; };
+		45B38E13239A499C004FB56A /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
+		45B38E14239A499C004FB56A /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
 		45D944ED237B8AD1000E2550 /* UserNotifications.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotifications.framework; path = System/Library/Frameworks/UserNotifications.framework; sourceTree = SDKROOT; };
 		45D944EF237B8AD1000E2550 /* UserNotificationsUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotificationsUI.framework; path = System/Library/Frameworks/UserNotificationsUI.framework; sourceTree = SDKROOT; };
 		45D94512237BD419000E2550 /* logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = logo.png; sourceTree = "<group>"; };
@@ -271,8 +271,8 @@
 				4551FD9F2378EA50007A2EFB /* AppDelegate.m */,
 				4551FDA12378EA50007A2EFB /* SceneDelegate.h */,
 				4551FDA22378EA50007A2EFB /* SceneDelegate.m */,
-				4551FDA42378EA50007A2EFB /* ViewController.h */,
-				4551FDA52378EA50007A2EFB /* ViewController.m */,
+				45B38E13239A499C004FB56A /* ViewController.h */,
+				45B38E14239A499C004FB56A /* ViewController.m */,
 				4551FDA72378EA50007A2EFB /* Main.storyboard */,
 				4551FDAA2378EA51007A2EFB /* Assets.xcassets */,
 				45F821842383CD8D00F0CD8A /* fosa.jpg */,
@@ -653,6 +653,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				45B38E15239A499C004FB56A /* ViewController.m in Sources */,
 				4551FDE72378F17E007A2EFB /* Fosa_QRCode_Queue.m in Sources */,
 				4551FE272378FA14007A2EFB /* LoginViewController.m in Sources */,
 				4587FF6E238FAAF500DB795E /* SealerCell.m in Sources */,
@@ -673,7 +674,6 @@
 				45EF0E3C238768BD00C4FE1C /* LoadCircleView.m in Sources */,
 				4551FE3B2379605E007A2EFB /* SqliteManager.m in Sources */,
 				45246562238524040034F392 /* productView.m in Sources */,
-				4551FDA62378EA50007A2EFB /* ViewController.m in Sources */,
 				4551FE212378F9B1007A2EFB /* FoodCollectionViewCell.m in Sources */,
 				4551FE302378FB0F007A2EFB /* AddViewController.m in Sources */,
 				4551FDDF2378EEB3007A2EFB /* FosaUserViewController.m in Sources */,

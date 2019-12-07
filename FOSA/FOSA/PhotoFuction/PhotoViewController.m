@@ -238,9 +238,7 @@
             self.imgView.contentMode = UIViewContentModeScaleAspectFill;
             self.imgView.clipsToBounds = YES;
             self.imgView.image = self.image;
-            //self.imgView.transform = CGAffineTransformMakeRotation(M_PI/2);
             [self DetectQRcode:self.image];
-            
             //self.imgView.hidden = NO;
         }
     }];
@@ -266,7 +264,6 @@
 
 #pragma mark -  放大缩小图片
 - (void)EnlargePhoto{
-    NSLog(@"***********************************");
     self.navigationController.navigationBar.hidden = YES;   //隐藏导航栏
     [UIApplication sharedApplication].statusBarHidden = YES;             //隐藏状态栏
     //底层视图

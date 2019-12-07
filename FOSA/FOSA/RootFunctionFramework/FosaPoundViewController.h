@@ -22,7 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic,strong) UITableView *foodTable;
 //pound
 @property (nonatomic,strong) UIView *weightView,*calorieView;
-@property (nonatomic,strong) UITextView *weight,*calorie;
+
 @property (nonatomic,strong) UIButton *connect,*select,*units;
 
 //clorieResult
