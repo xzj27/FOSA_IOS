@@ -8,13 +8,15 @@
 
 #import "FoodListViewController.h"
 #import "NutrientViewController.h"
+#import "SqliteManager.h"
 
 @interface FoodListViewController ()<UITableViewDelegate,UITableViewDataSource>{
     NSMutableArray *arrayData;
     NSMutableArray *dict;
     NSDictionary *nutrientData;
 }
-
+@property (nonatomic,assign) sqlite3 *database;
+@property (nonatomic,assign) sqlite3_stmt *stmt;
 @end
 
 @implementation FoodListViewController
@@ -34,62 +36,38 @@
 
 - (void)InitDataFromServer{
     NSLog(@"@@@@@@@@@@@@@@@");
-    //self.foodType = @"";
     arrayData = [[NSMutableArray alloc]init];
     //服务器地址
     NSString *serverAddr;
-    switch (self.foodType) {
-        case 0:
-            NSLog(@"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%ld",self.foodType);
-            serverAddr = @"http://192.168.3.110/fosa/HttpSelectCereal.php";
-            break;
-        case 1:
-            NSLog(@"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%ld",self.foodType);
-            serverAddr = @"http://192.168.3.110/fosa/HttpSelectCereal.php";
-            break;
-        case 2:
-            NSLog(@"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%ld",self.foodType);
-            serverAddr = @"http://192.168.3.110/fosa/HttpSelectMeat.php";
-            break;
-        case 3:
-            NSLog(@"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%ld",self.foodType);
-            serverAddr = @"http://192.168.3.110/fosa/HttpSelectCereal.php";
-            break;
-        case 4:
-            NSLog(@"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%ld",self.foodType);
-            serverAddr = @"http://192.168.3.110/fosa/HttpSelectCereal.php";
-            break;
-        case 5:
-            NSLog(@"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%ld",self.foodType);
-            serverAddr = @"http://192.168.3.110/fosa/HttpSelectFruit.php";
-            break;
-        case 6:
-            NSLog(@"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%ld",self.foodType);
-            serverAddr = @"http://192.168.3.109/fosa/HttpSelectCereal.php";
-            break;
-        default:
-            break;
-    }
+    serverAddr = [NSString stringWithFormat:@"http://192.168.3.110/fosa/GetServerDataByCategory.php?category=%@",self.category];
+    serverAddr = [serverAddr stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet characterSetWithCharactersInString:@"#%^{}\"[]|\\<> "].invertedSet];
+    NSLog(@"%@",serverAddr);
     NSURL *url = [NSURL URLWithString:serverAddr];
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
+    request.timeoutInterval = 4.0; //设置请求超时为4秒
     //4、创建get请求
     NSURLSessionDataTask *dataTask = [[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+        if (error == nil) {
             //解析JSon数据
-        self->dict =  [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
-                    //NSLog(@"%@",(NSString *)dict[0][@"CategoryName"]);
-        NSLog(@"%@",self->dict);
-        
-        for (NSInteger i = 0; i < self->dict.count; i++) {
-            [self->arrayData addObject:self->dict[i]];
+            self->dict =  [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
+                              //NSLog(@"%@",(NSString *)dict[0][@"CategoryName"]);
+            NSLog(@"%@",self->dict);
+                  
+            for (NSInteger i = 0; i < self->dict.count; i++) {
+                [self->arrayData addObject:self->dict[i]];
+            }
+            for (NSInteger j = 0; j < self->arrayData.count; j++) {
+                NSLog(@"$$$$$$$$$$$%@",self->arrayData[j][@"Protein"]);
+            }
+            //在主线程更新UI
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self.foodList reloadData];
+            });
+        }else{
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self SystemAlert:@"请求数据失败，请刷新网络"];
+            });
         }
-        for (NSInteger j = 0; j < self->arrayData.count; j++) {
-            NSLog(@"$$$$$$$$$$$%@",self->arrayData[j][@"protein"]);
-        }
-           
-        //在主线程更新UI
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self.foodList reloadData];
-        });
         }];
         //5、执行请求
         [dataTask resume];
@@ -133,25 +111,41 @@
     }
     //cell.backgroundColor = [UIColor redColor];
     NSInteger row = indexPath.row;
-    cell.textLabel.text = arrayData[row][@"foodName"];
-    
+    cell.textLabel.text = arrayData[row][@"FoodName"];
     //取消点击cell时显示的背景色
     //cell.selectionStyle = UITableViewCellSelectionStyleNone;
     //添加点击手势
     UITapGestureRecognizer *recognizer = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(cellAction:)];
-    recognizer.view.tag = row;
+    recognizer.accessibilityValue = arrayData[row][@"FoodName"];
     [cell addGestureRecognizer:recognizer];
     //返回cell
     return cell;
 }
 
 - (void)cellAction:(UITapGestureRecognizer *)sender{
-    NSLog(@"%@",arrayData[sender.view.tag][@"protein"]);
+    NSLog(@"%@",sender.accessibilityValue);
     NutrientViewController *nutrient = [[NutrientViewController alloc]init];
-    nutrient.nutrientData = [[NSMutableArray alloc]init];
-    nutrient.nutrientData = arrayData[sender.view.tag];
-    NSLog(@"%@",nutrient.nutrientData);
-    //[self.navigationController pushViewController:nutrient animated:YES];
+    nutrient.food = sender.accessibilityValue;
+    nutrient.foodkind = self.category;
+    nutrient.foodicon = self.categoryicon;
+    nutrient.current = self.current;
+    [self.navigationController pushViewController:nutrient animated:YES];
     
+   
 }
+//弹出系统提示
+- (void)SystemAlert:(NSString *)message{
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Notification" message:message preferredStyle:UIAlertControllerStyleAlert];
+    [alert addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+    }]];
+    [self presentViewController:alert animated:true completion:nil];
+}
+
+//- (void)insertDataIntoNutrient{
+//    self.database = [SqliteManager InitSqliteWithName:@"Fosa.db"]; //open database
+//    NSString *creatNutrientTable = @"create table if not exists Nutrient(id integer primary key,foodName text,Category text,Calorie text,Protein text,Fat text,Carbohydrate text,DietaryFiber text,Cholesterin text,Ca text,Mg text,Fe text,Zn text,K text,VitaminC text,VitaminE text,VitaminA text,Carotene text)";
+//    [SqliteManager InitTableWithName:creatNutrientTable database:self.database];// 创建营养表
+//
+//    NSString *InsertData = [NSString stringWithFormat:@"Insert into Nutrient(foodName,Category,Calorie,Protein,Fat,Carbohydrate,DietaryFiber ,Cholesterin,Ca,Mg,Fe,Zn,K,VitaminC,VitaminE,VitaminA,Carotene)values('%@','%@','%@','%@','%@','%@','%@','%@','%@','%@','%@','%@','%@','%@','%@','%@','%@',)",];
+//}
 @end

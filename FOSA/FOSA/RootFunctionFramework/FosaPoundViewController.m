@@ -11,14 +11,11 @@
 #import "ScanOneCodeViewController.h"
 #import "SqliteManager.h"
 #import "FoodInfoViewController.h"
-
 #import "CategoryViewController.h"
 
 #import "CellModel.h"
 #import "SealerCell.h"
 #import "CalorieTableViewCell.h"
-
-#import "CalorieModel.h"
 //图片宽高的最大值
 #define KCompressibilityFactor 1280.00
 @interface FosaPoundViewController ()<UITableViewDelegate,UITableViewDataSource,UIGestureRecognizerDelegate,AVCaptureMetadataOutputObjectsDelegate,UITextFieldDelegate>{
@@ -26,9 +23,10 @@
     NSMutableArray<CellModel *> *arrayData;
     //计算卡路里的食物数量
     int calorieNumber;
-    NSMutableArray<CalorieModel *> *calorieData;
     //标记当前是否展开
     Boolean isExpand;
+    //标记当前点击选择卡路里的cell
+    NSInteger current;
     //table cell的内容
     NSString *foodname,*expireDate,*storageDate;
     
@@ -360,6 +358,13 @@
     //添加键盘弹出与收回的事件
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
+    if (self.calorieData.count != 0) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+           NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+            self.calorieData[self->current].calorie= [defaults valueForKey:@"calorieValue"];
+           [self.calorieTable reloadData];
+        });
+    }
 }
 
 - (void)viewDidLoad {
@@ -376,7 +381,7 @@
     isScan = false; //扫码标记初始化
     isUpdate = false;
     arrayData = [[NSMutableArray alloc]init];
-    calorieData = [[NSMutableArray alloc]init];
+    self.calorieData = [[NSMutableArray alloc]init];
     _weight = [[UITextField alloc]init];
     
     //rootView
@@ -458,7 +463,7 @@
     NSString *weightText = @"";
     NSString *calorieText = @"";
     CalorieModel *model = [[CalorieModel alloc]initwithTextValue:weightText calorie:calorieText];
-    [calorieData addObject:model];
+    [self.calorieData addObject:model];
 }
 
 
@@ -511,26 +516,24 @@
     _calorieTable.dataSource = self;
     _calorieTable.hidden = YES;
     _calorieTable.showsVerticalScrollIndicator = NO;
-    [_calorieTable setSeparatorColor:[UIColor grayColor]];
+    //[_calorieTable setSeparatorColor:[UIColor grayColor]];
     [self.rootView addSubview:_calorieTable];
     cellCenter = self.calorieTable.center;
     [self addAction];
 }
 - (void)addAction{
-    
-    if (calorieData.count > 1) {
+    if (self.calorieData.count > 1) {
         [self.rootView setContentOffset:CGPointMake(0,self.poundView.frame.origin.y-NavigationHeight+self.poundView.frame.size.height) animated:YES];
     }
     self.calorieTable.hidden = NO;
     [self CalorieData];
     [_calorieTable reloadData];
     //NSInteger index = calorieData.count;
-    if (calorieData.count > 4) {
-        [self.calorieTable setContentOffset:CGPointMake(0, 100*(calorieData.count-4))];
+    if (self.calorieData.count > 4) {
+        [self.calorieTable setContentOffset:CGPointMake(0, 100*(self.calorieData.count-4))];
     }
     //[self.rootView setContentOffset:CGPointMake(0,self.poundView.frame.origin.y-NavigationHeight+self.poundView.frame.size.height+index*100) animated:YES];
 }
-
 //行高度
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
@@ -548,8 +551,8 @@
     if ([tableView isEqual:_foodTable]) {
         return arrayData.count;
     }else{
-        NSLog(@"%lu",(unsigned long)calorieData.count);
-        return calorieData.count;
+        NSLog(@"%lu",(unsigned long)self.calorieData.count);
+        return self.calorieData.count;
     }
     
 }
@@ -601,14 +604,16 @@
             }
         NSInteger row = indexPath.row;
         cell.weight.tag = row;
-        cell.weight.text = calorieData[row].weight;
-        cell.calorie.text = calorieData[row].calorie;
+        cell.weight.text = self.calorieData[row].weight;
+        cell.calorie.text = self.calorieData[row].calorie;
         _weight = cell.weight;
         _weight.delegate = self;
-        cell.backgroundColor = [UIColor colorWithRed:254/255.0 green:100/255.0 blue:151/255.0 alpha:1.0];
+        //cell.backgroundColor = [UIColor colorWithRed:254/255.0 green:100/255.0 blue:151/255.0 alpha:1.0];
             //取消点击cell时显示的背景色
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
-        [cell.select  addTarget:self action:@selector(showCategory) forControlEvents:UIControlEventTouchUpInside];
+        [cell.select  addTarget:self action:@selector(showCategory:) forControlEvents:UIControlEventTouchUpInside];
+        cell.select.tag = row;
+        
         [cell.delete_cell addTarget:self action:@selector(DeleteCell:) forControlEvents:UIControlEventTouchUpInside];
         cell.delete_cell.tag = row;
             //返回cell
@@ -643,18 +648,20 @@
 }
 #pragma mark - 计算卡路里
 //食物选择按钮
-- (void)showCategory{
+- (void)showCategory:(UIButton *)sender{
     NSLog(@"选择食物");
+    current = sender.tag;
     CategoryViewController *category = [[CategoryViewController alloc]init];
     category.hidesBottomBarWhenPushed = YES;
+    category.current = current;
     [self.navigationController pushViewController:category animated:YES];
-    isUpdate = true;
+    //isUpdate = true;
 }
 //删除记录按钮
 - (void)DeleteCell:(UIButton *)sender{
     NSLog(@"%ld",(long)sender.tag);
     NSLog(@"<><><><>%@<><><><><>",_weight.text);
-    [calorieData removeObjectAtIndex:sender.tag];
+    [self.calorieData removeObjectAtIndex:sender.tag];
     [self.calorieTable reloadData];
 }
 #pragma mark - 扫码结果
@@ -762,7 +769,7 @@
 //监听文本内容
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string{
     NSLog(@"%ld",(long)textField.tag);
-    calorieData[textField.tag].weight = textField.text;
+    self.calorieData[textField.tag].weight = textField.text;
     return YES;
 }
 

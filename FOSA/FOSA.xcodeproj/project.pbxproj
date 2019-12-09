@@ -52,6 +52,7 @@
 		4581C3882394AADF009C7CD1 /* CategoryModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 4581C3872394AADF009C7CD1 /* CategoryModel.m */; };
 		4581C38B2394E09D009C7CD1 /* CategoryCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4581C38A2394E09D009C7CD1 /* CategoryCollectionViewCell.m */; };
 		4587FF6E238FAAF500DB795E /* SealerCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4587FF6D238FAAF500DB795E /* SealerCell.m */; };
+		459D8382239DE9FF00C8F699 /* NutrientModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 459D8381239DE9FF00C8F699 /* NutrientModel.m */; };
 		459E0089237E43A4006D0E59 /* MyDeviceViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 459E0088237E43A4006D0E59 /* MyDeviceViewController.m */; };
 		459E008C237E43BA006D0E59 /* OtherViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 459E008B237E43BA006D0E59 /* OtherViewController.m */; };
 		45B38E122399E784004FB56A /* CalorieModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B38E112399E784004FB56A /* CalorieModel.m */; };
@@ -182,6 +183,8 @@
 		4581C38A2394E09D009C7CD1 /* CategoryCollectionViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CategoryCollectionViewCell.m; sourceTree = "<group>"; };
 		4587FF6C238FAAF500DB795E /* SealerCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SealerCell.h; sourceTree = "<group>"; };
 		4587FF6D238FAAF500DB795E /* SealerCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SealerCell.m; sourceTree = "<group>"; };
+		459D8380239DE9FF00C8F699 /* NutrientModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NutrientModel.h; sourceTree = "<group>"; };
+		459D8381239DE9FF00C8F699 /* NutrientModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NutrientModel.m; sourceTree = "<group>"; };
 		459E0087237E43A4006D0E59 /* MyDeviceViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MyDeviceViewController.h; sourceTree = "<group>"; };
 		459E0088237E43A4006D0E59 /* MyDeviceViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MyDeviceViewController.m; sourceTree = "<group>"; };
 		459E008A237E43BA006D0E59 /* OtherViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OtherViewController.h; sourceTree = "<group>"; };
@@ -457,6 +460,8 @@
 				453C1D8E23960B0F00902B4D /* FoodListViewController.m */,
 				45EBE4E72398D47800A98F05 /* NutrientViewController.h */,
 				45EBE4E82398D47800A98F05 /* NutrientViewController.m */,
+				459D8380239DE9FF00C8F699 /* NutrientModel.h */,
+				459D8381239DE9FF00C8F699 /* NutrientModel.m */,
 			);
 			path = HttpFunction;
 			sourceTree = "<group>";
@@ -691,6 +696,7 @@
 				4551FE172378F7A1007A2EFB /* FoodMoreInfoView.m in Sources */,
 				4551FE1A2378F7FF007A2EFB /* FoodModel.m in Sources */,
 				4551FDA02378EA50007A2EFB /* AppDelegate.m in Sources */,
+				459D8382239DE9FF00C8F699 /* NutrientModel.m in Sources */,
 				4551FDB12378EA51007A2EFB /* main.m in Sources */,
 				4551FDA32378EA50007A2EFB /* SceneDelegate.m in Sources */,
 				4551FE142378F75F007A2EFB /* FoodInfoView.m in Sources */,

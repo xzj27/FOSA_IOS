@@ -33,6 +33,11 @@
     CGFloat height = 100;
     NSLog(@"%f,%f",width,height);
     if (self) {
+        self.backgroundView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, width, height)];
+        self.backgroundView.layer.cornerRadius = 10;
+        self.backgroundView.backgroundColor = [UIColor colorWithRed:254/255.0 green:100/255.0 blue:151/255.0 alpha:1.0];
+        [self addSubview:self.backgroundView];
+        
         self.foodName = [[UILabel alloc]initWithFrame:CGRectMake(5, 5, width/4-5, height/2-10)];
         _foodName.text = @"食物";
         _foodName.textAlignment = NSTextAlignmentCenter;
@@ -56,12 +61,12 @@
         _calorie.userInteractionEnabled = NO;
         self.delete_cell = [[UIButton alloc]initWithFrame:CGRectMake(width-50, 25, 50, 50)];
         [_delete_cell setImage:[UIImage imageNamed:@"icon_deleteHL"] forState:UIControlStateNormal];
-        [self addSubview:_foodName];
-        [self addSubview:self.weight];
-        [self addSubview:_units];
-        [self addSubview:_select];
-        [self addSubview:_calorie];
-        [self addSubview:_delete_cell];
+        [self.backgroundView addSubview:_foodName];
+        [self.backgroundView addSubview:self.weight];
+        [self.backgroundView addSubview:_units];
+        [self.backgroundView addSubview:_select];
+        [self.backgroundView addSubview:_calorie];
+        [self.backgroundView addSubview:_delete_cell];
     }
     return self;
 }

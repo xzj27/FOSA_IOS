@@ -14,6 +14,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic,assign) long int foodType;
 @property (nonatomic,strong) UITableView *foodList;
+@property (nonatomic,strong) NSString *category,*categoryicon;
+
+@property (nonatomic,assign) NSInteger current;
+
 
 @end
 

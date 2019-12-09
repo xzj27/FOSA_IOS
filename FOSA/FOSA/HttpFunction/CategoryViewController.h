@@ -14,6 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic,strong) UICollectionView *CategoryView;
 
+@property (nonatomic,assign) NSInteger current;//当前的cell
 @end
 
 NS_ASSUME_NONNULL_END

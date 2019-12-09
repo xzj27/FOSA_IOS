@@ -17,6 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 +(NSString *)getPathWithName:(NSString *)databaseName;
 +(void)InsertDataIntoTable:(NSString *)InsertSql database:(sqlite3 *)db;//插入操作
 +(sqlite3_stmt *)SelectDataFromTable:(NSString *)SelectSql database:(sqlite3 *)db;//选择操作
++(int)SelectFromTable:(NSString *)SelectSql database:(sqlite3 *)db stmt:(sqlite3_stmt *)stmt;//选择操作
 +(void)DeleteDataFromTable:(NSString *)DeleteSql database:(sqlite3 *)db;//删除操作
 +(void)UpdataDataFromTable:(NSString *)UpdateSql database:(sqlite3 *)db;//更新操作
 

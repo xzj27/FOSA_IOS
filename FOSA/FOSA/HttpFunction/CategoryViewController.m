@@ -10,11 +10,16 @@
 #import "CategoryModel.h"
 #import "CategoryCollectionViewCell.h"
 
+#import "SqliteManager.h"
+
 #import "FoodListViewController.h"
 @interface CategoryViewController ()<UICollectionViewDelegate,UICollectionViewDataSource>{
     NSMutableArray<CategoryModel *> *DataArray;
     NSString *ID;
 }
+@property (nonatomic,assign) sqlite3 *database;
+@property (nonatomic,assign) sqlite3_stmt *stmt;
+
 
 @end
 
@@ -32,7 +37,7 @@
     self.view.backgroundColor = [UIColor whiteColor];
     // Do any additional setup after loading the view.
     
-    [self InitDataFromServer];
+    [self SelectNutrientTableOrUpdate];
     [self InitView];
 }
 
@@ -64,7 +69,6 @@
 
 - (void)InitDataFromServer{
     NSLog(@"@@@@@@@@@@@@@@@");
-    DataArray = [[NSMutableArray alloc]init];
     //服务器地址
     NSString *serverAddr = @"http://192.168.3.110/fosa/HttpComunication.php";
     
@@ -82,9 +86,11 @@
             for (int i = 0; i < [self->DataArray count]; i++) {
                 NSLog(@"%@----%@",self->DataArray[i].cagegoryName,self->DataArray[i].categoryImg);
             }
+        
         //在主线程更新UI
         dispatch_async(dispatch_get_main_queue(), ^{
             [self.CategoryView reloadData];
+            [self CreatNutrientDataBase];
         });
         }];
         //5、执行请求
@@ -139,12 +145,48 @@
     CategoryCollectionViewCell *cell = (CategoryCollectionViewCell *)[_CategoryView cellForItemAtIndexPath:indexPath];
       cell.backgroundColor = [UIColor colorWithRed:155/255.0 green:251/255.5 blue:241/255.0 alpha:1.0];
 }
-
 - (void)SelectFoodDetail:(CategoryCollectionViewCell *)cell{
     NSLog(@"%ld",(long)cell.tag);
     FoodListViewController *foodlist = [[FoodListViewController alloc]init];
+    foodlist.category = cell.categoryLabel.text;
+    foodlist.categoryicon = DataArray[cell.tag].categoryImg;
     foodlist.foodType = cell.tag;
+    foodlist.current = self.current;
     [self.navigationController pushViewController:foodlist animated:YES];
+    
+}
+#pragma mark - 本地数据库
+- (void)CreatNutrientDataBase{
+    //创建Nutrient数据库表
+    NSString *creatCategorySql = @"create table if not exists Category(id integer primary key,CategoryName text,CategoryImg text)";
+    [SqliteManager InitTableWithName:creatCategorySql database:_database];//创建数据表
+    for (NSInteger i = 0; i < DataArray.count; i++) {
+        NSString *InsertCategory = [NSString stringWithFormat:@"insert into Category(CategoryName,CategoryImg)values('%@','%@')",DataArray[i].cagegoryName,DataArray[i].categoryImg];
+        [SqliteManager InsertDataIntoTable:InsertCategory database:self.database];
+    }
+}
+- (void)SelectNutrientTableOrUpdate{
+    DataArray = [[NSMutableArray alloc]init];
+    // 打开数据库
+    self.database = [SqliteManager InitSqliteWithName:@"Fosa.db"];
+    NSString *selectCategory = [NSString stringWithFormat:@"Select CategoryName,CategoryImg from Category"];
+    //int result = [SqliteManager SelectFromTable:selectNutrient database:_database stmt:_stmt];
+    _stmt = [SqliteManager SelectDataFromTable:selectCategory database:self.database];
+    if (_stmt != NULL) {
+        while (sqlite3_step(_stmt) == SQLITE_ROW) {
+            NSLog(@"我从数据库查询食物种类！！！！");
+            const char * categoryname = (const char *)sqlite3_column_text(_stmt, 0);
+            const char * categoryImg = (const char *)sqlite3_column_text(_stmt, 1);
+            CategoryModel *model = [[CategoryModel alloc]initWithName:[NSString stringWithUTF8String:categoryname] categoryIcon:[NSString stringWithUTF8String:categoryImg]];
+            NSLog(@">>>>>>>>%@<<<<<<<<<<<<%@",[NSString stringWithUTF8String:categoryname],[NSString stringWithUTF8String:categoryImg]);
+            [DataArray addObject:model];
+            
+        }
+        [self.CategoryView reloadData];
+    }else{
+        NSLog(@"本地数据库为空，要到服务器上面找");
+        [self InitDataFromServer];
+    }
 }
 
 @end

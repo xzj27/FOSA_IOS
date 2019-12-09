@@ -53,6 +53,12 @@
         return stmt;
     }
 }
++ (int)SelectFromTable:(NSString *)SelectSql database:(sqlite3 *)db stmt:(nonnull sqlite3_stmt *)stmt {
+    const char *selsql = (char *)[SelectSql UTF8String];
+    int selresult = sqlite3_prepare_v2(db, selsql, -1, &stmt, NULL);
+    return selresult;
+}
+
 + (void)DeleteDataFromTable:(NSString *)DeleteSql database:(sqlite3 *)db{
     char * errmsg;
     sqlite3_exec(db, DeleteSql.UTF8String, NULL, NULL, &errmsg);

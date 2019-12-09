@@ -8,6 +8,7 @@
 
 #import "ViewController.h"
 #import <AVFoundation/AVFoundation.h>
+#import "CalorieModel.h"
 NS_ASSUME_NONNULL_BEGIN
 
 @interface FosaPoundViewController : ViewController
@@ -31,6 +32,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic,strong) UITextView *Allcalorie;
 @property (nonatomic,strong) UIButton *addCalorie;
 @property (nonatomic,strong) UITableView *calorieTable;
+@property (nonatomic,strong) NSMutableArray<CalorieModel *> *calorieData;
 ///**扫码相关*/
 @property (nonatomic,strong) UIView *rootScanView;
 @end
