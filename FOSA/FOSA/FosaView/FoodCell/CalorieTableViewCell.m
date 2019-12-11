@@ -31,7 +31,7 @@
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     CGFloat width = screen_width-10;
     CGFloat height = 100;
-    NSLog(@"%f,%f",width,height);
+    //NSLog(@"%f,%f",width,height);
     if (self) {
         self.backgroundView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, width, height)];
         self.backgroundView.layer.cornerRadius = 10;
@@ -46,6 +46,9 @@
         self.weight = [[UITextField alloc]initWithFrame:CGRectMake(width/4+10, 5, width/2-50, height/2-10)];
         self.weight.backgroundColor = [UIColor colorWithRed:254/255.0 green:150/255.0 blue:151/255.0 alpha:1.0];
         self.weight.layer.borderWidth = 0.5;
+        self.weight.returnKeyType = UIReturnKeyDone;
+        self.weight.keyboardType = UIKeyboardTypeDecimalPad;
+        
         self.units = [[UIButton alloc]initWithFrame:CGRectMake(width*3/4-40, 5, 50, height/2-10)];
         _units.backgroundColor = [UIColor colorWithRed:254/255.0 green:150/255.0 blue:151/255.0 alpha:1.0];
         _units.layer.cornerRadius = 5;

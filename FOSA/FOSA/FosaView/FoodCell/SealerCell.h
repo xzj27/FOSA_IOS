@@ -12,7 +12,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface SealerCell : UITableViewCell
 
-@property (nonatomic,strong) UILabel *expireLabel;
+@property (nonatomic,strong) UILabel *expireLabel,*remindLabel,*storageLabel,*foodNameLabel;
+@property (nonatomic,strong) UIImageView *foodImgView;
 @property (nonatomic,strong) UIButton *checkBtn;
 @end
 

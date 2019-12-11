@@ -23,7 +23,7 @@
     [self InitDeviceView];
 }
 - (void)initData{
-    arrayData = @[@"fosa1",@"fosa2",@"fosa3",@"fosa4",@"fosa5"];
+    arrayData = @[@"FOSA1",@"FOSA2",@"FOSA3",@"FOSA4",@"FOSA5"];
 }
 - (void)InitDeviceView{
     self.mainWidth = [UIScreen mainScreen].bounds.size.width;
@@ -39,7 +39,7 @@
     [self.view addSubview:self.deviceTable];
 
     //content
-    self.contentView = [[UIView alloc]initWithFrame:CGRectMake(self.mainWidth/5,0, self.mainWidth*4/5, self.mainHeight-_navheight-5)];
+    self.contentView = [[UIView alloc]initWithFrame:CGRectMake(self.mainWidth/4,0, self.mainWidth*3/4, self.mainHeight-_navheight-5)];
     self.contentView.backgroundColor = [UIColor whiteColor];
     [self.view addSubview:self.contentView];
 }
@@ -71,7 +71,7 @@
     }
     //取消点击cell时显示的背景色
     //cell.selectionStyle = UITableViewCellSelectionStyleNone;
-    cell.textLabel.font = [UIFont systemFontOfSize:15];
+    cell.textLabel.font = [UIFont systemFontOfSize:14];
     cell.textLabel.text = arrayData[indexPath.row];
     //返回cell
     return cell;

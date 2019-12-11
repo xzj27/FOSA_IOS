@@ -7,7 +7,7 @@
 //
 
 #import "ViewController.h"
-
+#import "UserItem.h"
 NS_ASSUME_NONNULL_BEGIN
 
 @interface FosaUserViewController : ViewController
@@ -16,9 +16,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic,strong) UIImageView *userIcon;
 @property (nonatomic,strong) UILabel *username,*FosaContentTitle,*AppsContentTitle;
 
-@property (nonatomic,strong) UIView *FosaContent,*AppsContent;
-@property (nonatomic,strong) UITextField *aboutFosa,*aboutApps;
-@property (nonatomic,strong) UIImageView *showContent,*showApps;
+@property (nonatomic,strong) UIView *itemView;
+
+@property (nonatomic,strong) UserItem *Tutorial,*Location,*Setting,*Notification,*HelpCenter,*FosaContent,*AppsContent;
 
 //常用的布局数据
 @property (nonatomic,assign) CGFloat mainWidth,mainHeigh,navHeigh;

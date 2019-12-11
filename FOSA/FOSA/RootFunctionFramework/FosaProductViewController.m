@@ -59,7 +59,7 @@
     CGRect navRect = self.navigationController.navigationBar.frame;
     //那么导航栏+状态栏的高度
     self.status_nav_height = statusRect.size.height+navRect.size.height;
-    NSArray *titles = @[@"Fosa Device",@"My Device"];
+    NSArray *titles = @[@"FOSA",@"My Device"];
     self.fosaScrollview = [[FosaScrollview alloc] init];
     
     [self.fosaScrollview configParameterFrame:CGRectMake(0,self.status_nav_height, [UIScreen mainScreen].bounds.size.width, 50) titles:titles index:0 block:^(NSInteger index) {
@@ -74,11 +74,11 @@
 
     NSMutableArray *contentM = [NSMutableArray array];
     MyDeviceViewController *mydevice = [[MyDeviceViewController alloc]init];
-    mydevice.view.backgroundColor = RandomColor;
+    mydevice.view.backgroundColor = [UIColor whiteColor];
     [contentM addObject:mydevice];
 
     OtherViewController *other = [[OtherViewController alloc]init];
-    other.view.backgroundColor = RandomColor;
+    other.view.backgroundColor = [UIColor whiteColor];
     [contentM addObject:other];
 
     [self.productContent configParam:contentM index:0 block:^(NSInteger index) {

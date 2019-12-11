@@ -24,7 +24,8 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
     if (@available(iOS 13,*)) {
-           return YES;
+        [NSThread sleepForTimeInterval:3];
+        return YES;
        }else{
        //创建window
        self.window = [[UIWindow alloc]initWithFrame:[UIScreen mainScreen].bounds];

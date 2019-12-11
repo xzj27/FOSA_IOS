@@ -12,6 +12,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface OtherViewController : UIViewController
 
+@property (nonatomic,strong) UITableView *deviceTable;
+@property (nonatomic,strong) UIView *contentView;
+
+@property (nonatomic,assign) CGFloat mainWidth,mainHeight,navheight;
+
 @end
 
 NS_ASSUME_NONNULL_END

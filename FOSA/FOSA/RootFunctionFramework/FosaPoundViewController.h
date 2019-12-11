@@ -16,6 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic,strong) UIScrollView *rootView;
 @property (nonatomic,strong) UIView *sealerView,*poundView,*InfoMenu,*scanView;
+@property (nonatomic,strong) UIView *sealerView2;
 @property (nonatomic,strong) UIImageView *sealerImage,*poundImage;
 //sealer
 @property (nonatomic,strong) UIImageView *indicator;
@@ -29,7 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
 //clorieResult
 @property (nonatomic,strong) UIView *calorieResultView;
 @property (nonatomic,strong) UILabel *totalcalorieLabel;
-@property (nonatomic,strong) UITextView *Allcalorie;
+@property (nonatomic,strong) UILabel *Allcalorie;
 @property (nonatomic,strong) UIButton *addCalorie;
 @property (nonatomic,strong) UITableView *calorieTable;
 @property (nonatomic,strong) NSMutableArray<CalorieModel *> *calorieData;

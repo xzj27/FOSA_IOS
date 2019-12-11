@@ -11,10 +11,10 @@
 #import "PhotoViewController.h"
 #import <UserNotifications/UserNotifications.h>
 #import "SqliteManager.h"
-
+#import "FosaDatePickerView.h"
 #define KCompressibilityFactor 1280.00 //图片宽高的最大值
 
-@interface AddViewController ()<UIScrollViewDelegate,UITextFieldDelegate,UNUserNotificationCenterDelegate>{
+@interface AddViewController ()<UIScrollViewDelegate,UITextFieldDelegate,UNUserNotificationCenterDelegate,FosaDatePickerViewDelegate>{
     //日期选择
     UIDatePicker *datePicker;
     //日期选择器的容器
@@ -40,6 +40,8 @@
 @property (nonatomic,strong) UIScrollView *backGround;
 @property (nonatomic,strong) UIImageView *bigImage;
 
+@property (nonatomic,weak) FosaDatePickerView *fosaDatePicker;
+
 @end
 
 @implementation AddViewController
@@ -53,8 +55,8 @@
     tapGr.cancelsTouchesInView = NO;
     [self.view addGestureRecognizer:tapGr];
     
-    [self InitialDatePicker];
     [self CreatAndInitView];
+    [self InitialDatePicker];
     
 }
 -(void)viewTapped:(UITapGestureRecognizer*)tapGr{
@@ -71,41 +73,11 @@
 }
 #pragma mark - 初始化日期选择器
 -(void)InitialDatePicker{
-    
-    dateView = [[UIView alloc]initWithFrame:CGRectMake(0, self.view.frame.size.height*2/3-50,self.view.frame.size.width,self.view.frame.size.height/3+50)];
-    dateView.backgroundColor = [UIColor whiteColor];
-    
-    sure = [[UIButton alloc]initWithFrame:CGRectMake(0, 0, self.view.frame.size.width/2, 50)];
-    cancel = [[UIButton alloc]initWithFrame:CGRectMake(self.view.frame.size.width/2, 0, self.view.frame.size.width/2, 50)];
-    [sure setTitle:@"确定" forState:UIControlStateNormal];
-    [sure setTitleColor:[UIColor blueColor] forState:UIControlStateNormal];
-    [cancel setTitle:@"取消" forState:UIControlStateNormal];
-    [cancel setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
-//    sure.backgroundColor = [UIColor colorWithRed:200/255 green:200/255 blue:200/255 alpha:1.0];
-//    cancel.backgroundColor = [UIColor colorWithRed:190/255 green:190/255 blue:190/255 alpha:1.0];
-    [dateView addSubview:sure];
-    [dateView addSubview:cancel];
-    
-    //添加响应
-    [sure addTarget:self action:@selector(selected) forControlEvents:UIControlEventTouchUpInside];
-    [cancel addTarget:self action:@selector(noSelect) forControlEvents:UIControlEventTouchUpInside];
-    
-    //初始化日期选择器
-    datePicker = [[UIDatePicker alloc]initWithFrame: CGRectMake(0, 50, self.view.frame.size.width, self.view.frame.size.height/3)];
-    
-    datePicker.backgroundColor = [UIColor grayColor];
-    
-    NSLocale *locale = [[NSLocale alloc]initWithLocaleIdentifier:@"zw"];
-    datePicker.locale = locale;
-    
-    //默认显示当前日期
-    [datePicker setCalendar:[NSCalendar currentCalendar]];
-    //设置时区
-    [datePicker setTimeZone:[NSTimeZone defaultTimeZone]];
-    //设置Datepicker的允许的最大最小日期max&&min
-    //现实年月日
-    [datePicker setDatePickerMode:UIDatePickerModeDate];
-    [dateView addSubview:datePicker];
+    FosaDatePickerView *DatePicker = [[FosaDatePickerView alloc]initWithFrame:CGRectMake(0, self.view.frame.size.height, self.view.frame.size.width, 300)];
+    DatePicker.delegate = self;
+    DatePicker.title = @"请选择时间";
+    [self.view addSubview:DatePicker];
+    self.fosaDatePicker = DatePicker;
 }
 #pragma mark - 创建并初始化界面
 -(void)CreatAndInitView{
@@ -296,36 +268,70 @@
 -(void)ExpireDateSelect{
     NSLog(@"select expire date");
     isRemind = false;
-    [self.view addSubview:dateView];
+    [UIView animateWithDuration:0.3 animations:^{
+        self.fosaDatePicker.frame = CGRectMake(0, self.view.frame.size.height - 300, self.view.frame.size.width, 300);
+        [self.fosaDatePicker show];
+    }];
 }
 -(void)RemindDateSelect{
     isRemind = true;
     NSLog(@"select reminding date");
-    [self.view addSubview:dateView];
+    [UIView animateWithDuration:0.3 animations:^{
+        self.fosaDatePicker.frame = CGRectMake(0, self.view.frame.size.height - 300, self.view.frame.size.width, 300);
+        [self.fosaDatePicker show];
+    }];
 }
-#pragma mark - 选择日期
--(void)selected{
-    NSDate *selectdate = datePicker.date;
-    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    [dateFormatter setDateFormat:@"yyyy-MM-dd"];
-    NSString *strDate = [dateFormatter stringFromDate:selectdate];
-    if(isRemind){
-        self.remindDate.text = strDate;
-        _redate = selectdate;
-        remind_Date = strDate;
-        NSLog(@"%@",remind_Date);
-    }else{
-        self.expireDate.text = strDate;
-        _exdate = selectdate;
-        expire_Date = strDate;
-        NSLog(@"%@",expire_Date);
-    }
-    [dateView removeFromSuperview];
-}
--(void)noSelect{
-    [dateView removeFromSuperview];
-}
+//#pragma mark - 选择日期
+//-(void)selected{
+//    NSDate *selectdate = datePicker.date;
+//    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+//    [dateFormatter setDateFormat:@"yyyy-MM-dd"];
+//    NSString *strDate = [dateFormatter stringFromDate:selectdate];
+//    if(isRemind){
+//        self.remindDate.text = strDate;
+//        _redate = selectdate;
+//        remind_Date = strDate;
+//        NSLog(@"%@",remind_Date);
+//    }else{
+//        self.expireDate.text = strDate;
+//        _exdate = selectdate;
+//        expire_Date = strDate;
+//        NSLog(@"%@",expire_Date);
+//    }
+//    [dateView removeFromSuperview];
+//}
+//-(void)noSelect{
+//    [dateView removeFromSuperview];
+//}
 
+#pragma mark -- FosaDatePickerViewDelegate
+/**
+ 保存按钮代理方法
+
+ @param timer 选择的数据
+ */
+- (void)datePickerViewSaveBtnClickDelegate:(NSString *)timer {
+    NSLog(@"保存点击");
+   
+    if (isRemind) {
+        self.remindDate.text = timer;
+    }else{
+        self.expireDate.text  = timer;
+    }
+    [UIView animateWithDuration:0.3 animations:^{
+       self.fosaDatePicker.frame = CGRectMake(0, self.view.frame.size.height, self.view.frame.size.width, 300);
+   }];
+}
+/**
+ 取消按钮代理方法
+ */
+- (void)datePickerViewCancelBtnClickDelegate {
+    NSLog(@"取消点击");
+//    self.btn.hidden = YES;
+    [UIView animateWithDuration:0.3 animations:^{
+        self.fosaDatePicker.frame = CGRectMake(0, self.view.frame.size.height, self.view.frame.size.width, 300);
+    }];
+}
 #pragma mark - 分享
 -(void)beginShare{
     NSLog(@"点击了分享");
@@ -381,17 +387,6 @@
     NSString *creatSealerSql = @"create table if not exists Fosa3(id integer primary key,foodName text,deviceName text,aboutFood text,expireDate text,remindDate text,storageDate text,photoPath text)";
     [SqliteManager InitTableWithName:creatSealerSql database:self.database];
 }
-////判断表是否已经存在
-//-(BOOL)isTabelExist:(NSString *)name{
-//    char *err;
-//    NSString *sql = [NSString stringWithFormat:@"SELECT COUNT(*) FROM sqlite_master where type='table' and name='%@';",name];
-//    const char *sql_stmt = [sql UTF8String];
-//    if(sqlite3_exec(_database, sql_stmt, NULL, NULL, &err) == 1){
-//        return YES;
-//    }else{
-//        return NO;
-//    }
-//}
 -(void) InsertDataIntoSqlite{
     if(self.foodName.text != nil){
         if ([self.deviceName.text hasPrefix:@"FOSASealer"]) {
@@ -399,7 +394,7 @@
             //获取当前日期
             NSDate *currentDate = [[NSDate alloc]init];
             NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
-            [formatter setDateFormat:@"yyyy-MM-dd"];
+            [formatter setDateFormat:@"yyyy-MM-dd HH:mm"];
             NSString *str = [formatter stringFromDate:currentDate];
             //currentDate = [formatter dateFromString:str];
             NSLog(@"%@",str);

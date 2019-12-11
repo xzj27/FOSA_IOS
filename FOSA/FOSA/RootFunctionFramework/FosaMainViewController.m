@@ -45,6 +45,7 @@
 
 @implementation FosaMainViewController
 
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
@@ -84,7 +85,6 @@
     ID = @"FosaCell";
     isEdit = false;
     _LeftOrRight = true;    //true mean that the view is folded
-    cellHeight = 101.666667;
     _count = 0;
     self.storageArray = [[NSMutableArray alloc]init];
     self.mainWidth = [UIScreen mainScreen].bounds.size.width;
@@ -106,7 +106,6 @@
     _StorageItemView.showsVerticalScrollIndicator = NO;
     //regist the user-defined collctioncell
     [_StorageItemView registerClass:[FoodCollectionViewCell class] forCellWithReuseIdentifier:ID];
-
     //给view 添加滑动事件
 //     UISwipeGestureRecognizer *recognizer;
 //        //right--
@@ -122,7 +121,6 @@
     UIGestureRecognizer *Crecognizer = [[UIGestureRecognizer alloc]initWithTarget:self action:@selector(moveMenu)];
     Crecognizer.delegate = self;
     [[self StorageItemView] addGestureRecognizer:Crecognizer];
-
 //    if ([NSProcessInfo.processInfo isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion){10,0,0}])
 //    {
 //        //CGRect fresh = CGRectMake(0, 0, self.StorageItemView.frame.size.width,50);
@@ -143,7 +141,6 @@
     _notification = [[FosaNotification alloc]init];
     [self CreatMenu];
 }
-
 //创建菜单视图
 - (void)CreatMenu{
     _CategoryMenu = [[UIView alloc]initWithFrame:CGRectMake(-self.mainWidth/4, self.navHeight,self.mainWidth/3,self.mainHeight)];
@@ -167,7 +164,15 @@
      [swipeGestureLeft setDirection:UISwipeGestureRecognizerDirectionLeft];
      [_CategoryScrollview addGestureRecognizer:swipeGestureLeft];
     
-     NSArray *color = @[[UIColor redColor],[UIColor blueColor],[UIColor greenColor],[UIColor yellowColor],[UIColor orangeColor],[UIColor purpleColor]];
+    //颜色
+     NSArray *color = @[
+         [UIColor colorWithRed:233/255.0 green:62/255.0 blue:77/255.0 alpha:1],
+         [UIColor colorWithRed:0/255.0 green:142/255.0 blue:215/255.0 alpha:1],
+         [UIColor colorWithRed:89/255.0 green:233/255.0 blue:77/255.0 alpha:1],
+         [UIColor colorWithRed:255/255.0 green:238/255.0 blue:120/255.0 alpha:1],
+         [UIColor colorWithRed:255/255.0 green:179/255.0 blue:0/255.0 alpha:1],
+         [UIColor colorWithRed:205/255.0 green:103/255.0 blue:255/255.0 alpha:1]];
+    
     NSArray *Item = @[@"谷物/面条",@"果汁",@"肉类",@"蔬菜",@"香料",@"咖啡/茶"];
     for (i = 0; i < 6; i++) {
         FosaMenu *food = [[FosaMenu alloc]initWithFrame:CGRectMake(0,i*self.CategoryMenu.frame.size.height/6, self.CategoryMenu.frame.size.width, self.CategoryMenu.frame.size.height/6)];

@@ -31,13 +31,15 @@
     NSString *foodname,*expireDate,*storageDate;
     
     //蓝牙磅和列表的中心
-    CGPoint center,cellCenter;
+    CGPoint center,cellCenter,sealer2Center;
     //标记当前是否正在扫码
     Boolean isScan;
     NSString *result;
     
     //标记是否局部更新
     Boolean isUpdate;
+    //标记是否已经选择卡路里
+    Boolean *isSelect;
     //扫码相关
     /**扫码相关*/
     AVCaptureDevice * device;
@@ -348,6 +350,7 @@
 #pragma mark - 主视图加载
 //局部更新
 - (void)viewWillAppear:(BOOL)animated{
+    self.navigationController.navigationBar.hidden = YES;
     if (isUpdate) {
         isExpand = false;
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -359,14 +362,18 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
     if (self.calorieData.count != 0) {
+        NSLog(@"我更新了卡路里总量");
         dispatch_async(dispatch_get_main_queue(), ^{
            NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
             self.calorieData[self->current].calorie= [defaults valueForKey:@"calorieValue"];
+            [defaults setObject:0 forKey:@"calorieValue"];
+            //self->current = -1;
            [self.calorieTable reloadData];
+           [self UpdateAndCalculateCalorie];
         });
     }
+    
 }
-
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
@@ -380,23 +387,24 @@
 - (void)InitView{
     isScan = false; //扫码标记初始化
     isUpdate = false;
+    isSelect = false;
     arrayData = [[NSMutableArray alloc]init];
     self.calorieData = [[NSMutableArray alloc]init];
     _weight = [[UITextField alloc]init];
     
     //rootView
-    self.rootView.frame = CGRectMake(0, NavigationHeight, screen_width, screen_height);
+    self.rootView.frame = CGRectMake(0, 0, screen_width, screen_height);
     self.rootView.bounces = NO;
     self.rootView.showsVerticalScrollIndicator = NO;
     self.rootView.showsHorizontalScrollIndicator = NO;
     self.rootView.contentSize = CGSizeMake(screen_width,screen_height*1.5);
     [self.view addSubview:self.rootView];
     //SealerView
-    self.sealerView.frame = CGRectMake(5,10,screen_width-10,screen_height/3);
+    self.sealerView.frame = CGRectMake(5,10,screen_width-10,(screen_height)/4-10);
     self.sealerView.backgroundColor = [UIColor colorWithRed:0/255.0 green:191/255.0 blue:227/255.0 alpha:1.0];
     [self.rootView addSubview:self.sealerView];
     //SealerView content
-    self.sealerImage.frame = CGRectMake(5, 5, self.sealerView.frame.size.height/2, self.sealerView.frame.size.height/2);
+    self.sealerImage.frame = CGRectMake(5, 5, self.sealerView.frame.size.height*2/3-10, self.sealerView.frame.size.height*2/3-10);
     self.sealerImage.image = [UIImage imageNamed:@"fosa.jpg"];
     [self.sealerView addSubview:self.sealerImage];
     
@@ -418,10 +426,14 @@
     [self.indicator addGestureRecognizer:recognizer];
     [self.InfoMenu addSubview:_indicator];
     [self.sealerView addSubview:self.InfoMenu];
-    
     [self InitFoodTable];
     
-    self.poundView.frame = CGRectMake(5, screen_height/3+30, screen_width-10, screen_height/6);
+    //sealerview2
+    self.sealerView2 = [[UIView alloc]initWithFrame:CGRectMake(5,10+(screen_height)/4,screen_width-10,(screen_height)/4-10)];
+    self.sealerView2.backgroundColor = [UIColor colorWithRed:0/255.0 green:191/255.0 blue:227/255.0 alpha:1.0];;
+    [self.rootView addSubview:self.sealerView2];
+    
+    self.poundView.frame = CGRectMake(5, 10+screen_height/2, screen_width-10, screen_height/8);
     self.poundView.backgroundColor = [UIColor colorWithRed:254/255.0 green:0/255.0 blue:151/255.0 alpha:1.0];
     [self.rootView addSubview:self.poundView];
     self.poundImage.frame = CGRectMake(5, 5, self.poundView.frame.size.height-10, self.poundView.frame.size.height-10);
@@ -431,33 +443,32 @@
     self.connect = [[UIButton alloc]initWithFrame:CGRectMake(self.poundView.frame.size.width-45, 5, 40, 40)];
     [self.connect setImage:[UIImage imageNamed:@"icon_disconnect"] forState:UIControlStateNormal];
     [self.poundView addSubview:self.connect];
-
-    
     //添加底部卡路里总量视图
-    self.calorieResultView = [[UIView alloc]initWithFrame:CGRectMake(0, screen_height-TabbarHeight-50, screen_width, 50)];
+    self.calorieResultView = [[UIView alloc]initWithFrame:CGRectMake(0, screen_height-TabbarHeight-70, screen_width, 70)];
     _calorieResultView.backgroundColor = [UIColor colorWithRed:208/255.0 green:208/255.0 blue:208/255.0 alpha:1.0];
-    self.totalcalorieLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, screen_width/4, 40)];
-    _totalcalorieLabel.text = @"卡路里总量:";
-    _totalcalorieLabel.font = [UIFont systemFontOfSize:11];
+    self.totalcalorieLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, screen_width/3, self.calorieResultView.frame.size.height)];
+    _totalcalorieLabel.text = @"卡路里总量(Kcal):";
+    _totalcalorieLabel.font = [UIFont systemFontOfSize:14];
     [_calorieResultView addSubview:_totalcalorieLabel];
-    self.Allcalorie = [[UITextView alloc]initWithFrame:CGRectMake(screen_width/4, 5, screen_width/2, 40)];
+    self.Allcalorie = [[UILabel alloc]initWithFrame:CGRectMake(screen_width/3, 5, screen_width*2/3-5, self.calorieResultView.frame.size.height)];
     _Allcalorie.userInteractionEnabled = NO;
     _Allcalorie.layer.cornerRadius = 5;
+    _Allcalorie.textAlignment = NSTextAlignmentCenter;
     _Allcalorie.backgroundColor = [UIColor colorWithRed:228/255.0 green:228/255.0 blue:228/255.0 alpha:1.0];
     
     [_calorieResultView addSubview:_Allcalorie];
-    
+
     self.addCalorie = [[UIButton alloc]initWithFrame:CGRectMake(screen_width*3/4, 0, screen_width/4, 50)];
     [_addCalorie setImage:[UIImage imageNamed:@"icon_add"] forState:UIControlStateNormal];
-    [_calorieResultView addSubview:_addCalorie];
+    //[_calorieResultView addSubview:_addCalorie];
     [_addCalorie addTarget:self action:@selector(addAction) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:_calorieResultView];
     //calorieNumber = 0;
-    
+
     center = self.poundView.center;
     cellCenter = self.calorieTable.center;
+    sealer2Center = _sealerView2.center;
     [self InitCalorieTable];
-    
 }
 - (void)CalorieData{
     NSString *weightText = @"";
@@ -465,47 +476,69 @@
     CalorieModel *model = [[CalorieModel alloc]initwithTextValue:weightText calorie:calorieText];
     [self.calorieData addObject:model];
 }
-
-
 #pragma mark - 食物列表
 - (void)ExpandList{
     if (!isExpand) {
         self.indicator.image = [UIImage imageNamed:@"caret_open"];
         self.foodTable.hidden = NO;
-        CGPoint center1 = CGPointZero;
-        center1.x = screen_width/2;
-        center1.y = screen_height+self.poundView.frame.size.height/2-TabbarHeight-50;
-        self.poundView.center = center1;
-        NSLog(@"%f*******%f",center1.x,center1.y);
-        NSLog(@"%f-------%f",_poundView.frame.origin.x,_poundView.frame.origin.y);
-        NSLog(@"%f&&&&&&&%f",_poundView.frame.origin.x,_poundView.frame.origin.y+self.poundView.frame.size.height);
-        isExpand = true;
-        
-        CGPoint listcenter = CGPointZero;
-        listcenter.y = center1.y + self.poundView.frame.size.height/2+self.calorieTable.frame.size.height/2;
-        listcenter.x = center1.x;
-        self.calorieTable.center = listcenter;
+        [self moveView];
     }else{
         self.indicator.image = [UIImage imageNamed:@"caret"];
         self.poundView.center = center;
         self.calorieTable.center = cellCenter;
+        self.sealerView2.center = sealer2Center;
         self.foodTable.hidden = YES;
         isExpand = false;
+        self.rootView.contentSize = CGSizeMake(screen_width,screen_height*1.5);
     }
 }
-- (void)InitData:(NSString *)foodName expireDate:(NSString *)expireDate storageDate:(NSString *)storageDate deviceID:(NSString *)deviceID{
+
+- (void)moveView{
+    isExpand = true;
+    self.rootView.contentSize = CGSizeMake(screen_width,screen_height+self.foodTable.frame.size.height);
+    
+    CGPoint sCenter2 = CGPointZero;
+    sCenter2.x = sealer2Center.x;
+    sCenter2.y = sealer2Center.y+self.foodTable.frame.size.height;
+    self.sealerView2.center = sCenter2;
+    
+    
+    CGPoint center1 = CGPointZero;
+    center1.x = screen_width/2;
+    center1.y = center.y+self.foodTable.frame.size.height;
+    self.poundView.center = center1;
+
+    CGPoint listcenter = CGPointZero;
+    listcenter.y = center1.y + self.poundView.frame.size.height/2+self.calorieTable.frame.size.height/2;
+    listcenter.x = center1.x;
+    self.calorieTable.center = listcenter;
+}
+
+
+- (void)InitData:(NSString *)foodName expireDate:(NSString *)expireDate storageDate:(NSString *)storageDate deviceID:(NSString *)deviceID {
     CellModel *model = [CellModel modelWithName:foodName expireDate:expireDate storageDate:storageDate fdevice:deviceID];
     [arrayData addObject:model];
 }
+//取出保存在本地的图片
+-(UIImage*)getImage:(NSString *)filepath{
+    NSArray *paths =NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask,YES);
+    NSString *photopath = [NSString stringWithFormat:@"%@.png",filepath];
+    NSString *imagePath = [[paths objectAtIndex:0]stringByAppendingPathComponent:[NSString stringWithFormat:@"%@",photopath]];
+    // 保存文件的名称
+    UIImage *img = [UIImage imageWithContentsOfFile:imagePath];
+    NSLog(@"=== %@", img);
+    return img;
+}
 //food table
 - (void)InitFoodTable{
-    self.foodTable = [[UITableView alloc]initWithFrame:CGRectMake(5, self.sealerView.frame.size.height+10, self.sealerView.frame.size.width,screen_height*2/3-NavigationHeight-TabbarHeight-50) style:UITableViewStylePlain];
+    self.foodTable = [[UITableView alloc]initWithFrame:CGRectMake(5, self.sealerView.frame.size.height+10, self.sealerView.frame.size.width,screen_height*3/4-TabbarHeight) style:UITableViewStylePlain];
+    self.foodTable.backgroundColor = [UIColor colorWithRed:208/255.0 green:208/255.0 blue:208/255.0 alpha:1.0];
     _foodTable.delegate = self;
     _foodTable.dataSource = self;
     _foodTable.hidden = YES;
     _foodTable.showsVerticalScrollIndicator = NO;
-    
-    [_foodTable setSeparatorColor:[UIColor grayColor]];
+    _foodTable.layer.borderWidth = 0.3;
+    //[_foodTable setSeparatorColor:[UIColor grayColor]];
 
     [self.rootView insertSubview:_foodTable atIndex:10];
 }
@@ -538,7 +571,7 @@
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if ([tableView isEqual:_foodTable]) {
-        return 50;
+        return 100;
     }else if([tableView isEqual:_calorieTable]){
         return 100;
     }else{
@@ -567,48 +600,47 @@
         static NSString *cellIdentifier = @"cell";
             //初始化cell，并指定其类型
             SealerCell *cell = [tableView  dequeueReusableCellWithIdentifier:cellIdentifier];
-            
             if (cell == nil) {
                 //创建cell
-                cell = [[SealerCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:cellIdentifier];
+                cell = [[SealerCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
             }
-            
-            //cell.backgroundColor = [UIColor redColor];
             NSInteger row = indexPath.row;
+        cell.foodImgView.image = [self getImage:arrayData[row].foodName];
             //取消点击cell时显示的背景色
             cell.selectionStyle = UITableViewCellSelectionStyleNone;
-            cell.textLabel.text =  arrayData[row].foodName;
-            cell.detailTextLabel.text = [NSString stringWithFormat:@"存储日期: %@",arrayData[row].storageDate];
+            cell.foodNameLabel.text =  arrayData[row].foodName;
+        cell.storageLabel.font = [UIFont systemFontOfSize:10];
+            cell.storageLabel.text = [NSString stringWithFormat:@"存储日期: %@",arrayData[row].storageDate];
 
             cell.expireLabel.font = [UIFont systemFontOfSize:10];
             cell.expireLabel.text =  [NSString stringWithFormat:@"有效日期: %@",arrayData[row].expireDate];
             NSArray *tag = @[arrayData[row].foodName,arrayData[row].device];
-            cell.checkBtn.accessibilityElements = tag;
+            //cell.checkBtn.accessibilityElements = tag;
 
-        //    //添加点击手势
-        //    UITapGestureRecognizer *recognizer = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(cellAction:)];
-        //    recognizer.accessibilityValue = arrayData[row].device;
-        //    [cell addGestureRecognizer:recognizer];
-            [cell.checkBtn addTarget:self action:@selector(cellAction:) forControlEvents:UIControlEventTouchUpInside];
+            //添加点击手势
+            UITapGestureRecognizer *recognizer = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(cellAction:)];
+        recognizer.accessibilityElements = tag;
+            [cell addGestureRecognizer:recognizer];
+            //[cell.checkBtn addTarget:self action:@selector(cellAction:) forControlEvents:UIControlEventTouchUpInside];
             //返回cell
             return cell;
     }else{
         static NSString *cellIndentify = @"cell";
         //初始化cell，并指定其类型
-            CalorieTableViewCell *cell = [tableView  dequeueReusableCellWithIdentifier:cellIndentify];
-        //cell.cellHeight = 100;
-        //cell.cellWidth = self.calorieTable.frame.size.height;
-            if (cell == nil) {
+        CalorieTableViewCell *cell = [tableView  dequeueReusableCellWithIdentifier:cellIndentify];
+        if (cell == nil) {
                 //创建cell
-                cell = [[CalorieTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIndentify];
-            }
+            cell = [[CalorieTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIndentify];
+        }
         NSInteger row = indexPath.row;
         cell.weight.tag = row;
         cell.weight.text = self.calorieData[row].weight;
         cell.calorie.text = self.calorieData[row].calorie;
         _weight = cell.weight;
         _weight.delegate = self;
-        //cell.backgroundColor = [UIColor colorWithRed:254/255.0 green:100/255.0 blue:151/255.0 alpha:1.0];
+        if (row == 0) {
+            cell.delete_cell.hidden = YES;
+        }
             //取消点击cell时显示的背景色
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         [cell.select  addTarget:self action:@selector(showCategory:) forControlEvents:UIControlEventTouchUpInside];
@@ -616,17 +648,19 @@
         
         [cell.delete_cell addTarget:self action:@selector(DeleteCell:) forControlEvents:UIControlEventTouchUpInside];
         cell.delete_cell.tag = row;
+        
+        [cell.units addTarget:self action:@selector(changeUnits:) forControlEvents:UIControlEventTouchUpInside];
+        cell.units.tag = 0;
             //返回cell
             return cell;
     }
 }
 /**cell的点击事件*/
-- (void)cellAction:(id)sender{
-    UIButton *btn = (UIButton *)sender;
-    NSLog(@"%@----%@",btn.accessibilityElements[0],btn.accessibilityElements[1]);
+- (void)cellAction:(UITapGestureRecognizer *)sender{
     FoodInfoViewController *info = [[FoodInfoViewController alloc]init];
-    info.name = btn.accessibilityElements[0];
-    info.deviceID = btn.accessibilityElements[1];
+    info.name = sender.accessibilityElements[0];
+    info.deviceID = sender.accessibilityElements[1];
+    info.hidesBottomBarWhenPushed = YES;
     [self.navigationController pushViewController:info animated:YES];
     isUpdate = true;
 }
@@ -647,6 +681,19 @@
     }
 }
 #pragma mark - 计算卡路里
+//更新卡路里
+- (void)UpdateAndCalculateCalorie{
+    CGFloat weight,calorie,SumofCalorie;
+    SumofCalorie = 0.0;
+    for (NSInteger i = 0; i < self.calorieData.count; i++) {
+        weight = [self.calorieData[i].weight floatValue];
+        calorie = [self.calorieData[i].calorie floatValue];
+        SumofCalorie = SumofCalorie + (weight/100)*calorie;
+//NSLog(@"weight=%f,calorie=%f,allcalorie=%f",weight,calorie,(weight/100)*calorie);
+    }
+    self.Allcalorie.text = [NSString stringWithFormat:@"%g",SumofCalorie];
+
+}
 //食物选择按钮
 - (void)showCategory:(UIButton *)sender{
     NSLog(@"选择食物");
@@ -663,6 +710,31 @@
     NSLog(@"<><><><>%@<><><><><>",_weight.text);
     [self.calorieData removeObjectAtIndex:sender.tag];
     [self.calorieTable reloadData];
+    [self UpdateAndCalculateCalorie];
+}
+//转换单位
+- (void)changeUnits:(UIButton *)sender{
+    switch (sender.tag) {
+        case 0:
+            [sender setTitle:@"g" forState:UIControlStateNormal];
+            sender.tag = 1;
+            break;
+//        case 1:
+//            [sender setTitle:@"ml" forState:UIControlStateNormal];
+//            sender.tag = 2;
+//            break;
+        case 1:
+            //1oz=28.35g
+            [sender setTitle:@"oz" forState:UIControlStateNormal];
+            sender.tag = 2;
+            break;
+        case 2:
+            //1lb=453.59g
+            [sender setTitle:@"lb" forState:UIControlStateNormal];
+            sender.tag = 0;
+        default:
+            break;
+    }
 }
 #pragma mark - 扫码结果
 - (void)captureOutput:(AVCaptureOutput *)output didOutputMetadataObjects:(NSArray<__kindof AVMetadataObject *> *)metadataObjects fromConnection:(AVCaptureConnection *)connection{
@@ -766,11 +838,52 @@
     return YES;
 }
 
-//监听文本内容
+//监听文本内容变化
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string{
-    NSLog(@"%ld",(long)textField.tag);
-    self.calorieData[textField.tag].weight = textField.text;
+    //得到输入框的内容
+    NSString *toBeString = [textField.text stringByReplacingCharactersInRange:range withString:string];
+    //限制小数点的输入次数
+    NSArray *array = [toBeString componentsSeparatedByString:@"."];
+    NSInteger count = [array count]-1;
+    if (count>=2 && [string isEqualToString:@"."]) {
+        return NO;
+    }
+    //限制小数点后的位数
+    NSInteger flag=0;
+    //const NSInteger limited =[self.currentModel.decimal integerValue];
+    for (NSInteger i = toBeString.length-1; i>=0; i--) {
+        if ([toBeString characterAtIndex:i] == '.') {
+            if (flag > 4) {
+                return NO;
+            }
+            break;
+        }
+        flag++;
+    }
+    // 限制第一位不能是小数点
+    if(textField.text.length == 0 && [string isEqualToString:@"."]) {
+        return NO;
+    }
+    // 限制"-"负数符号不能在中间，只能在第一位
+    if(textField.text.length > 0 && [string isEqualToString:@"-"]) {
+        return NO;
+    }
+    //限定输入值的范围
+    //CGFloat maxValue=[self.currentModel.value_max floatValue];
+    //CGFloat minValue=[self.currentModel.value_min floatValue];
+    //当前值
+//    CGFloat currentValue=[toBeString floatValue];
+//
+//    if (currentValue>=minValue&&currentValue<=maxValue) {
+//        return YES;
+//    }else{
+//        return NO;
+//    }
     return YES;
+}
+//输入结束
+- (void)textFieldDidEndEditing:(UITextField *)textField{
+    self.calorieData[textField.tag].weight = textField.text;
 }
 
 - (void)viewWillDisappear:(BOOL)animated{
@@ -782,5 +895,6 @@
     [self StopAndRelease];
     [self.previewLayer removeFromSuperlayer];
     [self.rootScanView removeFromSuperview];
+    self.navigationController.navigationBar.hidden = NO;
 }
 @end

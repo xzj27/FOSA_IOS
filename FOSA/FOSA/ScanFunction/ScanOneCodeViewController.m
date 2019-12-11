@@ -637,7 +637,7 @@
                         isJump = true;
                     }
                     
-                }else if([result hasPrefix:@"Fosa"]||[result hasPrefix:@"FS9"]){
+                }else if([result hasPrefix:@"Fosa"]||[result hasPrefix:@"FS9"]||[result hasPrefix:@"FOSASealer"]){
                     [self ScanSuccess:@"ding.wav"];
                     [self performSelectorOnMainThread:@selector(showOneMessage:) withObject:result waitUntilDone:NO]; //在主线程中展示这个物品的通知
                 }else if ([result hasPrefix:@"FOSA"]) {

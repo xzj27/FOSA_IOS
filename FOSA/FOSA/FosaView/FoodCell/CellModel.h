@@ -12,7 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CellModel : NSObject
 
-@property (nonatomic,copy) NSString *foodName,*remindDate,*foodPhoto,*device,*expireDate,*storageDate;
+@property (nonatomic,copy) NSString *foodName,*remindDate,*foodPhoto,*device,*expireDate,*storageDate,*photopath;
 
 + (instancetype)modelWithName:(NSString *) food_name foodIcon:(NSString *)foodPhoto remind_date:(NSString *) remindDate fdevice:(NSString *)device;
 - (instancetype)initWithName: (NSString *) food_name foodIcon:(NSString *)foodPhoto remind_date:(NSString *) remindDate fdevice:(NSString *)device;

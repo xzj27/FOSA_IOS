@@ -197,7 +197,7 @@ completionHandler(UNNotificationPresentationOptionBadge|UNNotificationPresentati
 //在此，可判断response的种类和request的触发器是什么，可根据远程通知和本地通知分别处理，再根据action进行后续回调
 
 }
-- (void)sendNotificationByDate:(NSString *)foodName body:(NSString *)body path:(NSString *)photo deviceName:(NSString *)device{
+- (void)sendNotificationByDate:(NSString *)foodName body:(NSString *)body path:(NSString *)photo deviceName:(NSString *)device date:(NSString *)mdate{
     NSLog(@"我将发送一个系统通知");
     UNMutableNotificationContent *content = [[UNMutableNotificationContent alloc] init];
     content.title = @"\"Reminding\"";
@@ -225,8 +225,8 @@ completionHandler(UNNotificationPresentationOptionBadge|UNNotificationPresentati
     //设置时间间隔的触发器
     //格式化时间
     NSDateFormatter * formatter = [[NSDateFormatter alloc]init];
-    [formatter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
-    NSDate * date = [formatter dateFromString:@"2019-11-12 15:36:00"];
+    [formatter setDateFormat:@"yyyy-MM-dd HH:mm"];
+    NSDate * date = [formatter dateFromString:mdate];
     NSDateComponents * components = [[NSCalendar currentCalendar]
                                                 components:NSCalendarUnitYear |
                                                 NSCalendarUnitMonth |
@@ -272,7 +272,7 @@ completionHandler(UNNotificationPresentationOptionBadge|UNNotificationPresentati
     UNNotificationSound *sound = [UNNotificationSound defaultSound];
     content.sound = sound;
     //设置时间间隔的触发器
-    UNTimeIntervalNotificationTrigger *time_trigger = [UNTimeIntervalNotificationTrigger triggerWithTimeInterval:3 repeats:NO];
+    UNTimeIntervalNotificationTrigger *time_trigger = [UNTimeIntervalNotificationTrigger triggerWithTimeInterval:2 repeats:NO];
     NSString *requestIdentifer = foodName;
         //content.categoryIdentifier = @"textCategory";
     content.categoryIdentifier = @"seeCategory";
@@ -360,8 +360,8 @@ completionHandler(UNNotificationPresentationOptionBadge|UNNotificationPresentati
     NSLog(@"点击了分享");
     //UIImage *sharephoto = [self getJPEGImagerImg:self.food_image];
     //UIImage *sharephoto1 = [self getJPEGImagerImg:[UIImage imageNamed:@"启动图2"]];
-    NSArray *activityItems = @[image];
-    UIActivityViewController *activityVC = [[UIActivityViewController alloc]initWithActivityItems:activityItems applicationActivities:nil];
+    //NSArray *activityItems = @[image];
+    //UIActivityViewController *activityVC = [[UIActivityViewController alloc]initWithActivityItems:activityItems applicationActivities:nil];
 }
 #pragma mark - 压缩图片
 - (UIImage *)getJPEGImagerImg:(UIImage *)image{
