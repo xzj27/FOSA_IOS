@@ -201,28 +201,28 @@
     [add addSubview:add_icon];
     [self.CategoryScrollview addSubview:add];
 }
-- (void)InitAddView{
-    //在UICollectionView最后添加一个addview
-    CGFloat cellWidth = (self.StorageItemView.frame.size.width-15)/2;
-    CGFloat cellheight = cellHeight;
-    NSLog(@"***********%f",cellheight);
-    CGFloat x = 5+(self.storageArray.count%2)*(cellWidth+5);
-    CGFloat y = 0;
-    if (_storageArray.count == 0) {
-        y = 5;
-    }else if(self.storageArray.count % 2 == 0){
-        y = (cellheight+5)*(self.storageArray.count/2)+5;
-    }else if(self.storageArray.count % 2 == 1){
-        y = (cellheight+5)*(self.storageArray.count/2)+5;
-    }
-    self.addView = [[UIButton alloc]initWithFrame:CGRectMake(x, y, cellWidth, cellheight)];
-    self.addView.layer.cornerRadius = 5;
-    _addView.backgroundColor = [UIColor colorWithRed:105/255.0 green:251/255.5 blue:241/255.0 alpha:1.0];
-    [self.addView setImage:[UIImage imageNamed:@"icon_additem"] forState:UIControlStateNormal];
-    [self.StorageItemView addSubview:self.addView];
-    //添加点击事件
-    [self.addView addTarget:self action:@selector(addFunction) forControlEvents:UIControlEventTouchUpInside];
-}
+//- (void)InitAddView{
+//    //在UICollectionView最后添加一个addview
+//    CGFloat cellWidth = (self.StorageItemView.frame.size.width-15)/2;
+//    CGFloat cellheight = cellHeight;
+//    NSLog(@"***********%f",cellheight);
+//    CGFloat x = 5+(self.storageArray.count%2)*(cellWidth+5);
+//    CGFloat y = 0;
+//    if (_storageArray.count == 0) {
+//        y = 5;
+//    }else if(self.storageArray.count % 2 == 0){
+//        y = (cellheight+5)*(self.storageArray.count/2)+5;
+//    }else if(self.storageArray.count % 2 == 1){
+//        y = (cellheight+5)*(self.storageArray.count/2)+5;
+//    }
+//    self.addView = [[UIButton alloc]initWithFrame:CGRectMake(x, y, cellWidth, cellheight)];
+//    self.addView.layer.cornerRadius = 5;
+//    _addView.backgroundColor = [UIColor colorWithRed:105/255.0 green:251/255.5 blue:241/255.0 alpha:1.0];
+//    [self.addView setImage:[UIImage imageNamed:@"icon_additem"] forState:UIControlStateNormal];
+//    [self.StorageItemView addSubview:self.addView];
+//    //添加点击事件
+//    [self.addView addTarget:self action:@selector(addFunction) forControlEvents:UIControlEventTouchUpInside];
+//}
 // 添加事件
 - (void) addFunction{
    PhotoViewController *photo = [[PhotoViewController alloc]init];
@@ -259,17 +259,24 @@
     NSDate *currentDate = [[NSDate alloc]init];
     NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
     [formatter setDateFormat:@"yyyy-MM-dd"];
+    
+    NSDateFormatter *formatter2 = [[NSDateFormatter alloc]init];
+    [formatter2 setDateFormat:@"yyyy-MM-dd HH:mm"];
+    
     NSString *str = [formatter stringFromDate:currentDate];
     currentDate = [formatter dateFromString:str];
     NSLog(@"%@",str);
+    NSString *str2; // 用于转换
     
     //查询数据库所有食品并获得其foodname和expire date
-    for (int i = 0; i < _storageArray.count; i++) {
+    for (int i = 1; i < _storageArray.count; i++) {
 NSLog(@"foodName=%@&&&&&&&expireDate=%@",_storageArray[i].foodName,_storageArray[i].remindDate);
         NSString *Rdate = _storageArray[i].remindDate;//格式为 yyyy-MM-dd
         NSDate *foodDate = [[NSDate alloc]init];
         NSLog(@"%@",Rdate);
-        foodDate = [formatter dateFromString:Rdate];
+        foodDate = [formatter2 dateFromString:Rdate];
+        str2 = [formatter stringFromDate:foodDate];
+        foodDate = [formatter dateFromString:str2];
         NSLog(@"%@-------%@",currentDate,foodDate);
         NSComparisonResult result = [currentDate compare:foodDate];
         

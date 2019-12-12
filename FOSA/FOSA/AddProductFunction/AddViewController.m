@@ -28,10 +28,11 @@
     Boolean isRemind;
    
    }
-@property(nonatomic,assign) NSString *storagePath;;
-@property(nonatomic,assign)sqlite3 *database;
+@property (nonatomic,assign) NSString *storagePath;;
+@property (nonatomic,assign) sqlite3 *database;
 //结果集定义
-@property(nonatomic,assign)sqlite3_stmt *stmt;
+@property (nonatomic,assign) sqlite3_stmt *stmt;
+@property (nonatomic,strong) UIButton *done;
 
 //记录所选择的日期
 @property (nonatomic,assign) NSDate *exdate,*redate;
@@ -81,9 +82,14 @@
 }
 #pragma mark - 创建并初始化界面
 -(void)CreatAndInitView{
+    self.done = [[UIButton alloc]initWithFrame:CGRectMake(0, 0, 40, 40)];
+    [_done setImage:[UIImage imageNamed:@"icon_done"] forState:UIControlStateNormal];
+    [_done addTarget:self action:@selector(finish) forControlEvents:UIControlEventTouchUpInside];
+    UIBarButtonItem *rightItem = [[UIBarButtonItem alloc]initWithCustomView:_done];
+       self.navigationItem.rightBarButtonItem= rightItem;
     
-   self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithImage:[UIImage imageNamed:@"icon_done"] style:UIBarButtonItemStylePlain target:nil action:nil];
-    self.navigationItem.rightBarButtonItem.target = self;     self.navigationItem.rightBarButtonItem.action = @selector(finish);
+//   self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithImage:[UIImage imageNamed:@"icon_done"] style:UIBarButtonItemStylePlain target:nil action:nil];
+//    self.navigationItem.rightBarButtonItem.target = self;     self.navigationItem.rightBarButtonItem.action = @selector(finish);
     
     self.mainWidth = [UIScreen mainScreen].bounds.size.width;
     self.mainheight = [UIScreen mainScreen].bounds.size.height;
@@ -116,9 +122,9 @@
     UITapGestureRecognizer *clickRecognizer = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(EnlargePhoto)];
     [self.imageView1 addGestureRecognizer:clickRecognizer];
     
-    self.share = [[UIButton alloc]initWithFrame:CGRectMake(headerWidth-35,5,30,30)];
+    self.share = [[UIButton alloc]initWithFrame:CGRectMake(headerWidth-45,5,40,40)];
     [_share setImage:[UIImage imageNamed:@"icon_share"] forState:UIControlStateNormal];
-    self.like = [[UIButton alloc]initWithFrame:CGRectMake(headerWidth-35, headerheight-30,30,30)];
+    self.like = [[UIButton alloc]initWithFrame:CGRectMake(headerWidth-45, self.imageView1.frame.origin.y+self.imageView1.frame.size.height-40,40,40)];
     [_like setImage:[UIImage imageNamed:@"icon_like"] forState:UIControlStateNormal];
     
     [self.headerView addSubview:_share];
@@ -281,28 +287,6 @@
         [self.fosaDatePicker show];
     }];
 }
-//#pragma mark - 选择日期
-//-(void)selected{
-//    NSDate *selectdate = datePicker.date;
-//    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-//    [dateFormatter setDateFormat:@"yyyy-MM-dd"];
-//    NSString *strDate = [dateFormatter stringFromDate:selectdate];
-//    if(isRemind){
-//        self.remindDate.text = strDate;
-//        _redate = selectdate;
-//        remind_Date = strDate;
-//        NSLog(@"%@",remind_Date);
-//    }else{
-//        self.expireDate.text = strDate;
-//        _exdate = selectdate;
-//        expire_Date = strDate;
-//        NSLog(@"%@",expire_Date);
-//    }
-//    [dateView removeFromSuperview];
-//}
-//-(void)noSelect{
-//    [dateView removeFromSuperview];
-//}
 
 #pragma mark -- FosaDatePickerViewDelegate
 /**

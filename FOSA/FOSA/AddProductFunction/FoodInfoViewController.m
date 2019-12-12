@@ -9,12 +9,13 @@
 #import "FoodInfoViewController.h"
 #import "PhotoViewController.h"
 #import <UserNotifications/UserNotifications.h>
+#import "FosaDatePickerView.h"
 #import "SqliteManager.h"
 //图片宽高的最大值
 #define KCompressibilityFactor 1280.00
 #define MaxSCale 3.0  //最大缩放比例
 #define MinScale 0.5  //最小缩放比例
-@interface FoodInfoViewController ()<UITextFieldDelegate,UINavigationControllerDelegate,UNUserNotificationCenterDelegate,UITextViewDelegate,UIImagePickerControllerDelegate,UIScrollViewDelegate>{
+@interface FoodInfoViewController ()<UITextFieldDelegate,UINavigationControllerDelegate,UNUserNotificationCenterDelegate,UITextViewDelegate,UIImagePickerControllerDelegate,UIScrollViewDelegate,FosaDatePickerViewDelegate>{
     //日期选择
     UIDatePicker *datePicker;
     //日期选择器的容器
@@ -39,6 +40,9 @@
 //记录所选择的日期
 @property (nonatomic,assign) NSDate *exdate,*redate;
 
+//fosa 日期选择器
+@property (nonatomic,strong) FosaDatePickerView *fosaDatePicker;
+
 //图片放大视图
 @property (nonatomic,strong) UIScrollView *backGround;
 @property (nonatomic,strong) UIImageView *bigImage;
@@ -56,8 +60,8 @@
     tapGr.cancelsTouchesInView = NO;
     [self.view addGestureRecognizer:tapGr];
     
-    [self InitialDatePicker];
     [self CreatAndInitView];
+    [self InitialDatePicker];
     [self creatOrOpensql];
     [self SelectDataFromSqlite];
 }
@@ -71,36 +75,11 @@
 }
 
 -(void)InitialDatePicker{
-    dateView = [[UIView alloc]initWithFrame:CGRectMake(0, self.view.frame.size.height*2/3-50,self.view.frame.size.width,self.view.frame.size.height/3+50)];
-    dateView.backgroundColor = [UIColor whiteColor];
-    
-    sure = [[UIButton alloc]initWithFrame:CGRectMake(0, 0, self.view.frame.size.width/2, 50)];
-    cancel = [[UIButton alloc]initWithFrame:CGRectMake(self.view.frame.size.width/2, 0, self.view.frame.size.width/2, 50)];
-    [sure setTitle:@"确定" forState:UIControlStateNormal];
-    [sure setTitleColor:[UIColor blueColor] forState:UIControlStateNormal];
-    [cancel setTitle:@"取消" forState:UIControlStateNormal];
-    [cancel setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
-    [dateView addSubview:sure];
-    [dateView addSubview:cancel];
-
-    //添加响应
-    [sure addTarget:self action:@selector(selected) forControlEvents:UIControlEventTouchUpInside];
-    [cancel addTarget:self action:@selector(noSelect) forControlEvents:UIControlEventTouchUpInside];
-    //初始化日期选择器
-    datePicker = [[UIDatePicker alloc]initWithFrame: CGRectMake(0, 50, self.view.frame.size.width, self.view.frame.size.height/3)];
-    datePicker.backgroundColor = [UIColor whiteColor];
-    
-    NSLocale *locale = [[NSLocale alloc]initWithLocaleIdentifier:@"zw"];
-    datePicker.locale = locale;
-    
-    //默认显示当前日期
-    [datePicker setCalendar:[NSCalendar currentCalendar]];
-    //设置时区
-    [datePicker setTimeZone:[NSTimeZone defaultTimeZone]];
-    //设置Datepicker的允许的最大最小日期max&&min
-    //现实年月日
-    [datePicker setDatePickerMode:UIDatePickerModeDate];
-    [dateView addSubview:datePicker];
+   FosaDatePickerView *DatePicker = [[FosaDatePickerView alloc]initWithFrame:CGRectMake(0, self.view.frame.size.height, self.view.frame.size.width, 300)];
+    DatePicker.delegate = self;
+    DatePicker.title = @"请选择时间";
+    [self.view addSubview:DatePicker];
+    self.fosaDatePicker = DatePicker;
 }
 #pragma mark - 创建并初始化界面
 -(void)CreatAndInitView{
@@ -150,7 +129,7 @@
     [self.headerView addSubview:_imageView1];   //添加图片视图
     [self.headerView addSubview:_deviceName];
     
-    self.share = [[UIButton alloc]initWithFrame:CGRectMake(headerWidth-35,5,30,30)];
+    self.share = [[UIButton alloc]initWithFrame:CGRectMake(headerWidth-45,5,40,40)];
     [_share setImage:[UIImage imageNamed:@"icon_share"] forState:UIControlStateNormal];
     [_share addTarget:self action:@selector(beginShare) forControlEvents:UIControlEventTouchUpInside];
     
@@ -158,7 +137,7 @@
     [_takePhoto setImage:[UIImage imageNamed:@"icon_takePicture"] forState:UIControlStateNormal];
     [_takePhoto addTarget:self action:@selector(SelectOrChangephoto) forControlEvents:UIControlEventTouchUpInside];
     
-    self.like = [[UIButton alloc]initWithFrame:CGRectMake(headerWidth-35, headerheight-30,30,30)];
+    self.like = [[UIButton alloc]initWithFrame:CGRectMake(headerWidth-45, self.imageView1.frame.origin.y+self.imageView1.frame.size.height-40,40,40)];
     [_like setImage:[UIImage imageNamed:@"icon_like"] forState:UIControlStateNormal];
     
     
@@ -330,31 +309,45 @@
 -(void)ExpireDateSelect{
     NSLog(@"select expire date");
     isRemind = false;
-    [self.view addSubview:dateView];
+     [UIView animateWithDuration:0.3 animations:^{
+           self.fosaDatePicker.frame = CGRectMake(0, self.view.frame.size.height - 300, self.view.frame.size.width, 300);
+           [self.fosaDatePicker show];
+       }];
 }
 -(void)RemindDateSelect{
     isRemind = true;
     NSLog(@"select reminding date");
-    [self.view addSubview:dateView];
+    [UIView animateWithDuration:0.3 animations:^{
+        self.fosaDatePicker.frame = CGRectMake(0, self.view.frame.size.height - 300, self.view.frame.size.width, 300);
+        [self.fosaDatePicker show];
+    }];
 }
--(void)selected{
-    NSDate *selectdate = datePicker.date;
-    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    [dateFormatter setDateFormat:@"yyyy-MM-dd"];
-    NSString *strDate = [dateFormatter stringFromDate:selectdate];
-    if(isRemind){
-        self.remindDate.text = strDate;
-        _redate = selectdate;
-        remind_Date = strDate;
+
+#pragma mark -- FosaDatePickerViewDelegate
+/**
+ 保存按钮代理方法
+
+ @param timer 选择的数据
+ */
+- (void)datePickerViewSaveBtnClickDelegate:(NSString *)timer {
+    NSLog(@"保存点击");
+    if (isRemind) {
+        self.remindDate.text = timer;
     }else{
-        self.expireDate.text = strDate;
-        _exdate = selectdate;
-        expire_Date = strDate;
+        self.expireDate.text  = timer;
     }
-    [dateView removeFromSuperview];
+    [UIView animateWithDuration:0.3 animations:^{
+       self.fosaDatePicker.frame = CGRectMake(0, self.view.frame.size.height, self.view.frame.size.width, 300);
+   }];
 }
--(void)noSelect{
-    [dateView removeFromSuperview];
+/**
+ 取消按钮代理方法
+ */
+- (void)datePickerViewCancelBtnClickDelegate {
+    NSLog(@"取消点击");
+    [UIView animateWithDuration:0.3 animations:^{
+        self.fosaDatePicker.frame = CGRectMake(0, self.view.frame.size.height, self.view.frame.size.width, 300);
+    }];
 }
 #pragma mark - 分享
 //生成share的UIView
