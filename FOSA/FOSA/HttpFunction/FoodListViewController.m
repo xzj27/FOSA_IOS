@@ -141,11 +141,11 @@
     [self presentViewController:alert animated:true completion:nil];
 }
 
-//- (void)insertDataIntoNutrient{
-//    self.database = [SqliteManager InitSqliteWithName:@"Fosa.db"]; //open database
-//    NSString *creatNutrientTable = @"create table if not exists Nutrient(id integer primary key,foodName text,Category text,Calorie text,Protein text,Fat text,Carbohydrate text,DietaryFiber text,Cholesterin text,Ca text,Mg text,Fe text,Zn text,K text,VitaminC text,VitaminE text,VitaminA text,Carotene text)";
-//    [SqliteManager InitTableWithName:creatNutrientTable database:self.database];// 创建营养表
-//
-//    NSString *InsertData = [NSString stringWithFormat:@"Insert into Nutrient(foodName,Category,Calorie,Protein,Fat,Carbohydrate,DietaryFiber ,Cholesterin,Ca,Mg,Fe,Zn,K,VitaminC,VitaminE,VitaminA,Carotene)values('%@','%@','%@','%@','%@','%@','%@','%@','%@','%@','%@','%@','%@','%@','%@','%@','%@',)",];
-//}
+- (void)insertDataIntoNutrient{
+    self.database = [SqliteManager InitSqliteWithName:@"Fosa.db"]; //open database
+    NSString *creatNutrientTable = @"create table if not exists Nutrient(id integer primary key,foodName text,Category text,Calorie text,Protein text,Fat text,Carbohydrate text,DietaryFiber text,Cholesterin text,Ca text,Mg text,Fe text,Zn text,K text,VitaminC text,VitaminE text,VitaminA text,Carotene text)";
+    [SqliteManager InitTableWithName:creatNutrientTable database:self.database];// 创建营养表
+
+   // NSString *InsertData = [NSString stringWithFormat:@"Insert into Nutrient(foodName,Category,Calorie,Protein,Fat,Carbohydrate,DietaryFiber ,Cholesterin,Ca,Mg,Fe,Zn,K,VitaminC,VitaminE,VitaminA,Carotene)values('%@','%@','%@','%@','%@','%@','%@','%@','%@','%@','%@','%@','%@','%@','%@','%@','%@',)",];
+}
 @end

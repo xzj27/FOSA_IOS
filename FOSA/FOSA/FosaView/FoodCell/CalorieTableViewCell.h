@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CalorieTableViewCell : UITableViewCell
 
-@property (nonatomic,strong) UIView *backgroundView;
+@property (nonatomic,strong) UIView *backView;
 @property (nonatomic,strong) UIButton *delete_cell,*select,*units;
 @property (nonatomic,strong) UILabel *foodName;
 @property (nonatomic,strong) UITextField *weight;

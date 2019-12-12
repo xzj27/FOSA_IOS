@@ -439,17 +439,17 @@
     UIButton *btn2 = [[UIButton alloc]initWithFrame:CGRectMake(self.sealerView.frame.size.width-45, 5, 40, 40)];
     
     [btn2 setImage:[UIImage imageNamed:@"icon_scan"]  forState:UIControlStateNormal];
-    [btn2 addTarget:self action:@selector(ScanAction) forControlEvents:UIControlEventTouchUpInside];
+    //[btn2 addTarget:self action:@selector(ScanAction) forControlEvents:UIControlEventTouchUpInside];
     [self.sealerView2 addSubview:btn2];
     
     UIView *infoMenu2 = [[UIView alloc]initWithFrame:CGRectMake(0, self.sealerView.frame.size.height*5/6, self.sealerView.frame.size.width,self.sealerView.frame.size.height/6)];
     infoMenu2.backgroundColor = [UIColor colorWithRed:80/255.0 green:200/255.0 blue:240/255.0 alpha:1.0];
     UIImageView *indicator2 = [[UIImageView alloc]initWithFrame:CGRectMake(0, 0, self.InfoMenu.frame.size.height, self.InfoMenu.frame.size.height)];
     indicator2.image = [UIImage imageNamed:@"caret"];
-    UITapGestureRecognizer *recognizer2 = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(ExpandList)];
+    //UITapGestureRecognizer *recognizer2 = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(ExpandList)];
     indicator2.userInteractionEnabled = YES;
     [infoMenu2 addSubview:indicator2];
-    [indicator2 addGestureRecognizer:recognizer2];
+    //[indicator2 addGestureRecognizer:recognizer2];
     [_sealerView2 addSubview:infoMenu2];
     //列表
     
@@ -463,6 +463,7 @@
     self.connect = [[UIButton alloc]initWithFrame:CGRectMake(self.poundView.frame.size.width-45, 5, 40, 40)];
     [self.connect setImage:[UIImage imageNamed:@"icon_disconnect"] forState:UIControlStateNormal];
     [self.poundView addSubview:self.connect];
+    
     //添加底部卡路里总量视图
     self.calorieResultView = [[UIView alloc]initWithFrame:CGRectMake(0, screen_height-TabbarHeight-70, screen_width, 70)];
     _calorieResultView.backgroundColor = [UIColor colorWithRed:208/255.0 green:208/255.0 blue:208/255.0 alpha:1.0];
@@ -470,7 +471,7 @@
     _totalcalorieLabel.text = @"卡路里总量(Kcal):";
     _totalcalorieLabel.font = [UIFont systemFontOfSize:14];
     [_calorieResultView addSubview:_totalcalorieLabel];
-    self.Allcalorie = [[UILabel alloc]initWithFrame:CGRectMake(screen_width/3, 5, screen_width*2/3-5, self.calorieResultView.frame.size.height)];
+    self.Allcalorie = [[UILabel alloc]initWithFrame:CGRectMake(screen_width/3, 5, screen_width*2/3-70, self.calorieResultView.frame.size.height)];
     _Allcalorie.userInteractionEnabled = NO;
     _Allcalorie.layer.cornerRadius = 5;
     _Allcalorie.textAlignment = NSTextAlignmentCenter;
@@ -478,9 +479,9 @@
     
     [_calorieResultView addSubview:_Allcalorie];
 
-    self.addCalorie = [[UIButton alloc]initWithFrame:CGRectMake(screen_width*3/4, 0, screen_width/4, 50)];
+    self.addCalorie = [[UIButton alloc]initWithFrame:CGRectMake(screen_width-70, 0, 70, 70)];
     [_addCalorie setImage:[UIImage imageNamed:@"icon_add"] forState:UIControlStateNormal];
-    //[_calorieResultView addSubview:_addCalorie];
+    [_calorieResultView addSubview:_addCalorie];
     [_addCalorie addTarget:self action:@selector(addAction) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:_calorieResultView];
     //calorieNumber = 0;
@@ -564,7 +565,7 @@
 }
 //calorie table
 - (void)InitCalorieTable{
-    self.calorieTable = [[UITableView alloc]initWithFrame:CGRectMake(_poundView.frame.origin.x, _poundView.frame.origin.y+self.poundView.frame.size.height, _poundView.frame.size.width,100*4) style:UITableViewStylePlain];
+    self.calorieTable = [[UITableView alloc]initWithFrame:CGRectMake(_poundView.frame.origin.x, _poundView.frame.origin.y+self.poundView.frame.size.height, _poundView.frame.size.width,110*4) style:UITableViewStylePlain];
     _calorieTable.delegate = self;
     _calorieTable.dataSource = self;
     _calorieTable.hidden = YES;
@@ -583,7 +584,7 @@
     [_calorieTable reloadData];
     //NSInteger index = calorieData.count;
     if (self.calorieData.count > 4) {
-        [self.calorieTable setContentOffset:CGPointMake(0, 100*(self.calorieData.count-4))];
+        [self.calorieTable setContentOffset:CGPointMake(0, 110*(self.calorieData.count-4))];
     }
     //[self.rootView setContentOffset:CGPointMake(0,self.poundView.frame.origin.y-NavigationHeight+self.poundView.frame.size.height+index*100) animated:YES];
 }
@@ -593,7 +594,7 @@
     if ([tableView isEqual:_foodTable]) {
         return 100;
     }else if([tableView isEqual:_calorieTable]){
-        return 100;
+        return 110;
     }else{
         return 0;
     }
@@ -658,9 +659,6 @@
         cell.calorie.text = self.calorieData[row].calorie;
         _weight = cell.weight;
         _weight.delegate = self;
-        if (row == 0) {
-            cell.delete_cell.hidden = YES;
-        }
             //取消点击cell时显示的背景色
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         [cell.select  addTarget:self action:@selector(showCategory:) forControlEvents:UIControlEventTouchUpInside];
