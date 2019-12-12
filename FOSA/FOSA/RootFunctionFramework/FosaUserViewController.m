@@ -54,7 +54,7 @@
     self.isAppsOpen= false;
 
     //底层视图
-    self.rootScrollview = [[UIScrollView alloc]initWithFrame:CGRectMake(0, -StatusBarHeight*3/4,self.mainWidth,self.mainHeigh-TabbarHeight+StatusBarHeight/2)];
+    self.rootScrollview = [[UIScrollView alloc]initWithFrame:CGRectMake(0, -StatusBarHeight*3/4,self.mainWidth,self.mainHeigh-TabbarHeight+StatusBarHeight*3/4)];
     _rootScrollview.showsVerticalScrollIndicator = NO;
     _rootScrollview.showsHorizontalScrollIndicator = NO;
     [self.view addSubview:_rootScrollview];
