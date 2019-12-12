@@ -27,6 +27,8 @@
     NSString *ID;
     Boolean isEdit;
     CGFloat cellHeight;
+    //刷新标志
+    Boolean isUpdate;
 }
 @property (nonatomic,strong) UIView *CategoryMenu;  //菜单视图
 @property(nonatomic,assign) sqlite3 *database;
@@ -66,27 +68,36 @@
     UIBarButtonItem *leftItem = [[UIBarButtonItem alloc]initWithCustomView:self.Remindbtn];
     self.navigationItem.leftBarButtonItem = leftItem;
     [self InitView];
-    [self InitAddView];
 }
 
 - (void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
-    //[self creatOrOpensql];
-    //[self SelectDataFromSqlite];
-    if (self.StorageItemView != nil) {
+
+    if (isUpdate == true) {
         NSLog(@"异步刷新界面");
         dispatch_async(dispatch_get_main_queue(), ^{
             [self.storageArray removeAllObjects];
+            //[self RemoveObjectAfterIndex:0];
             [self.StorageItemView reloadData];
         });
     }
 }
+- (void)RemoveObjectAfterIndex:(NSInteger)index{
+    for (NSInteger i = index+1; i < _storageArray.count; i++) {
+        [_storageArray removeObjectAtIndex:i];
+    }
+}
+
 - (void)InitView{
     ID = @"FosaCell";
     isEdit = false;
     _LeftOrRight = true;    //true mean that the view is folded
     _count = 0;
+    isUpdate = false;
     self.storageArray = [[NSMutableArray alloc]init];
+    
+    NSLog(@"FosaMain 执行 InitView");
+    
     self.mainWidth = [UIScreen mainScreen].bounds.size.width;
     self.mainHeight = [UIScreen mainScreen].bounds.size.height;
     self.navHeight = self.navigationController.navigationBar.frame.size.height;
@@ -255,10 +266,10 @@
     //查询数据库所有食品并获得其foodname和expire date
     for (int i = 0; i < _storageArray.count; i++) {
 NSLog(@"foodName=%@&&&&&&&expireDate=%@",_storageArray[i].foodName,_storageArray[i].remindDate);
-        NSString *Edate = _storageArray[i].remindDate;
+        NSString *Rdate = _storageArray[i].remindDate;//格式为 yyyy-MM-dd
         NSDate *foodDate = [[NSDate alloc]init];
-        NSLog(@"%@",Edate);
-        foodDate = [formatter dateFromString:Edate];
+        NSLog(@"%@",Rdate);
+        foodDate = [formatter dateFromString:Rdate];
         NSLog(@"%@-------%@",currentDate,foodDate);
         NSComparisonResult result = [currentDate compare:foodDate];
         
@@ -280,8 +291,8 @@ NSLog(@"foodName=%@&&&&&&&expireDate=%@",_storageArray[i].foodName,_storageArray
     }
     _circleview = [[LoadCircleView alloc]initWithFrame:CGRectMake(0  ,400,self.view.frame.size.width,100)];
     //添加到视图上展示
-     [self.view addSubview:_circleview];
-    [self performSelector:@selector(removeLoading) withObject:nil afterDelay:3.0f];
+    [self.view addSubview:_circleview];
+    [self performSelector:@selector(removeLoading) withObject:nil afterDelay:2.0f];
     
 }
 //取出保存在本地的图片
@@ -312,6 +323,13 @@ NSLog(@"foodName=%@&&&&&&&expireDate=%@",_storageArray[i].foodName,_storageArray
     self.database = [SqliteManager InitSqliteWithName:@"Fosa.db"];
 }
 - (void) SelectDataFromSqlite{
+    
+    if (_storageArray.count == 0) {
+        //添加第一个为空的cellmodel
+        CellModel *add = [[CellModel alloc]init];
+        [self.storageArray addObject:add];
+    }
+    
     //查询数据库添加的食物
     NSString *sql = [NSString stringWithFormat:@"select foodName,deviceName,aboutFood,expireDate,remindDate,photoPath from Fosa2"];
     self.stmt = [SqliteManager SelectDataFromTable:sql database:self.database];
@@ -326,6 +344,7 @@ NSLog(@"foodName=%@&&&&&&&expireDate=%@",_storageArray[i].foodName,_storageArray
                 NSLog(@"查询到数据%@",[NSString stringWithUTF8String:expired_date]);
                 NSLog(@"查询到数据%@",[NSString stringWithUTF8String:photo_path]);
                 NSLog(@"********************************");
+            
         [self CreatFoodViewWithName:[NSString stringWithUTF8String:food_name] fdevice:[NSString stringWithUTF8String:device_name] remindDate:[NSString stringWithUTF8String:remind_date] foodPhoto:[NSString stringWithUTF8String:photo_path]];
             }
     }else{
@@ -434,7 +453,7 @@ if (!_LeftOrRight) {//view 展开
         [self.StorageItemView reloadData];
         if (self.storageArray.count == 0) {
             [self.addView removeFromSuperview];
-            [self InitAddView];
+            //[self InitAddView];
         }
     }
 }
@@ -485,24 +504,19 @@ if (!_LeftOrRight) {//view 展开
     FoodCollectionViewCell *cell = [self.StorageItemView dequeueReusableCellWithReuseIdentifier:ID forIndexPath:indexPath];
     //给自定义cell的model传值
     long int index = indexPath.section*2+indexPath.row;
-    //cell.model = self.storageArray[index];
-    
     [cell setModel:self.storageArray[index]];
-        //cell.backgroundColor = [UIColor colorWithRed:arc4random()%255/255.0 green:arc4random()%255/255.0 blue:arc4random()%255/255.0 alpha:1];
     cell.backgroundColor = [UIColor colorWithRed:155/255.0 green:251/255.5 blue:241/255.0 alpha:1.0];
-        cell.layer.cornerRadius = 10;
-        cell.userInteractionEnabled = YES;
-        //给每一个cell添加长按手势
-        _longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(lonePressMoving:)];
-        _longPress.minimumPressDuration = 1; //长按时间
-        [cell addGestureRecognizer:_longPress];
-    
-    if (index+1 == self.storageArray.count) {
-        [self.addView removeFromSuperview];
-        [self InitAddView];
-    }
+    cell.layer.cornerRadius = 10;
+    cell.userInteractionEnabled = YES;
+    if (index == 0) {
+        [cell.add addTarget:self action:@selector(addFunction) forControlEvents:UIControlEventTouchUpInside];
         return cell;
-    //}
+    }
+    //给每一个cell添加长按手势
+    _longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(lonePressMoving:)];
+    _longPress.minimumPressDuration = 1; //长按时间
+    [cell addGestureRecognizer:_longPress];
+        return cell;
 }
 //点击item方法
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath{
@@ -545,6 +559,7 @@ if (!_LeftOrRight) {//view 展开
     }else{
             NSLog(@"数据库关闭异常");
     }
+    isUpdate = true;
 }
 
 @end

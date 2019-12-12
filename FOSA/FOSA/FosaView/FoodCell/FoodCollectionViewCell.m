@@ -14,6 +14,11 @@
 {
     self = [super initWithFrame:frame];
     if (self) {
+        self.add = [[UIButton alloc]initWithFrame:self.bounds];
+        [_add setImage:[UIImage imageNamed:@"icon_additem"] forState:UIControlStateNormal];
+        _add.hidden = YES;
+        [self addSubview:_add];
+
         self.nameLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, 5, self.bounds.size.width,self.bounds.size.height/6)];
         self.nameLabel.textColor = [UIColor blackColor];
         self.nameLabel.textAlignment = NSTextAlignmentCenter;
@@ -56,6 +61,17 @@
     _model = model;
     self.foodImageview.image = [self getImage:model.foodPhoto];
     self.nameLabel.text  = model.foodName;
+    if (model.foodName == NULL) {
+        self.add.hidden = NO;
+        self.nameLabel.hidden = YES;
+        self.dateLabel.hidden = YES;
+        self.foodImageview.hidden = YES;
+    }else{
+        self.add.hidden = YES;
+        self.nameLabel.hidden = NO;
+        self.dateLabel.hidden = NO;
+        self.foodImageview.hidden = NO;
+    }
     
     self.dateLabel.text = [NSString stringWithFormat:@"Remind:%@",model.remindDate ];
 }

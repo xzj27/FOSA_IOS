@@ -16,6 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic,strong) UILabel *nameLabel,*dateLabel;
 @property (nonatomic,strong) UIImageView *foodImageview,*deleteIcon,*cancelIcon;
+@property (nonatomic,strong) UIButton *add;
 @end
 
 NS_ASSUME_NONNULL_END
