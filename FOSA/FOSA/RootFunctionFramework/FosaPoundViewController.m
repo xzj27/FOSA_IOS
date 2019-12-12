@@ -453,8 +453,14 @@
     [_sealerView2 addSubview:infoMenu2];
     //列表
     
-    self.poundView.frame = CGRectMake(5, 10+screen_height/2, screen_width-10, screen_height/8);
+    self.poundView.frame = CGRectMake(5, StatusBarHeight+screen_height/2, screen_width-10, screen_height/8);
     self.poundView.backgroundColor = [UIColor colorWithRed:254/255.0 green:0/255.0 blue:151/255.0 alpha:1.0];
+    
+    //添加点击手势
+    self.poundView.userInteractionEnabled = YES;
+    UITapGestureRecognizer *poundrecognizer = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(clickToMove)];
+    [self.poundView addGestureRecognizer:poundrecognizer];
+    
     [self.rootView addSubview:self.poundView];
     self.poundImage.frame = CGRectMake(5, 5, self.poundView.frame.size.height-10, self.poundView.frame.size.height-10);
     self.poundImage.image = [UIImage imageNamed:@"img_pound.jpg"];
@@ -513,7 +519,9 @@
         self.rootView.contentSize = CGSizeMake(screen_width,screen_height*1.5);
     }
 }
-
+- (void)clickToMove{
+     [self.rootView setContentOffset:CGPointMake(0,self.poundView.frame.origin.y-StatusBarHeight) animated:YES];
+}
 - (void)moveView{
     isExpand = true;
     self.rootView.contentSize = CGSizeMake(screen_width,screen_height+self.foodTable.frame.size.height);
@@ -565,7 +573,7 @@
 }
 //calorie table
 - (void)InitCalorieTable{
-    self.calorieTable = [[UITableView alloc]initWithFrame:CGRectMake(_poundView.frame.origin.x, _poundView.frame.origin.y+self.poundView.frame.size.height, _poundView.frame.size.width,110*4) style:UITableViewStylePlain];
+    self.calorieTable = [[UITableView alloc]initWithFrame:CGRectMake(_poundView.frame.origin.x, _poundView.frame.origin.y+self.poundView.frame.size.height, _poundView.frame.size.width,screen_height-TabbarHeight-70-self.poundView.frame.size.height) style:UITableViewStylePlain];
     _calorieTable.delegate = self;
     _calorieTable.dataSource = self;
     _calorieTable.hidden = YES;
@@ -576,17 +584,16 @@
     [self addAction];
 }
 - (void)addAction{
-    if (self.calorieData.count > 1) {
-        [self.rootView setContentOffset:CGPointMake(0,self.poundView.frame.origin.y-NavigationHeight+self.poundView.frame.size.height) animated:YES];
+    if (self.calorieData.count > 0) {
+        [self.rootView setContentOffset:CGPointMake(0,self.poundView.frame.origin.y-StatusBarHeight) animated:YES];
     }
     self.calorieTable.hidden = NO;
     [self CalorieData];
     [_calorieTable reloadData];
     //NSInteger index = calorieData.count;
-    if (self.calorieData.count > 4) {
-        [self.calorieTable setContentOffset:CGPointMake(0, 110*(self.calorieData.count-4))];
+    if (self.calorieData.count*110 > self.calorieTable.frame.size.height) {
+        [self.calorieTable setContentOffset:CGPointMake(0, 110*(self.calorieData.count-(int)self.calorieTable.frame.size.height/110))];
     }
-    //[self.rootView setContentOffset:CGPointMake(0,self.poundView.frame.origin.y-NavigationHeight+self.poundView.frame.size.height+index*100) animated:YES];
 }
 //行高度
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -724,6 +731,7 @@
 }
 //删除记录按钮
 - (void)DeleteCell:(UIButton *)sender{
+    [self.rootView setContentOffset:CGPointMake(0,self.poundView.frame.origin.y-StatusBarHeight) animated:YES];
     NSLog(@"%ld",(long)sender.tag);
     NSLog(@"<><><><>%@<><><><><>",_weight.text);
     [self.calorieData removeObjectAtIndex:sender.tag];
@@ -737,10 +745,6 @@
             [sender setTitle:@"g" forState:UIControlStateNormal];
             sender.tag = 1;
             break;
-//        case 1:
-//            [sender setTitle:@"ml" forState:UIControlStateNormal];
-//            sender.tag = 2;
-//            break;
         case 1:
             //1oz=28.35g
             [sender setTitle:@"oz" forState:UIControlStateNormal];
@@ -821,19 +825,16 @@
     [self.scanBtn setImage:[UIImage imageNamed:@"icon_scan"] forState:UIControlStateNormal];
     isScan = false;
 }
-
 #pragma mark - 退出键盘
 -(void)StopEdit:(UITapGestureRecognizer *)gestureRecognizer
 {
     [self.view endEditing:YES];
 }
 -(void)keyboardWillShow:(NSNotification *)noti{
-    //设置底层视图滚动位置
-    //[self.rootView setContentOffset:CGPointMake(0,self.poundView.frame.origin.y-NavigationHeight) animated:YES];
     NSLog(@"键盘弹出来了");
 }
 -(void)keyboardWillHide:(NSNotification *)noti{
-    [self.rootView setContentOffset:CGPointMake(0,self.poundView.frame.origin.y) animated:YES];
+    [self.rootView setContentOffset:CGPointMake(0,self.poundView.frame.origin.y-StatusBarHeight) animated:YES];
     NSLog(@"键盘被收起来了");
 }
 
@@ -845,17 +846,14 @@
         index = 4;
     }
     //设置底层视图滚动位置
-       [self.rootView setContentOffset:CGPointMake(0,self.poundView.frame.origin.y-NavigationHeight+self.poundView.frame.size.height+index*100) animated:YES];
+       [self.rootView setContentOffset:CGPointMake(0,self.poundView.frame.origin.y+self.poundView.frame.size.height+index*110-StatusBarHeight) animated:YES];
 }
-
 //点击软键盘返回键退出解盘
 - (BOOL)textFieldShouldReturn:(UITextField *)textField{
-    //[self.rootView setContentOffset:CGPointMake(0,0) animated:YES];
     NSLog(@"收回键盘");
     [self.weight resignFirstResponder];
     return YES;
 }
-
 //监听文本内容变化
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string{
     //得到输入框的内容
