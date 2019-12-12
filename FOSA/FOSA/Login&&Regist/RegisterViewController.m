@@ -129,39 +129,42 @@
 //弹出系统提示
 -(void)SystemAlert:(NSString *)message{
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Alert" message:message preferredStyle:UIAlertControllerStyleAlert];
-    [alert addAction:[UIAlertAction actionWithTitle:@"返回登录" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action){
-        //点击回调
-        [self dismissViewControllerAnimated:YES completion:nil];
-    }]];
-    
-    [alert addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleDefault handler:nil]];
-    [self presentViewController:alert animated:true completion:nil];
+    if ([message isEqualToString:@"账号或密码不能为空"]) {
+        [alert addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil]];
+        [self presentViewController:alert animated:true completion:nil];
+    }else{
+        [alert addAction:[UIAlertAction actionWithTitle:@"返回登录" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action){
+            //点击回调
+            [self dismissViewControllerAnimated:YES completion:nil];
+        }]];
+        [alert addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleDefault handler:nil]];
+        [self presentViewController:alert animated:true completion:nil];
+    }
 }
 
 //数据库操作
 //创建或打开数据库
 -(void)creatOrOpensql
 {
-    if (self.userNameInput.text == NULL || self.passwordInput.text == NULL) {
+    if ([self.userNameInput.text isEqualToString:@""] || [self.passwordInput.text isEqualToString:@""]) {
         [self SystemAlert:@"账号或密码不能为空"];
-        return;
+    }else{
+        NSString *path = [self getPath];
+        char *erro = 0;
+        int sqlStatus = sqlite3_open_v2([path UTF8String], &_database,SQLITE_OPEN_CREATE|SQLITE_OPEN_READWRITE,NULL);
+        if (sqlStatus == SQLITE_OK) {
+            NSLog(@"数据库打开成功");
+        }
+        //创建数据库表
+        const char *sql = "create table if not exists Fosa_User(id integer primary key,userName text,password text)";
+        int tabelStatus = sqlite3_exec(self.database, sql,NULL,NULL,&erro);//运行结果
+        if (tabelStatus == SQLITE_OK)
+        {
+            NSLog(@"表创建成功");
+        }
+        //数据库操作
+        [self InsertDataIntoSqlite];
     }
-    
-    NSString *path = [self getPath];
-    char *erro = 0;
-    int sqlStatus = sqlite3_open_v2([path UTF8String], &_database,SQLITE_OPEN_CREATE|SQLITE_OPEN_READWRITE,NULL);
-    if (sqlStatus == SQLITE_OK) {
-        NSLog(@"数据库打开成功");
-    }
-    //创建数据库表
-    const char *sql = "create table if not exists Fosa_User(id integer primary key,userName text,password text)";
-    int tabelStatus = sqlite3_exec(self.database, sql,NULL,NULL,&erro);//运行结果
-    if (tabelStatus == SQLITE_OK)
-    {
-        NSLog(@"表创建成功");
-    }
-    //数据库操作
-    [self InsertDataIntoSqlite];
 }
 -(void) InsertDataIntoSqlite{
     char *erro = 0;

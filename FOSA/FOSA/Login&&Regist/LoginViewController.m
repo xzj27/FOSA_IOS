@@ -112,9 +112,8 @@
     _login.backgroundColor = [UIColor orangeColor];
     [_login setTitle:@"登录" forState:UIControlStateNormal];
     _login.layer.cornerRadius = 5;
+     [_login addTarget:self action:@selector(creatOrOpensql) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:_login];
-    [self.login addTarget:self action:@selector(beginLogin) forControlEvents:UIControlEventTouchUpInside];
-    
     //注册按钮
     self.registbtn = [[UIButton alloc]initWithFrame:CGRectMake(10, 400, self.mainWidth-20, 50)];
     _registbtn.backgroundColor = [UIColor orangeColor];
@@ -129,7 +128,7 @@
     self.regist.font = [UIFont systemFontOfSize:15];
     self.regist.textColor = [UIColor greenColor];
     self.regist.userInteractionEnabled = YES;           //打开交互
-    [self.view addSubview:_regist];
+    //[self.view addSubview:_regist];
     UIGestureRecognizer *registGestureRecognizer = [[UIGestureRecognizer alloc]initWithTarget:self action:@selector(jumpToRegist)];
     [self.regist addGestureRecognizer:registGestureRecognizer];
 }
@@ -175,25 +174,27 @@
 //创建或打开数据库
 -(void)creatOrOpensql
 {
-    if (self.userNameInput.text == NULL || self.passwordInput.text == NULL) {
+    if ([self.userNameInput.text isEqualToString:@""] || [self.passwordInput.text isEqualToString:@""]) {
+        NSLog(@"账号或密码不能为空");
         [self SystemAlert:@"账号或密码不能为空"];
-        return;
+    }else{
+        NSString *path = [self getPath];
+        char *erro = 0;
+        int sqlStatus = sqlite3_open_v2([path UTF8String], &_database,SQLITE_OPEN_CREATE|SQLITE_OPEN_READWRITE,NULL);
+        if (sqlStatus == SQLITE_OK) {
+               NSLog(@"数据库打开成功");
+        }
+        //创建数据库表
+        const char *sql = "create table if not exists Fosa_User(id integer primary key,userName text,password text)";
+        int tabelStatus = sqlite3_exec(self.database, sql,NULL, NULL, &erro);//运行结果
+        if (tabelStatus == SQLITE_OK)
+        {
+            NSLog(@"表创建成功");
+        }
+        //数据库操作
+        [self SelectDataFromSqlite];
     }
-    NSString *path = [self getPath];
-    char *erro = 0;
-    int sqlStatus = sqlite3_open_v2([path UTF8String], &_database,SQLITE_OPEN_CREATE|SQLITE_OPEN_READWRITE,NULL);
-    if (sqlStatus == SQLITE_OK) {
-        NSLog(@"数据库打开成功");
-    }
-    //创建数据库表
-    const char *sql = "create table if not exists Fosa_User(id integer primary key,userName text,password text)";
-    int tabelStatus = sqlite3_exec(self.database, sql,NULL, NULL, &erro);//运行结果
-    if (tabelStatus == SQLITE_OK)
-    {
-        NSLog(@"表创建成功");
-    }
-    //数据库操作
-    [self SelectDataFromSqlite];
+   
 }
 -(void) SelectDataFromSqlite{
     //查询数据库
@@ -249,14 +250,6 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillShowNotification object:nil];
 
 }
-/*
-#pragma mark - Navigation
 
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
 
 @end
