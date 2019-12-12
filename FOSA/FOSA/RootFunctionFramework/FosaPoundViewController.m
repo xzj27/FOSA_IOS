@@ -397,7 +397,7 @@
     self.rootView.bounces = NO;
     self.rootView.showsVerticalScrollIndicator = NO;
     self.rootView.showsHorizontalScrollIndicator = NO;
-    self.rootView.contentSize = CGSizeMake(screen_width,screen_height*1.5);
+    self.rootView.contentSize = CGSizeMake(screen_width,screen_height*1.5-StatusBarHeight*2);
     [self.view addSubview:self.rootView];
     //SealerView
     self.sealerView.frame = CGRectMake(5,10,screen_width-10,(screen_height)/4-10);
@@ -542,8 +542,6 @@
     listcenter.x = center1.x;
     self.calorieTable.center = listcenter;
 }
-
-
 - (void)InitData:(NSString *)foodName expireDate:(NSString *)expireDate storageDate:(NSString *)storageDate deviceID:(NSString *)deviceID {
     CellModel *model = [CellModel modelWithName:foodName expireDate:expireDate storageDate:storageDate fdevice:deviceID];
     [arrayData addObject:model];
@@ -573,7 +571,7 @@
 }
 //calorie table
 - (void)InitCalorieTable{
-    self.calorieTable = [[UITableView alloc]initWithFrame:CGRectMake(_poundView.frame.origin.x, _poundView.frame.origin.y+self.poundView.frame.size.height, _poundView.frame.size.width,screen_height-TabbarHeight-70-self.poundView.frame.size.height) style:UITableViewStylePlain];
+    self.calorieTable = [[UITableView alloc]initWithFrame:CGRectMake(_poundView.frame.origin.x, _poundView.frame.origin.y+self.poundView.frame.size.height, _poundView.frame.size.width,screen_height-StatusBarHeight-TabbarHeight-70-self.poundView.frame.size.height) style:UITableViewStylePlain];
     _calorieTable.delegate = self;
     _calorieTable.dataSource = self;
     _calorieTable.hidden = YES;
@@ -899,6 +897,7 @@
 }
 //输入结束
 - (void)textFieldDidEndEditing:(UITextField *)textField{
+    [self UpdateAndCalculateCalorie];
     self.calorieData[textField.tag].weight = textField.text;
 }
 
