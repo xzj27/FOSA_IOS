@@ -54,7 +54,7 @@
     self.isAppsOpen= false;
 
     //底层视图
-    self.rootScrollview = [[UIScrollView alloc]initWithFrame:CGRectMake(0, -StatusBarHeight/2,self.mainWidth,self.mainHeigh-TabbarHeight+StatusBarHeight/2)];
+    self.rootScrollview = [[UIScrollView alloc]initWithFrame:CGRectMake(0, -StatusBarHeight*3/4,self.mainWidth,self.mainHeigh-TabbarHeight+StatusBarHeight/2)];
     _rootScrollview.showsVerticalScrollIndicator = NO;
     _rootScrollview.showsHorizontalScrollIndicator = NO;
     [self.view addSubview:_rootScrollview];
@@ -84,7 +84,7 @@
     [self.username addGestureRecognizer:jumpTologinRecognizer];
     
     self.itemView = [[UIView alloc]initWithFrame:CGRectMake(0, self.mainHeigh/5, self.mainWidth, self.mainHeigh*4/5)];
-    self.itemView.backgroundColor = [UIColor colorWithRed:228/255.0 green:228/255.0 blue:228/255.0 alpha:1.0];
+    self.itemView.backgroundColor = [UIColor colorWithRed:208/255.0 green:208/255.0 blue:208/255.0 alpha:1.0];
     [self.rootScrollview addSubview:_itemView];
     
     //tutorial

@@ -432,6 +432,26 @@
     self.sealerView2 = [[UIView alloc]initWithFrame:CGRectMake(5,10+(screen_height)/4,screen_width-10,(screen_height)/4-10)];
     self.sealerView2.backgroundColor = [UIColor colorWithRed:0/255.0 green:191/255.0 blue:227/255.0 alpha:1.0];;
     [self.rootView addSubview:self.sealerView2];
+    UIImageView *imageview2 = [[UIImageView alloc]initWithFrame: CGRectMake(5, 5, self.sealerView.frame.size.height*2/3-10, self.sealerView.frame.size.height*2/3-10)];
+    imageview2.image = [UIImage imageNamed:@"fosa.jpg"];
+    [self.sealerView2 addSubview:imageview2];
+    //扫描按钮2
+    UIButton *btn2 = [[UIButton alloc]initWithFrame:CGRectMake(self.sealerView.frame.size.width-45, 5, 40, 40)];
+    
+    [btn2 setImage:[UIImage imageNamed:@"icon_scan"]  forState:UIControlStateNormal];
+    [btn2 addTarget:self action:@selector(ScanAction) forControlEvents:UIControlEventTouchUpInside];
+    [self.sealerView2 addSubview:btn2];
+    
+    UIView *infoMenu2 = [[UIView alloc]initWithFrame:CGRectMake(0, self.sealerView.frame.size.height*5/6, self.sealerView.frame.size.width,self.sealerView.frame.size.height/6)];
+    infoMenu2.backgroundColor = [UIColor colorWithRed:80/255.0 green:200/255.0 blue:240/255.0 alpha:1.0];
+    UIImageView *indicator2 = [[UIImageView alloc]initWithFrame:CGRectMake(0, 0, self.InfoMenu.frame.size.height, self.InfoMenu.frame.size.height)];
+    indicator2.image = [UIImage imageNamed:@"caret"];
+    UITapGestureRecognizer *recognizer2 = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(ExpandList)];
+    indicator2.userInteractionEnabled = YES;
+    [infoMenu2 addSubview:indicator2];
+    [indicator2 addGestureRecognizer:recognizer2];
+    [_sealerView2 addSubview:infoMenu2];
+    //列表
     
     self.poundView.frame = CGRectMake(5, 10+screen_height/2, screen_width-10, screen_height/8);
     self.poundView.backgroundColor = [UIColor colorWithRed:254/255.0 green:0/255.0 blue:151/255.0 alpha:1.0];
