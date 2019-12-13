@@ -400,7 +400,7 @@
     self.rootView.contentSize = CGSizeMake(screen_width,screen_height*1.5-StatusBarHeight*2);
     [self.view addSubview:self.rootView];
     //SealerView
-    self.sealerView.frame = CGRectMake(5,10,screen_width-10,(screen_height)/4-10);
+    self.sealerView.frame = CGRectMake(5,0,screen_width-10,(screen_height)/4);
     self.sealerView.backgroundColor = [UIColor colorWithRed:0/255.0 green:191/255.0 blue:227/255.0 alpha:1.0];
     [self.rootView addSubview:self.sealerView];
     //SealerView content
@@ -429,7 +429,7 @@
     [self InitFoodTable];
     
     //sealerview2
-    self.sealerView2 = [[UIView alloc]initWithFrame:CGRectMake(5,10+(screen_height)/4,screen_width-10,(screen_height)/4-10)];
+    self.sealerView2 = [[UIView alloc]initWithFrame:CGRectMake(5,(screen_height)/4+StatusBarHeight/2,screen_width-10,(screen_height)/4)];
     self.sealerView2.backgroundColor = [UIColor colorWithRed:0/255.0 green:191/255.0 blue:227/255.0 alpha:1.0];;
     [self.rootView addSubview:self.sealerView2];
     UIImageView *imageview2 = [[UIImageView alloc]initWithFrame: CGRectMake(5, 5, self.sealerView.frame.size.height*2/3-10, self.sealerView.frame.size.height*2/3-10)];
@@ -471,13 +471,13 @@
     [self.poundView addSubview:self.connect];
     
     //添加底部卡路里总量视图
-    self.calorieResultView = [[UIView alloc]initWithFrame:CGRectMake(0, screen_height-TabbarHeight-70, screen_width, 70)];
+    self.calorieResultView = [[UIView alloc]initWithFrame:CGRectMake(0, screen_height-2*TabbarHeight, screen_width, TabbarHeight)];
     _calorieResultView.backgroundColor = [UIColor colorWithRed:208/255.0 green:208/255.0 blue:208/255.0 alpha:1.0];
     self.totalcalorieLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, screen_width/3, self.calorieResultView.frame.size.height)];
     _totalcalorieLabel.text = @"卡路里总量(Kcal):";
-    _totalcalorieLabel.font = [UIFont systemFontOfSize:14];
+    _totalcalorieLabel.font = [UIFont systemFontOfSize:14*(screen_width/414.0)];
     [_calorieResultView addSubview:_totalcalorieLabel];
-    self.Allcalorie = [[UILabel alloc]initWithFrame:CGRectMake(screen_width/3, 5, screen_width*2/3-70, self.calorieResultView.frame.size.height)];
+    self.Allcalorie = [[UILabel alloc]initWithFrame:CGRectMake(screen_width/3, 5, screen_width*2/3-TabbarHeight, self.calorieResultView.frame.size.height)];
     _Allcalorie.userInteractionEnabled = NO;
     _Allcalorie.layer.cornerRadius = 5;
     _Allcalorie.textAlignment = NSTextAlignmentCenter;
@@ -485,7 +485,7 @@
     
     [_calorieResultView addSubview:_Allcalorie];
 
-    self.addCalorie = [[UIButton alloc]initWithFrame:CGRectMake(screen_width-70, 0, 70, 70)];
+    self.addCalorie = [[UIButton alloc]initWithFrame:CGRectMake(screen_width-TabbarHeight, 0, TabbarHeight, TabbarHeight)];
     [_addCalorie setImage:[UIImage imageNamed:@"icon_add"] forState:UIControlStateNormal];
     [_calorieResultView addSubview:_addCalorie];
     [_addCalorie addTarget:self action:@selector(addAction) forControlEvents:UIControlEventTouchUpInside];
@@ -565,13 +565,11 @@
     _foodTable.hidden = YES;
     _foodTable.showsVerticalScrollIndicator = NO;
     _foodTable.layer.borderWidth = 0.3;
-    //[_foodTable setSeparatorColor:[UIColor grayColor]];
-
     [self.rootView insertSubview:_foodTable atIndex:10];
 }
 //calorie table
 - (void)InitCalorieTable{
-    self.calorieTable = [[UITableView alloc]initWithFrame:CGRectMake(_poundView.frame.origin.x, _poundView.frame.origin.y+self.poundView.frame.size.height, _poundView.frame.size.width,screen_height-StatusBarHeight-TabbarHeight-70-self.poundView.frame.size.height) style:UITableViewStylePlain];
+    self.calorieTable = [[UITableView alloc]initWithFrame:CGRectMake(_poundView.frame.origin.x, _poundView.frame.origin.y+self.poundView.frame.size.height, _poundView.frame.size.width,screen_height-StatusBarHeight-2*TabbarHeight-self.poundView.frame.size.height) style:UITableViewStylePlain];
     _calorieTable.delegate = self;
     _calorieTable.dataSource = self;
     _calorieTable.hidden = YES;
@@ -734,7 +732,12 @@
     NSLog(@"<><><><>%@<><><><><>",_weight.text);
     [self.calorieData removeObjectAtIndex:sender.tag];
     [self.calorieTable reloadData];
-    [self UpdateAndCalculateCalorie];
+    if (_calorieData.count > 0) {
+        [self UpdateAndCalculateCalorie];
+    }else{
+        _Allcalorie.text = @"0";
+    }
+    
 }
 //转换单位
 - (void)changeUnits:(UIButton *)sender{
@@ -833,12 +836,12 @@
 }
 -(void)keyboardWillHide:(NSNotification *)noti{
     [self.rootView setContentOffset:CGPointMake(0,self.poundView.frame.origin.y-StatusBarHeight) animated:YES];
+    [self UpdateAndCalculateCalorie];
     NSLog(@"键盘被收起来了");
 }
-
 //点击文本框，弹出键盘时的监听
 - (void)textFieldDidBeginEditing:(UITextField *)textField{
-    NSLog(@"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%lu",textField.tag);
+    NSLog(@"keyboard:%lu",textField.tag);
     NSInteger index = textField.tag;
     if (textField.tag>3) {
         index = 4;
@@ -897,7 +900,7 @@
 }
 //输入结束
 - (void)textFieldDidEndEditing:(UITextField *)textField{
-    [self UpdateAndCalculateCalorie];
+ 
     self.calorieData[textField.tag].weight = textField.text;
 }
 

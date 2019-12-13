@@ -1217,7 +1217,9 @@
 #pragma mark - UIImagePickerControllerDelegate
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary<NSString *,id> *)info {
     // 对选取照片的处理，如果选取的图片尺寸过大，则压缩选取图片，否则不作处理
-    UIImage *image = [ScanOneCodeViewController LY_imageSizeWithScreenImage:info[UIImagePickerControllerOriginalImage]];
+   // UIImage *image = [ScanOneCodeViewController LY_imageSizeWithScreenImage:info[UIImagePickerControllerOriginalImage]];
+    UIImage *image = info[UIImagePickerControllerOriginalImage];
+    NSLog(@"%@",image);
     // CIDetector(CIDetector可用于人脸识别)进行图片解析，从而使我们可以便捷的从相册中获取到二维码
     [self dismissViewControllerAnimated:YES completion:nil];
     //[self analyseRectImage:image];
@@ -1242,25 +1244,32 @@
             food.deviceID = food.infoArray[2];
             NSLog(@"%@---%@",food.name,food.deviceID);
             
-            food.food_image = [self getPartOfImage:image];
+            CGFloat mainwidth = [UIScreen mainScreen].bounds.size.width;
+            CGFloat mainHeight = [UIScreen mainScreen].bounds.size.height;
+            food.food_image = [self getPartOfImage:image inRect:CGRectMake(0,mainHeight/4, mainwidth, mainHeight/2)];
             [self.navigationController pushViewController:food animated:YES];
         }
     }
-
 }
 
-- (UIImage *)getPartOfImage:(UIImage *)img
+- (UIImage *)getPartOfImage:(UIImage *)img inRect:(CGRect)rect
 {
-    CGFloat mainwidth = [UIScreen mainScreen].bounds.size.width;
-    CGFloat mainHeight = [UIScreen mainScreen].bounds.size.height;
+    
+    //把像 素rect 转化为 点rect（如无转化则按原图像素取部分图片）
+    CGFloat scale = [UIScreen mainScreen].scale;
+    CGFloat x= rect.origin.x*scale,y=rect.origin.y*scale,w=rect.size.width*scale,h=rect.size.height*scale;
+    CGRect dianRect = CGRectMake(x, y, w, h);
+    
     
     CGImageRef cgRef = img.CGImage;
-    CGImageRef imageRef = CGImageCreateWithImageInRect(cgRef, CGRectMake(0,mainHeight/4, mainwidth, mainHeight/2));
-    UIImage *thumbScale = [UIImage imageWithCGImage:imageRef];
+    NSLog(@"cgRef:  %@",cgRef);
+    CGImageRef imageRef = CGImageCreateWithImageInRect(cgRef, dianRect);
+    //UIImage *thumbScale = [UIImage imageWithCGImage:imageRef];
+    UIImage *newImage = [UIImage imageWithCGImage:imageRef scale:[UIScreen mainScreen].scale orientation:UIImageOrientationUp];
     CGImageRelease(imageRef);
-     UIImageWriteToSavedPhotosAlbum(thumbScale, self,@selector(image:didFinishSavingWithError:contextInfo:),nil);
+     UIImageWriteToSavedPhotosAlbum(newImage, self,@selector(image:didFinishSavingWithError:contextInfo:),nil);
     
-    return thumbScale;
+    return newImage;
 }
 #pragma mark - <保存到相册>
 -(void)image:(UIImage *)image didFinishSavingWithError:(NSError *)error contextInfo:(void *)contextInfo {

@@ -76,7 +76,7 @@
     self.username.layer.borderWidth = 1;
     self.username.layer.cornerRadius = 5;
     self.username.textAlignment = NSTextAlignmentCenter;
-    self.username.font = [UIFont systemFontOfSize:15];
+    self.username.font = [UIFont systemFontOfSize:15*(screen_width/414.0)];
     self.username.textColor = [UIColor whiteColor];
     [self.headerView addSubview:self.username];
     //添加点击响应

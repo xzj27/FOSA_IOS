@@ -18,30 +18,35 @@
 
 @implementation FosaNotification
 
+/** 屏幕高度 */
+#define screen_height [UIScreen mainScreen].bounds.size.height
+/** 屏幕宽度 */
+#define screen_width [UIScreen mainScreen].bounds.size.width
 
 //仿照系统通知绘制UIview
 - (UIView *)CreatNotificatonView:(NSString *)title body:(NSString *)body{
     NSLog(@"begin creating");
-    CGFloat mainwidth = [UIScreen mainScreen].bounds.size.width/2;
-    CGFloat mainHeight = [UIScreen mainScreen].bounds.size.height/2;
-    
+    CGFloat mainwidth = [UIScreen mainScreen].bounds.size.width;
+    CGFloat mainHeight = [UIScreen mainScreen].bounds.size.height;
+
     UIView *notification = [[UIView alloc]initWithFrame:CGRectMake(0, 0, mainwidth,mainHeight)];
     notification.backgroundColor = [UIColor whiteColor];
-    
-    UIImageView *logo = [[UIImageView alloc]initWithFrame:CGRectMake(mainwidth/12, mainwidth/12, 40, 40)];
-    UILabel *brand = [[UILabel alloc]initWithFrame:CGRectMake(mainwidth/4, mainwidth/8, 50, 15)];
+
+    UIImageView *logo = [[UIImageView alloc]initWithFrame:CGRectMake(mainwidth/12, mainwidth/12, mainwidth/6, mainwidth/6)];
+    UILabel *brand = [[UILabel alloc]initWithFrame:CGRectMake(mainwidth/4, mainwidth/8, mainwidth/4, mainwidth)];
     UIImageView *InfoCodeView = [[UIImageView alloc]initWithFrame:CGRectMake(mainwidth*4/5-10, 5, mainwidth/5, mainwidth/5)];
-    
+
     UIImageView *image = [[UIImageView alloc]initWithFrame:CGRectMake(0,mainHeight/4, mainwidth, mainHeight/2)];
     UILabel *Ntitle = [[UILabel alloc]initWithFrame:CGRectMake(5,mainHeight*3/4+10, mainwidth, 20)];
     UILabel *Nbody = [[UILabel alloc]initWithFrame:CGRectMake(5, mainHeight*3/4+40, mainwidth, 20)];
+
     [notification addSubview:logo];
     [notification addSubview:brand];
     [notification addSubview:InfoCodeView];
     [notification addSubview:Ntitle];
     [notification addSubview:image];
     [notification addSubview:Nbody];
-    
+
     logo.image  = [UIImage imageNamed:@"logo"];
     image.image = self.image;
     image.contentMode = UIViewContentModeScaleAspectFill;
@@ -136,7 +141,6 @@
         }
     }];
 }
-
 //代理回调方法，通知即将展示的时候
 - (void)userNotificationCenter:(UNUserNotificationCenter *)center willPresentNotification:(UNNotification *)notification withCompletionHandler:(void (^)(UNNotificationPresentationOptions options))completionHandler{
     NSLog(@"即将展示通知");

@@ -16,6 +16,8 @@ int main(int argc, char * argv[]) {
         // Setup code that might create autoreleased objects goes here.
         appDelegateClassName = NSStringFromClass([AppDelegate class]);
     }
-    NSLog(@"MAIN-----------------%@",appDelegateClassName);
+    CGFloat screenwidth = [UIScreen mainScreen].bounds.size.width;
+    CGFloat screenheight = [UIScreen mainScreen].bounds.size.height;
+    NSLog(@"MAIN--------%f---------%f",screenwidth,screenheight);
     return UIApplicationMain(argc, argv, nil, appDelegateClassName);
 }

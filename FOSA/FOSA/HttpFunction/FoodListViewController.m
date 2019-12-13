@@ -57,7 +57,7 @@
                 [self->arrayData addObject:self->dict[i]];
             }
             for (NSInteger j = 0; j < self->arrayData.count; j++) {
-                NSLog(@"$$$$$$$$$$$%@",self->arrayData[j][@"Protein"]);
+                NSLog(@"*******************************%@",self->arrayData[j][@"FoodName"]);
             }
             //在主线程更新UI
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -145,7 +145,8 @@
     self.database = [SqliteManager InitSqliteWithName:@"Fosa.db"]; //open database
     NSString *creatNutrientTable = @"create table if not exists Nutrient(id integer primary key,foodName text,Category text,Calorie text,Protein text,Fat text,Carbohydrate text,DietaryFiber text,Cholesterin text,Ca text,Mg text,Fe text,Zn text,K text,VitaminC text,VitaminE text,VitaminA text,Carotene text)";
     [SqliteManager InitTableWithName:creatNutrientTable database:self.database];// 创建营养表
-
-   // NSString *InsertData = [NSString stringWithFormat:@"Insert into Nutrient(foodName,Category,Calorie,Protein,Fat,Carbohydrate,DietaryFiber ,Cholesterin,Ca,Mg,Fe,Zn,K,VitaminC,VitaminE,VitaminA,Carotene)values('%@','%@','%@','%@','%@','%@','%@','%@','%@','%@','%@','%@','%@','%@','%@','%@','%@',)",];
+    for (NSInteger i = 0; i < arrayData.count; i++) {
+        // NSString *InsertData = [NSString stringWithFormat:@"Insert into Nutrient(foodName,Category,Calorie,Protein,Fat,Carbohydrate,DietaryFiber ,Cholesterin,Ca,Mg,Fe,Zn,K,VitaminC,VitaminE,VitaminA,Carotene)values('%@','%@','%@','%@','%@','%@','%@','%@','%@','%@','%@','%@','%@','%@','%@','%@','%@',)",arrayData[i][@"FoodName"],];
+    }
 }
 @end
