@@ -101,18 +101,16 @@
     _rootScrollview.contentSize = CGSizeMake(self.view.frame.size.width,_mainheight*2);
     [self.view addSubview:_rootScrollview];
     
-
     //添加头部
     CGFloat headerWidth = _mainWidth-20;
     CGFloat headerheight = _mainheight/3;
-    
     
     CGRect headerFrame = CGRectMake(10,5,headerWidth, headerheight);
     self.headerView = [[UIView alloc]initWithFrame:headerFrame];
     _headerView.backgroundColor = [UIColor colorWithRed:180/255.0 green:180/255.0 blue:180/255.0 alpha:1.0];
     _headerView.layer.cornerRadius = 5;
     [self.rootScrollview addSubview:_headerView];
-    
+
     //添加头部控件,已经在扫码界面初始化
     self.imageView1 = [[UIImageView alloc]initWithFrame:CGRectMake(15, headerheight/4-5,headerheight*3/4-5,headerheight*3/4-5)];
     self.imageView1.contentMode = UIViewContentModeScaleAspectFill;
@@ -435,6 +433,8 @@
 #pragma mark -  放大缩小图片
 - (void)EnlargePhoto{
     NSLog(@"***********************************");
+    [self.aboutFood resignFirstResponder];
+    [self.foodName resignFirstResponder];
     self.navigationController.navigationBar.hidden = YES;   //隐藏导航栏
     [UIApplication sharedApplication].statusBarHidden = YES;             //隐藏状态栏
     //底层视图
@@ -454,7 +454,7 @@
     _bigImage.frame = self.view.frame;
     _bigImage.image = self.imageView1.image;
     _bigImage.userInteractionEnabled = YES;
-    _bigImage.contentMode = UIViewContentModeScaleToFill;
+    _bigImage.contentMode = UIViewContentModeScaleAspectFit;
     _bigImage.clipsToBounds = YES;
     UITapGestureRecognizer *shrinkRecognizer = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(shirnkPhoto)];
     [shrinkRecognizer setNumberOfTapsRequired:1];

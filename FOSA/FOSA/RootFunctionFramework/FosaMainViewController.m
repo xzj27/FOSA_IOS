@@ -72,7 +72,7 @@
 
 - (void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
-
+    self.database = [SqliteManager InitSqliteWithName:@"Fosa.db"];
     if (isUpdate == true) {
         NSLog(@"异步刷新界面");
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -494,7 +494,7 @@ if (!_LeftOrRight) {//view 展开
 #pragma mark - UICollectionViewDataSource
 //每个section有几个item
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
-    [self creatOrOpensql];
+    //[self creatOrOpensql];
     [self SelectDataFromSqlite];
     return self.storageArray.count;
 }

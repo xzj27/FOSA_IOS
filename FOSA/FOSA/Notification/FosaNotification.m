@@ -26,9 +26,13 @@
 //仿照系统通知绘制UIview
 - (UIView *)CreatNotificatonView:(NSString *)title body:(NSString *)body{
     NSLog(@"begin creating");
+    
+    CGFloat scale = [UIScreen mainScreen].scale;
+    NSLog(@"+++++++++++++++++++++++++++%f",scale);
+    
     CGFloat mainwidth = [UIScreen mainScreen].bounds.size.width;
     CGFloat mainHeight = [UIScreen mainScreen].bounds.size.height;
-
+    
     UIView *notification = [[UIView alloc]initWithFrame:CGRectMake(0, 0, mainwidth,mainHeight)];
     notification.backgroundColor = [UIColor whiteColor];
 
