@@ -351,8 +351,8 @@
 //生成share的UIView
 - (UIView *)CreatShareView:(NSString *)title body:(NSString *)body{
     NSLog(@"begin creating");
-    CGFloat mainwidth = [UIScreen mainScreen].bounds.size.width/2;
-    CGFloat mainHeight = [UIScreen mainScreen].bounds.size.height/2;
+    CGFloat mainwidth = [UIScreen mainScreen].bounds.size.width;
+    CGFloat mainHeight = [UIScreen mainScreen].bounds.size.height;
     
     UIView *notification = [[UIView alloc]initWithFrame:CGRectMake(0, 0, mainwidth,mainHeight)];
     notification.backgroundColor = [UIColor whiteColor];
