@@ -12,6 +12,7 @@
 
 @interface FoodListViewController ()<UITableViewDelegate,UITableViewDataSource>{
     NSMutableArray *arrayData;
+    NSMutableArray<NSString *> *nameArray;
     NSMutableArray *dict;
     NSDictionary *nutrientData;
 }
@@ -30,13 +31,12 @@
     [super viewDidLoad];
     self.view.backgroundColor = [UIColor whiteColor];
     // Do any additional setup after loading the view.
-    [self InitDataFromServer];
     [self InitFoodListView];
+    [self SelectDataFromNutrient];
 }
 
 - (void)InitDataFromServer{
     NSLog(@"@@@@@@@@@@@@@@@");
-    arrayData = [[NSMutableArray alloc]init];
     //服务器地址
     NSString *serverAddr;
     serverAddr = [NSString stringWithFormat:@"http://192.168.3.110/fosa/GetServerDataByCategory.php?category=%@",self.category];
@@ -54,14 +54,19 @@
             NSLog(@"%@",self->dict);
                   
             for (NSInteger i = 0; i < self->dict.count; i++) {
+                NSLog(@"11111111");
                 [self->arrayData addObject:self->dict[i]];
+                NSLog(@"2222222222");
+                [self->nameArray addObject:self->dict[i][@"FoodName"]];
+                NSLog(@"3333333333");
+                NSLog(@"<><><><><><><>%@",self->arrayData[i]);
             }
-            for (NSInteger j = 0; j < self->arrayData.count; j++) {
-                NSLog(@"*******************************%@",self->arrayData[j][@"FoodName"]);
-            }
+            
             //在主线程更新UI
             dispatch_async(dispatch_get_main_queue(), ^{
+                 NSLog(@"&&&&&&&&&&&&");
                 [self.foodList reloadData];
+                [self insertDataIntoNutrient];
             });
         }else{
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -91,8 +96,7 @@
 //每组多少行
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    NSLog(@"%ld",arrayData.count);
-    return arrayData.count;
+    return nameArray.count;
 }
 //多少组
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
@@ -111,12 +115,12 @@
     }
     //cell.backgroundColor = [UIColor redColor];
     NSInteger row = indexPath.row;
-    cell.textLabel.text = arrayData[row][@"FoodName"];
+    cell.textLabel.text = nameArray[row];
     //取消点击cell时显示的背景色
     //cell.selectionStyle = UITableViewCellSelectionStyleNone;
     //添加点击手势
     UITapGestureRecognizer *recognizer = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(cellAction:)];
-    recognizer.accessibilityValue = arrayData[row][@"FoodName"];
+    recognizer.accessibilityValue = nameArray[row];
     [cell addGestureRecognizer:recognizer];
     //返回cell
     return cell;
@@ -140,13 +144,39 @@
     }]];
     [self presentViewController:alert animated:true completion:nil];
 }
-
-- (void)insertDataIntoNutrient{
+//查找数据
+- (void)SelectDataFromNutrient{
+    //初始化数组
+    arrayData = [[NSMutableArray alloc]init];
+    nameArray = [[NSMutableArray alloc]init];
+    
     self.database = [SqliteManager InitSqliteWithName:@"Fosa.db"]; //open database
+    
+    NSString *selectsql = [NSString stringWithFormat:@"select foodName from Nutrient where Category = '%@'",self.category];
+    
+    _stmt = [SqliteManager SelectDataFromTable:selectsql database:self.database];
+     if (_stmt != nil) {
+            while (sqlite3_step(_stmt) == SQLITE_ROW) {
+                NSLog(@"我从手机数据库查询到食物");
+                const char *foodname = (const char *) sqlite3_column_text(_stmt, 0);
+                NSLog(@"%@",[NSString stringWithUTF8String:foodname]);
+                [nameArray addObject:[NSString stringWithUTF8String:foodname]];
+            }
+         [self.foodList reloadData];
+        }else{
+            NSLog(@"本地数据库为空，要到服务器上面找");
+            [self InitDataFromServer];
+        }
+}
+
+//插入数据
+- (void)insertDataIntoNutrient{
+    
     NSString *creatNutrientTable = @"create table if not exists Nutrient(id integer primary key,foodName text,Category text,Calorie text,Protein text,Fat text,Carbohydrate text,DietaryFiber text,Cholesterin text,Ca text,Mg text,Fe text,Zn text,K text,VitaminC text,VitaminE text,VitaminA text,Carotene text)";
     [SqliteManager InitTableWithName:creatNutrientTable database:self.database];// 创建营养表
     for (NSInteger i = 0; i < arrayData.count; i++) {
-        // NSString *InsertData = [NSString stringWithFormat:@"Insert into Nutrient(foodName,Category,Calorie,Protein,Fat,Carbohydrate,DietaryFiber ,Cholesterin,Ca,Mg,Fe,Zn,K,VitaminC,VitaminE,VitaminA,Carotene)values('%@','%@','%@','%@','%@','%@','%@','%@','%@','%@','%@','%@','%@','%@','%@','%@','%@',)",arrayData[i][@"FoodName"],];
+         NSString *InsertData = [NSString stringWithFormat:@"Insert into Nutrient(foodName,Category,Calorie,Protein,Fat,Carbohydrate,DietaryFiber ,Cholesterin,Ca,Mg,Fe,Zn,K,VitaminC,VitaminE,VitaminA,Carotene)values('%@','%@','%@','%@','%@','%@','%@','%@','%@','%@','%@','%@','%@','%@','%@','%@','%@')",arrayData[i][@"FoodName"],arrayData[i][@"Category"],arrayData[i][@"Calorie(Kcal)"],arrayData[i][@"Protein(g)"],arrayData[i][@"Fat(g)"],arrayData[i][@"Carbohydrate(g)"],arrayData[i][@"DietaryFiber(g)"],arrayData[i][@"Cholesterin(mg)"],arrayData[i][@"Ca(mg)"],arrayData[i][@"Mg(mg)"],arrayData[i][@"Fe(mg)"],arrayData[i][@"Zn(mg)"],arrayData[i][@"K(mg)"],arrayData[i][@"VitaminC(mg)"],arrayData[i][@"VitaminE(mg)"],arrayData[i][@"VitaminA(mcg)"],arrayData[i][@"Carotene(mcg)"]];
+        [SqliteManager InsertDataIntoTable:InsertData database:self.database];
     }
 }
 @end

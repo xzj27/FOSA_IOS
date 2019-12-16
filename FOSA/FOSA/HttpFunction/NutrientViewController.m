@@ -7,6 +7,7 @@
 //
 
 #import "NutrientViewController.h"
+#import "SqliteManager.h"
 #import "NutrientModel.h"
 
 @interface NutrientViewController ()<UITableViewDelegate,UITableViewDataSource>{
@@ -14,6 +15,8 @@
     NSMutableArray *dict;
     NSArray *array;
 }
+@property (nonatomic,assign) sqlite3 *database;
+@property (nonatomic,assign) sqlite3_stmt *stmt;
 @end
 
 @implementation NutrientViewController
@@ -27,12 +30,12 @@
     // Do any additional setup after loading the view.
     self.view.backgroundColor = [UIColor whiteColor];
     [self InitData];
-    [self InitNutrientDataFromServer];
     [self InitHeader];
+    [self SelectNutrientTableOrUpdate];
     [self InitNutrientTable];
 }
 - (void)InitData{
-    array = @[@"Calorie(Kcal)",@"Protein(g)",@"Fat(g)",@"Carbohydrate(g)",@"DietaryFiber(g)",@"Cholesterin(mg)",@"Ca(mg)",@"Mg(mg)",@"Fe(mg)",@"Zn(mg)",@"K(mg)",@"VitaminC(mg)",@"VitaminE(mg)",@"VitaminA(µg)",@"carotene(µg)"];
+    array = @[@"Calorie(Kcal)",@"Protein(g)",@"Fat(g)",@"Carbohydrate(g)",@"DietaryFiber(g)",@"Cholesterin(mg)",@"Ca(mg)",@"Mg(mg)",@"Fe(mg)",@"Zn(mg)",@"K(mg)",@"VitaminC(mg)",@"VitaminE(mg)",@"VitaminA(mcg)",@"Carotene(mcg)"];
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithImage:[UIImage imageNamed:@"icon_done"] style:UIBarButtonItemStylePlain target:nil action:nil];
     self.navigationItem.rightBarButtonItem.target = self; self.navigationItem.rightBarButtonItem.action = @selector(finish);
 }
@@ -48,7 +51,6 @@
 
 - (void)InitNutrientDataFromServer{
     NSLog(@"@@@@@@@@@@@@@@@");
-       NutrientData = [[NSMutableArray alloc]init];
        //服务器地址
        NSString *serverAddr;
        serverAddr = [NSString stringWithFormat:@"http://192.168.3.110/fosa/GetServerDataByFoodName.php?food=%@&foodkind=%@",self.food,self.foodkind];
@@ -103,7 +105,7 @@
     [self.Header addSubview:_tips];
 }
 - (void)InitNutrientTable{
-    self.nutrientList = [[UITableView alloc]initWithFrame:CGRectMake(0, 4*navheight+statusHeight, mainWidth, mainHeight) style:UITableViewStylePlain];
+    self.nutrientList = [[UITableView alloc]initWithFrame:CGRectMake(0, 4*navheight+statusHeight, mainWidth, 1.5*mainHeight) style:UITableViewStylePlain];
     _nutrientList.delegate = self;
     _nutrientList.dataSource = self;
     //_foodList.hidden = YES;
@@ -111,6 +113,49 @@
     [_nutrientList setSeparatorColor:[UIColor grayColor]];
     [self.view addSubview:_nutrientList];
 }
+- (void)SelectNutrientTableOrUpdate{
+    // 打开数据库
+    NSLog(@"首先查找数据库");
+     NutrientData = [[NSMutableArray alloc]init];
+    self.database = [SqliteManager InitSqliteWithName:@"Fosa.db"];
+    NSString *selectCategory = [NSString stringWithFormat:@"Select Calorie,Protein,Fat,Carbohydrate,DietaryFiber ,Cholesterin,Ca,Mg,Fe,Zn,K,VitaminC,VitaminE,VitaminA,Carotene from Nutrient where foodName = '%@' and Category = '%@'",self.food,self.foodkind];
+    //int result = [SqliteManager SelectFromTable:selectNutrient database:_database stmt:_stmt];
+    _stmt = [SqliteManager SelectDataFromTable:selectCategory database:self.database];
+    if (_stmt != NULL) {
+        while (sqlite3_step(_stmt) == SQLITE_ROW) {
+            //foodName,Category,Calorie,Protein,Fat,Carbohydrate,DietaryFiber ,Cholesterin,Ca,Mg,Fe,Zn,K,VitaminC,VitaminE,VitaminA,Carotene
+            NSLog(@"我从手机数据库查询到食物营养成分");
+            for (int i = 0; i < 15; i++) {
+                const char * nutrient = (const char *)sqlite3_column_text(_stmt, i);
+                NutrientModel *model = [[NutrientModel alloc]initWithName:array[i] content:[NSString stringWithUTF8String:nutrient]];
+                [NutrientData addObject:model];
+            }
+//            const char * foodName = (const char *)sqlite3_column_text(_stmt, 1);
+//            const char * Category = (const char *)sqlite3_column_text(_stmt, 2);
+//            const char * Calorie = (const char *)sqlite3_column_text(_stmt, 3);
+//            const char * Protein = (const char *)sqlite3_column_text(_stmt, 4);
+//            const char * Fat = (const char *)sqlite3_column_text(_stmt, 5);
+//            const char * Carbohydrate = (const char *)sqlite3_column_text(_stmt, 6);
+//            const char * DietaryFiber = (const char *)sqlite3_column_text(_stmt, 7);
+//            const char * Cholesterin = (const char *)sqlite3_column_text(_stmt, 8);
+//            const char * Ca = (const char *)sqlite3_column_text(_stmt, 9);
+//            const char * Mg = (const char *)sqlite3_column_text(_stmt, 10);
+//            const char * Fe = (const char *)sqlite3_column_text(_stmt, 11);
+//            const char * Zn = (const char *)sqlite3_column_text(_stmt, 12);
+//            const char * K = (const char *)sqlite3_column_text(_stmt, 13);
+//            const char * VitaminC = (const char *)sqlite3_column_text(_stmt, 14);
+//            const char * VitaminE = (const char *)sqlite3_column_text(_stmt, 15);
+//            const char * VitaminA = (const char *)sqlite3_column_text(_stmt, 16);
+//            const char * Carotene = (const char *)sqlite3_column_text(_stmt, 17);
+        }
+        [self.nutrientList reloadData];
+    }else{
+        NSLog(@"本地数据库为空，要到服务器上面找");
+        [self InitNutrientDataFromServer];
+    }
+}
+
+
 
 //行高度
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath

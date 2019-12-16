@@ -37,7 +37,7 @@
     self.view.backgroundColor = [UIColor whiteColor];
     // Do any additional setup after loading the view.
     
-    [self SelectNutrientTableOrUpdate];
+    [self SelectCategoryTableOrUpdate];
     [self InitView];
 }
 
@@ -165,7 +165,7 @@
         [SqliteManager InsertDataIntoTable:InsertCategory database:self.database];
     }
 }
-- (void)SelectNutrientTableOrUpdate{
+- (void)SelectCategoryTableOrUpdate{
     DataArray = [[NSMutableArray alloc]init];
     // 打开数据库
     self.database = [SqliteManager InitSqliteWithName:@"Fosa.db"];

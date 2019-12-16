@@ -1117,7 +1117,7 @@
     _bigImage.frame = self.view.frame;
     _bigImage.image = image;
     _bigImage.userInteractionEnabled = YES;
-    _bigImage.contentMode = UIViewContentModeScaleToFill;
+    _bigImage.contentMode = UIViewContentModeScaleAspectFit;
     _bigImage.clipsToBounds = YES;
     UITapGestureRecognizer *shrinkRecognizer = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(shirnkPhoto)];
     [shrinkRecognizer setNumberOfTapsRequired:1];

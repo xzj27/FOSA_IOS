@@ -360,7 +360,7 @@
     UIImageView *logo = [[UIImageView alloc]initWithFrame:CGRectMake(mainwidth/12, mainwidth/12, 30, 30)];
     UILabel *brand = [[UILabel alloc]initWithFrame:CGRectMake(mainwidth/4+10, mainwidth/6, 50, 15)];
     UIImageView *InfoCodeView = [[UIImageView alloc]initWithFrame:CGRectMake(mainwidth*4/5-10, 5, mainwidth/5, mainwidth/5)];
-    
+
     UIImageView *image = [[UIImageView alloc]initWithFrame:CGRectMake(0,mainHeight/4, mainwidth, mainHeight/2)];
     UILabel *Ntitle = [[UILabel alloc]initWithFrame:CGRectMake(5,mainHeight*3/4+10, mainwidth, 20)];
     UILabel *Nbody = [[UILabel alloc]initWithFrame:CGRectMake(5, mainHeight*3/4+40, mainwidth, 20)];
@@ -370,7 +370,7 @@
     [notification addSubview:Ntitle];
     [notification addSubview:image];
     [notification addSubview:Nbody];
-    
+
     logo.image  = [UIImage imageNamed:@"logo"];
     image.image = self.food_image;
     image.contentMode = UIViewContentModeScaleAspectFill;
