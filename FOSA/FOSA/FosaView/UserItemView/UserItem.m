@@ -24,7 +24,7 @@
         self.itemImgView = img;
         [self addSubview:self.itemImgView];
         
-        UILabel *label = [[UILabel alloc]initWithFrame:CGRectMake(self.bounds.size.height, 0, self.bounds.size.width/3, self.bounds.size.height)];
+        UILabel *label = [[UILabel alloc]initWithFrame:CGRectMake(self.bounds.size.height, 0, self.bounds.size.width-self.bounds.size.height, self.bounds.size.height)];
         self.itemLabel = label;
         self.itemLabel.font = [UIFont systemFontOfSize:15];
         [self addSubview:_itemLabel];
@@ -39,16 +39,16 @@
     }
     return self;
 }
-
-- (void)click{
-    if (!isOpen) {
-        [self.showContent setImage:[UIImage imageNamed:@"icon_open"] forState:UIControlStateNormal];
-        isOpen = true;
-    }else{
-        [self.showContent setImage:[UIImage imageNamed:@"icon_close"] forState:UIControlStateNormal];
-        isOpen = false;
-    }
-}
+//
+//- (void)click{
+//    if (!isOpen) {
+//        [self.showContent setImage:[UIImage imageNamed:@"icon_open"] forState:UIControlStateNormal];
+//        isOpen = true;
+//    }else{
+//        [self.showContent setImage:[UIImage imageNamed:@"icon_close"] forState:UIControlStateNormal];
+//        isOpen = false;
+//    }
+//}
 
 /*
 // Only override drawRect: if you perform custom drawing.

@@ -53,7 +53,8 @@
     NSLog(@"@@@@@@@@@@@@@@@");
        //服务器地址
        NSString *serverAddr;
-       serverAddr = [NSString stringWithFormat:@"http://192.168.3.110/fosa/GetServerDataByFoodName.php?food=%@&foodkind=%@",self.food,self.foodkind];
+       serverAddr = [NSString stringWithFormat:@"http://192.168.3.109/fosa/GetServerDataByFoodName.php?food=%@&foodkind=%@",self.food,self.foodkind];
+        //serverAddr = [NSString stringWithFormat:@"http://192.168.43.21/fosa/GetServerDataByFoodName.php?food=%@&foodkind=%@",self.food,self.foodkind];
        serverAddr = [serverAddr stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet characterSetWithCharactersInString:@"#%^{}\"[]|\\<> "].invertedSet];
        NSLog(@"%@",serverAddr);
        NSURL *url = [NSURL URLWithString:serverAddr];
@@ -91,6 +92,7 @@
     [self.view addSubview:_Header];
     
     self.categoryIcon = [[UIImageView alloc]initWithFrame:CGRectMake(navheight, navheight/2, navheight, navheight)];
+    self.categoryIcon.backgroundColor = [UIColor colorWithRed:0/255.0 green:249/255.0 blue:116/255.0 alpha:1.0];
     self.categoryIcon.backgroundColor = [UIColor whiteColor];
     _categoryIcon.layer.cornerRadius = navheight/2;
     _categoryIcon.image = [UIImage imageNamed:self.foodicon];
@@ -105,7 +107,7 @@
     [self.Header addSubview:_tips];
 }
 - (void)InitNutrientTable{
-    self.nutrientList = [[UITableView alloc]initWithFrame:CGRectMake(0, 4*navheight+statusHeight, mainWidth, 1.5*mainHeight) style:UITableViewStylePlain];
+    self.nutrientList = [[UITableView alloc]initWithFrame:CGRectMake(0, 4*navheight+statusHeight, mainWidth, mainHeight-4*navheight-statusHeight) style:UITableViewStylePlain];
     _nutrientList.delegate = self;
     _nutrientList.dataSource = self;
     //_foodList.hidden = YES;
@@ -130,23 +132,6 @@
                 NutrientModel *model = [[NutrientModel alloc]initWithName:array[i] content:[NSString stringWithUTF8String:nutrient]];
                 [NutrientData addObject:model];
             }
-//            const char * foodName = (const char *)sqlite3_column_text(_stmt, 1);
-//            const char * Category = (const char *)sqlite3_column_text(_stmt, 2);
-//            const char * Calorie = (const char *)sqlite3_column_text(_stmt, 3);
-//            const char * Protein = (const char *)sqlite3_column_text(_stmt, 4);
-//            const char * Fat = (const char *)sqlite3_column_text(_stmt, 5);
-//            const char * Carbohydrate = (const char *)sqlite3_column_text(_stmt, 6);
-//            const char * DietaryFiber = (const char *)sqlite3_column_text(_stmt, 7);
-//            const char * Cholesterin = (const char *)sqlite3_column_text(_stmt, 8);
-//            const char * Ca = (const char *)sqlite3_column_text(_stmt, 9);
-//            const char * Mg = (const char *)sqlite3_column_text(_stmt, 10);
-//            const char * Fe = (const char *)sqlite3_column_text(_stmt, 11);
-//            const char * Zn = (const char *)sqlite3_column_text(_stmt, 12);
-//            const char * K = (const char *)sqlite3_column_text(_stmt, 13);
-//            const char * VitaminC = (const char *)sqlite3_column_text(_stmt, 14);
-//            const char * VitaminE = (const char *)sqlite3_column_text(_stmt, 15);
-//            const char * VitaminA = (const char *)sqlite3_column_text(_stmt, 16);
-//            const char * Carotene = (const char *)sqlite3_column_text(_stmt, 17);
         }
         [self.nutrientList reloadData];
     }else{
@@ -154,9 +139,6 @@
         [self InitNutrientDataFromServer];
     }
 }
-
-
-
 //行高度
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {

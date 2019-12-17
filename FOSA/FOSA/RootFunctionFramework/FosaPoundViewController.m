@@ -532,8 +532,6 @@
     sCenter2.x = sealer2Center.x;
     sCenter2.y = sealer2Center.y+self.foodTable.frame.size.height;
     self.sealerView2.center = sCenter2;
-    
-    
     CGPoint center1 = CGPointZero;
     center1.x = screen_width/2;
     center1.y = center.y+self.foodTable.frame.size.height;

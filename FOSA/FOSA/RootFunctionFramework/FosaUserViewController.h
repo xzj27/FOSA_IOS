@@ -11,12 +11,12 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface FosaUserViewController : ViewController
-@property (nonatomic,strong) UIScrollView *rootScrollview;
+@property (nonatomic,strong) UIView *rootview;
 @property (nonatomic,strong) UIView *headerView;
 @property (nonatomic,strong) UIImageView *userIcon;
 @property (nonatomic,strong) UILabel *username,*FosaContentTitle,*AppsContentTitle;
 
-@property (nonatomic,strong) UIView *itemView;
+@property (nonatomic,strong) UIScrollView *itemView;
 
 @property (nonatomic,strong) UserItem *Tutorial,*Location,*Setting,*Notification,*HelpCenter,*FosaContent,*AppsContent;
 

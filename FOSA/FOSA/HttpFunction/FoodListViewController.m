@@ -39,7 +39,8 @@
     NSLog(@"@@@@@@@@@@@@@@@");
     //服务器地址
     NSString *serverAddr;
-    serverAddr = [NSString stringWithFormat:@"http://192.168.3.110/fosa/GetServerDataByCategory.php?category=%@",self.category];
+    serverAddr = [NSString stringWithFormat:@"http://192.168.3.109/fosa/GetServerDataByCategory.php?category=%@",self.category];
+    //serverAddr = [NSString stringWithFormat:@"http://192.168.43.21/fosa/GetServerDataByCategory.php?category=%@",self.category];
     serverAddr = [serverAddr stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet characterSetWithCharactersInString:@"#%^{}\"[]|\\<> "].invertedSet];
     NSLog(@"%@",serverAddr);
     NSURL *url = [NSURL URLWithString:serverAddr];
@@ -52,14 +53,10 @@
             self->dict =  [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
                               //NSLog(@"%@",(NSString *)dict[0][@"CategoryName"]);
             NSLog(@"%@",self->dict);
-                  
             for (NSInteger i = 0; i < self->dict.count; i++) {
-                NSLog(@"11111111");
                 [self->arrayData addObject:self->dict[i]];
-                NSLog(@"2222222222");
                 [self->nameArray addObject:self->dict[i][@"FoodName"]];
-                NSLog(@"3333333333");
-                NSLog(@"<><><><><><><>%@",self->arrayData[i]);
+                //NSLog(@"<><><><><><><>%@",self->arrayData[i]);
             }
             
             //在主线程更新UI
@@ -155,7 +152,7 @@
     NSString *selectsql = [NSString stringWithFormat:@"select foodName from Nutrient where Category = '%@'",self.category];
     
     _stmt = [SqliteManager SelectDataFromTable:selectsql database:self.database];
-     if (_stmt != nil) {
+     if (_stmt != NULL) {
             while (sqlite3_step(_stmt) == SQLITE_ROW) {
                 NSLog(@"我从手机数据库查询到食物");
                 const char *foodname = (const char *) sqlite3_column_text(_stmt, 0);
@@ -163,12 +160,13 @@
                 [nameArray addObject:[NSString stringWithUTF8String:foodname]];
             }
          [self.foodList reloadData];
-        }else{
+        }
+        
+    if (nameArray.count == 0) {
             NSLog(@"本地数据库为空，要到服务器上面找");
             [self InitDataFromServer];
         }
 }
-
 //插入数据
 - (void)insertDataIntoNutrient{
     

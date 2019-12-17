@@ -54,15 +54,13 @@
     self.isAppsOpen= false;
 
     //底层视图
-    self.rootScrollview = [[UIScrollView alloc]initWithFrame:CGRectMake(0, -StatusBarHeight*3/4,self.mainWidth,self.mainHeigh-TabbarHeight+StatusBarHeight*3/4)];
-    _rootScrollview.showsVerticalScrollIndicator = NO;
-    _rootScrollview.showsHorizontalScrollIndicator = NO;
-    [self.view addSubview:_rootScrollview];
+    self.rootview = [[UIView alloc]initWithFrame:CGRectMake(0, 0,self.mainWidth,self.mainHeigh-TabbarHeight)];
+    [self.view addSubview:_rootview];
     //[[[UIApplication sharedApplication] keyWindow]addSubview:_rootScrollview];
     //顶部视图
     self.headerView = [[UIView alloc]initWithFrame:CGRectMake(0,0,self.mainWidth,self.mainHeigh/5)];
     _headerView.backgroundColor = [UIColor colorWithRed:208/255.0 green:208/255.0 blue:208/255.0 alpha:1.0];
-    [self.rootScrollview addSubview:_headerView];
+    [self.rootview addSubview:_headerView];
     
     self.userIcon = [[UIImageView alloc]initWithFrame:CGRectMake(20,_headerView.frame.size.height/4, _headerView.frame.size.height/2, _headerView.frame.size.height/2)];
     [_userIcon setImage:[UIImage imageNamed:@"img_user"]];
@@ -83,9 +81,11 @@
     UITapGestureRecognizer *jumpTologinRecognizer = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(jumpToLogin:)];
     [self.username addGestureRecognizer:jumpTologinRecognizer];
     
-    self.itemView = [[UIView alloc]initWithFrame:CGRectMake(0, self.mainHeigh/5, self.mainWidth, self.mainHeigh*4/5)];
+    self.itemView = [[UIScrollView alloc]initWithFrame:CGRectMake(0, self.mainHeigh/5, self.mainWidth, self.mainHeigh*4/5)];
     self.itemView.backgroundColor = [UIColor colorWithRed:208/255.0 green:208/255.0 blue:208/255.0 alpha:1.0];
-    [self.rootScrollview addSubview:_itemView];
+    _itemView.showsVerticalScrollIndicator = NO;
+    _itemView.showsHorizontalScrollIndicator = NO;
+    [self.rootview addSubview:_itemView];
     
     //tutorial
     CGFloat itemViewHeight = self.itemView.frame.size.height;
@@ -139,37 +139,15 @@
     UITapGestureRecognizer *appsRecognizer = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(JumpToApps)];
     [self.AppsContent addGestureRecognizer:appsRecognizer];
     self.AppsContent.userInteractionEnabled = YES;
-     _rootScrollview.contentSize = CGSizeMake(self.view.frame.size.width,self.mainHeigh);
+    
+    _itemView.contentSize = CGSizeMake(screen_width, 1.5*_itemView.frame.size.height);
 }
 - (void)JumpToApps{
     AppsViewController *app = [[AppsViewController alloc]init];
     app.hidesBottomBarWhenPushed = YES;
     [self.navigationController pushViewController:app animated:YES];
 }
-//
-//-(void)TapAction1:(id)sender{
-//
-//        if(!self.isFosaOpen){
-//            [self.rootScrollview addSubview:self.aboutFosa];
-//            self.showContent.image = [UIImage imageNamed:@"icon_open"];
-//            self.isFosaOpen = true;
-//        }else{
-//            [self.aboutFosa removeFromSuperview];
-//            self.showContent.image = [UIImage imageNamed:@"icon_close"];
-//            self.isFosaOpen = false;
-//        }
-//}
-//-(void)TapAction:(id)sender{
-//    if(!self.isAppsOpen){
-//        [self.rootScrollview addSubview:self.aboutApps];
-//        self.showApps.image = [UIImage imageNamed:@"icon_open"];
-//        self.isAppsOpen = true;
-//    }else{
-//        [self.aboutApps removeFromSuperview];
-//        self.showApps.image = [UIImage imageNamed:@"icon_close"];
-//        self.isAppsOpen = false;
-//    }
-//}
+
 -(void)jumpToLogin:(id)sender{
     NSLog(@"跳转");
     LoginViewController *login = [[LoginViewController alloc]init];
