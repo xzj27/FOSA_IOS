@@ -1061,21 +1061,21 @@
         NSLog(@"查询失败");
     }else{
         while (sqlite3_step(_stmt) == SQLITE_ROW) {
-            food_name = (const char *)sqlite3_column_text(_stmt, 0);
-            food = [NSString stringWithUTF8String:food_name];
+            food_name   = (const char *)sqlite3_column_text(_stmt, 0);
+            food        = [NSString stringWithUTF8String:food_name];
 
             device_name = (const char *)sqlite3_column_text(_stmt,1);
-            fdevice = [NSString stringWithUTF8String:device_name];
+            fdevice     = [NSString stringWithUTF8String:device_name];
            
-            about_food = (const char *)sqlite3_column_text(_stmt,2);
+            about_food  = (const char *)sqlite3_column_text(_stmt,2);
             expire_date = (const char *)sqlite3_column_text(_stmt,3);
-            expire = [NSString stringWithUTF8String:expire_date];
+            expire      = [NSString stringWithUTF8String:expire_date];
             
             remind_date = (const char *)sqlite3_column_text(_stmt,4);
-            remind = [NSString stringWithUTF8String:remind_date];
+            remind      = [NSString stringWithUTF8String:remind_date];
             
-            photo_path = (const char *)sqlite3_column_text(_stmt, 5);
-            photoPath = [NSString stringWithUTF8String:photo_path];
+            photo_path  = (const char *)sqlite3_column_text(_stmt, 5);
+            photoPath   = [NSString stringWithUTF8String:photo_path];
         }
     }
     if (fdevice == NULL) {
@@ -1335,6 +1335,3 @@
 }
 @end
 //
-
-
-

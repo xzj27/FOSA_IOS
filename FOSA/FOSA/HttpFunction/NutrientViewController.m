@@ -98,9 +98,9 @@
     _categoryIcon.image = [UIImage imageNamed:self.foodicon];
     [self.Header addSubview:_categoryIcon];
     
-    self.foodNameLabel = [[UILabel alloc]initWithFrame:CGRectMake(navheight*2.5, navheight/2, navheight*1.5, navheight)];
+    self.foodNameLabel = [[UILabel alloc]initWithFrame:CGRectMake(navheight*3, navheight/2, mainWidth/2, navheight)];
     _foodNameLabel.text = self.food;
-    _foodNameLabel.textAlignment = NSTextAlignmentCenter;
+    //_foodNameLabel.textAlignment = NSTextAlignmentCenter;
     [self.Header addSubview:_foodNameLabel];
     self.tips = [[UILabel alloc]initWithFrame:CGRectMake(0, navheight*2, mainWidth, navheight)];
     _tips.text = @"每100g所含营养成分参考值";
