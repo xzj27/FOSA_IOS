@@ -54,8 +54,6 @@
 }
 
 #pragma mark - UISceneSession lifecycle
-
-
 - (UISceneConfiguration *)application:(UIApplication *)application configurationForConnectingSceneSession:(UISceneSession *)connectingSceneSession options:(UISceneConnectionOptions *)options  API_AVAILABLE(ios(13.0)){
     // Called when a new scene session is being created.
     // Use this method to select a configuration to create the new scene with.
@@ -80,18 +78,22 @@
     request.timeoutInterval = 2.0; //设置请求超时为4秒
     //4、创建get请求
     NSURLSessionDataTask *dataTask = [[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+        if (error == NULL) {
             //解析JSon数据
-            NSMutableArray *dict =  [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
-        for (int i = 0; i < [dict count]; i++) {
-        CategoryModel *model = [CategoryModel modelWithName:(NSString *)dict[i][@"CategoryName"] categoryIcon:dict[i][@"CategoryIcon"]];
-            [DataArray addObject:model];
-            NSLog(@"%@",(NSString *)dict[i][@"CategoryName"]);
+                NSMutableArray *dict =  [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
+            for (int i = 0; i < [dict count]; i++) {
+            CategoryModel *model = [CategoryModel modelWithName:(NSString *)dict[i][@"CategoryName"] categoryIcon:dict[i][@"CategoryIcon"]];
+                [DataArray addObject:model];
+                NSLog(@"%@",(NSString *)dict[i][@"CategoryName"]);
+            }
+            //在主线程更新UI
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self UpdateDataInSql:DataArray];
+                //[self InitNutrientDataFromServer];
+            });
+        }else{
+            NSLog(@"加载内容失败");
         }
-        //在主线程更新UI
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self UpdateDataInSql:DataArray];
-            //[self InitNutrientDataFromServer];
-        });
         }];
         //5、执行请求
         [dataTask resume];

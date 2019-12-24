@@ -8,12 +8,9 @@
 
 #import "ScanUIView.h"
 #import <AVFoundation/AVFoundation.h>
-@interface ScanUIView()<AVCaptureMetadataOutputObjectsDelegate>
+@interface ScanUIView()
 @end
-
-
 @implementation ScanUIView
-
 
 #pragma mark - 懒加载属性
 - (AVCaptureDevice *)device{
@@ -39,7 +36,7 @@
         _output = [[AVCaptureMetadataOutput alloc]init];
         CGFloat ScreenWidth = self.bounds.size.width;
         //设置扫描作用域范围(中间透明的扫描框)
-        CGRect intertRect = [self.previewLayer metadataOutputRectOfInterestForRect:CGRectMake(ScreenWidth*0.15, ScreenWidth*0.15+64, ScreenWidth*0.7, ScreenWidth*0.7)];
+        CGRect intertRect = [self.previewLayer metadataOutputRectOfInterestForRect:CGRectMake(ScreenWidth*0.1, ScreenWidth*0.1, ScreenWidth*0.8, ScreenWidth*0.8)];
         _output.rectOfInterest = intertRect;
     }
     return _output;
@@ -63,8 +60,6 @@
     }
     return _previewLayer;
 }
-
-
 - (instancetype)initWithFrame:(CGRect)frame
 {
     self = [super initWithFrame:frame];
@@ -100,10 +95,12 @@
        //指定设备的识别类型
            self.output.metadataObjectTypes = @[AVMetadataObjectTypeQRCode,AVMetadataObjectTypeCode128Code,AVMetadataObjectTypeEAN8Code,AVMetadataObjectTypeAztecCode,AVMetadataObjectTypeCode39Code,AVMetadataObjectTypeCode93Code,AVMetadataObjectTypeUPCECode,AVMetadataObjectTypeCode39Mod43Code,AVMetadataObjectTypeEAN13Code,AVMetadataObjectTypePDF417Code];
        //设备输出 初始化，并设置代理和回调，当设备扫描到数据时通过该代理输出队列，一般输出队列都设置为主队列，也是设置了回调方法执行所在的队列环境
-       dispatch_queue_t queue = dispatch_queue_create("myqueue", NULL);
-       [self.output setMetadataObjectsDelegate:self queue:queue];
+    
+       //dispatch_queue_t queue = dispatch_queue_create("myqueue", NULL);
+       //[self.output setMetadataObjectsDelegate:self queue:queue];
+    
        //视频流输出
-        [self.VideoOutput setSampleBufferDelegate:self queue:dispatch_get_main_queue()];
+        //[self.VideoOutput setSampleBufferDelegate:self queue:dispatch_get_main_queue()];
        //添加预览图层
        self.previewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
        self.previewLayer.frame = self.bounds;

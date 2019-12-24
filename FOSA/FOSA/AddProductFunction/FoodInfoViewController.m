@@ -116,17 +116,17 @@
     self.imageView1.contentMode = UIViewContentModeScaleAspectFill;
     self.imageView1.clipsToBounds = YES;
     self.imageView1.userInteractionEnabled = YES;
+    self.imageView1.layer.shadowColor = [UIColor redColor].CGColor;//阴影颜色
     // 点击图片放大还原
     UITapGestureRecognizer *clickRecognizer = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(EnlargePhoto)];
     [self.imageView1 addGestureRecognizer:clickRecognizer];
 
-    
     self.deviceName = [[UITextView alloc]initWithFrame:CGRectMake(0, 0,headerWidth/2, headerheight/4-5)];
     self.deviceName.userInteractionEnabled = NO;
     self.deviceName.backgroundColor = [UIColor clearColor];
     [self.headerView addSubview:_imageView1];   //添加图片视图
     [self.headerView addSubview:_deviceName];
-    
+
     self.share = [[UIButton alloc]initWithFrame:CGRectMake(headerWidth-45,5,40,40)];
     [_share setImage:[UIImage imageNamed:@"icon_share"] forState:UIControlStateNormal];
     [_share addTarget:self action:@selector(beginShare) forControlEvents:UIControlEventTouchUpInside];

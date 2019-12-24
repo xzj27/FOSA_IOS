@@ -77,14 +77,8 @@
         NSLog(@"异步刷新界面");
         dispatch_async(dispatch_get_main_queue(), ^{
             [self.storageArray removeAllObjects];
-            //[self RemoveObjectAfterIndex:0];
             [self.StorageItemView reloadData];
         });
-    }
-}
-- (void)RemoveObjectAfterIndex:(NSInteger)index{
-    for (NSInteger i = index+1; i < _storageArray.count; i++) {
-        [_storageArray removeObjectAtIndex:i];
     }
 }
 
@@ -117,21 +111,23 @@
     _StorageItemView.showsVerticalScrollIndicator = NO;
     //regist the user-defined collctioncell
     [_StorageItemView registerClass:[FoodCollectionViewCell class] forCellWithReuseIdentifier:ID];
+    
     //给view 添加滑动事件
-//     UISwipeGestureRecognizer *recognizer;
-//        //right--
-//        recognizer = [[UISwipeGestureRecognizer alloc]initWithTarget:self action:@selector(handleSwipeFrom:)];
-//        [recognizer setDirection:(UISwipeGestureRecognizerDirectionRight)];
-//        [[self view] addGestureRecognizer:recognizer];
-//        //[recognizer release];
-//        //left---
-//        recognizer = [[UISwipeGestureRecognizer alloc]initWithTarget:self action:@selector(handleSwipeFrom:)];
-//        [recognizer setDirection:(UISwipeGestureRecognizerDirectionLeft)];
-//        [[self view] addGestureRecognizer:recognizer];
-//        //[recognizer release];
-    UIGestureRecognizer *Crecognizer = [[UIGestureRecognizer alloc]initWithTarget:self action:@selector(moveMenu)];
-    Crecognizer.delegate = self;
-    [[self StorageItemView] addGestureRecognizer:Crecognizer];
+     UISwipeGestureRecognizer *recognizer;
+        //right--
+        recognizer = [[UISwipeGestureRecognizer alloc]initWithTarget:self action:@selector(handleSwipeFrom:)];
+        [recognizer setDirection:(UISwipeGestureRecognizerDirectionRight)];
+        [[self view] addGestureRecognizer:recognizer];
+        //[recognizer release];
+        //left---
+        recognizer = [[UISwipeGestureRecognizer alloc]initWithTarget:self action:@selector(handleSwipeFrom:)];
+        [recognizer setDirection:(UISwipeGestureRecognizerDirectionLeft)];
+        [[self view] addGestureRecognizer:recognizer];
+    //空白屏幕点击事件
+//    UIGestureRecognizer *Crecognizer = [[UIGestureRecognizer alloc]initWithTarget:self action:@selector(moveMenu)];
+//    [Crecognizer requireGestureRecognizerToFail:recognizer];
+//    Crecognizer.delegate = self;
+//    [[self StorageItemView] addGestureRecognizer:Crecognizer];
     if ([NSProcessInfo.processInfo isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion){10,0,0}])
     {
         //CGRect fresh = CGRectMake(0, 0, self.StorageItemView.frame.size.width,50);
@@ -167,13 +163,13 @@
     self.CategoryScrollview.bounces = NO;
     [self.CategoryMenu addSubview:self.CategoryScrollview];
     //添加滑动手势
-    UISwipeGestureRecognizer *swipeGestureRight = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(swipeGestureRight:)];
-     [swipeGestureRight setDirection:UISwipeGestureRecognizerDirectionRight];
-     [_CategoryScrollview addGestureRecognizer:swipeGestureRight];
-         
-     UISwipeGestureRecognizer *swipeGestureLeft = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(swipeGestureLeft:)];
-     [swipeGestureLeft setDirection:UISwipeGestureRecognizerDirectionLeft];
-     [_CategoryScrollview addGestureRecognizer:swipeGestureLeft];
+//    UISwipeGestureRecognizer *swipeGestureRight = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(swipeGestureRight:)];
+//     [swipeGestureRight setDirection:UISwipeGestureRecognizerDirectionRight];
+//     [_CategoryScrollview addGestureRecognizer:swipeGestureRight];
+//
+//     UISwipeGestureRecognizer *swipeGestureLeft = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(swipeGestureLeft:)];
+//     [swipeGestureLeft setDirection:UISwipeGestureRecognizerDirectionLeft];
+//     [_CategoryScrollview addGestureRecognizer:swipeGestureLeft];
     
     //颜色
      NSArray *color = @[
@@ -201,28 +197,7 @@
     [add addSubview:add_icon];
     [self.CategoryScrollview addSubview:add];
 }
-//- (void)InitAddView{
-//    //在UICollectionView最后添加一个addview
-//    CGFloat cellWidth = (self.StorageItemView.frame.size.width-15)/2;
-//    CGFloat cellheight = cellHeight;
-//    NSLog(@"***********%f",cellheight);
-//    CGFloat x = 5+(self.storageArray.count%2)*(cellWidth+5);
-//    CGFloat y = 0;
-//    if (_storageArray.count == 0) {
-//        y = 5;
-//    }else if(self.storageArray.count % 2 == 0){
-//        y = (cellheight+5)*(self.storageArray.count/2)+5;
-//    }else if(self.storageArray.count % 2 == 1){
-//        y = (cellheight+5)*(self.storageArray.count/2)+5;
-//    }
-//    self.addView = [[UIButton alloc]initWithFrame:CGRectMake(x, y, cellWidth, cellheight)];
-//    self.addView.layer.cornerRadius = 5;
-//    _addView.backgroundColor = [UIColor colorWithRed:105/255.0 green:251/255.5 blue:241/255.0 alpha:1.0];
-//    [self.addView setImage:[UIImage imageNamed:@"icon_additem"] forState:UIControlStateNormal];
-//    [self.StorageItemView addSubview:self.addView];
-//    //添加点击事件
-//    [self.addView addTarget:self action:@selector(addFunction) forControlEvents:UIControlEventTouchUpInside];
-//}
+
 // 添加事件
 - (void) addFunction{
    PhotoViewController *photo = [[PhotoViewController alloc]init];
@@ -366,15 +341,6 @@ NSLog(@"foodName=%@&&&&&&&expireDate=%@",_storageArray[i].foodName,_storageArray
 }
 //点击通知项的方法
 - (void)ClickNotification:(FoodCollectionViewCell *)cell{
-//    if (!isEdit) {
-//        FoodInfoViewController *info = [[FoodInfoViewController alloc]init];
-//        info.hidesBottomBarWhenPushed = YES;
-//        info.deviceID = cell.model.device;
-//        info.name = cell.model.foodName;
-//        [self.navigationController pushViewController:info animated:YES];
-//    }else{
-//        NSLog(@"正处于编辑状态无法跳转");
-//    }
     FoodInfoViewController *info = [[FoodInfoViewController alloc]init];
     info.hidesBottomBarWhenPushed = YES;
     info.deviceID = cell.model.device;
@@ -412,26 +378,37 @@ NSLog(@"foodName=%@&&&&&&&expireDate=%@",_storageArray[i].foodName,_storageArray
            
     }
 }
-//-(void)handleSwipeFrom:(UISwipeGestureRecognizer *)recognizer
-//{
-//    if(recognizer.direction==UISwipeGestureRecognizerDirectionLeft) {
-//        NSLog(@"swipe left");
-//        //执行程序
-//        [self moveMenu];
-//    }
-//    if(recognizer.direction==UISwipeGestureRecognizerDirectionRight) {
-//
-//        NSLog(@"swipe right");
-//        //执行程序
-//        [self moveMenu];
-//    }
-//}
+
+//屏幕滑动手势
+-(void)handleSwipeFrom:(UISwipeGestureRecognizer *)recognizer
+{
+    if(recognizer.direction==UISwipeGestureRecognizerDirectionLeft) {
+        NSLog(@"swipe left");
+        //执行程序
+        [self moveMenu];
+    }
+    if(recognizer.direction==UISwipeGestureRecognizerDirectionRight) {
+
+        NSLog(@"swipe right");
+        //执行程序
+        [self moveMenu];
+    }
+}
 - (void) moveMenu
 {
-if (!_LeftOrRight) {//view 展开
+    if (_LeftOrRight) {//view 折叠
+       _LeftOrRight = false;
+        [UIView animateWithDuration:0.5 animations:^{
+            //view 向左移动
+            self->_CategoryMenu.center = CGPointMake(self.CategoryMenu.frame.size.width/2, (self.CategoryMenu.frame.size.height)/2+self.navHeight);
+        }];
+    }else{
         _LeftOrRight = true;
-        //向右移动
-         _CategoryMenu.center = CGPointMake(-self.mainWidth/12,(self.CategoryMenu.frame.size.height)/2+self.navHeight);
+        
+        [UIView animateWithDuration:0.5 animations:^{
+            //向右移动
+            self->_CategoryMenu.center = CGPointMake(-self.mainWidth/12,(self.CategoryMenu.frame.size.height)/2+self.navHeight);
+        }];
     }
 }
 #pragma mark - 刷新事件与menu事件
@@ -557,15 +534,13 @@ if (!_LeftOrRight) {//view 展开
         return YES;
     }
 }
-
-
 - (void)viewDidDisappear:(BOOL)animated{
-    int close = sqlite3_close_v2(_database);
-    if (close == SQLITE_OK) {
-            _database = nil;
-    }else{
-            NSLog(@"数据库关闭异常");
-    }
+//    int close = sqlite3_close_v2(_database);
+//    if (close == SQLITE_OK) {
+//            _database = nil;
+//    }else{
+//            NSLog(@"数据库关闭异常");
+//    }
     isUpdate = true;
 }
 

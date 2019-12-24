@@ -559,12 +559,12 @@
 //food table
 - (void)InitFoodTable{
     self.foodTable = [[UITableView alloc]initWithFrame:CGRectMake(5, self.sealerView.frame.size.height+10, self.sealerView.frame.size.width,screen_height*3/4-TabbarHeight) style:UITableViewStylePlain];
-    self.foodTable.backgroundColor = [UIColor colorWithRed:208/255.0 green:208/255.0 blue:208/255.0 alpha:1.0];
+    self.foodTable.backgroundColor = [UIColor colorWithRed:228/255.0 green:228/255.0 blue:228/255.0 alpha:1.0];
     _foodTable.delegate = self;
     _foodTable.dataSource = self;
     _foodTable.hidden = YES;
     _foodTable.showsVerticalScrollIndicator = NO;
-    _foodTable.layer.borderWidth = 0.3;
+    _foodTable.layer.borderWidth = 1;
     [self.rootView insertSubview:_foodTable atIndex:10];
 }
 //calorie table

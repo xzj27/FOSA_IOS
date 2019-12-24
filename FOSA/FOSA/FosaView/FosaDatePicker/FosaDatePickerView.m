@@ -17,7 +17,6 @@
 @property (strong, nonatomic) NSMutableArray *dataArray; // 数据源
 @property (copy, nonatomic) NSString *selectStr; // 选中的时间
 
-
 @property (strong, nonatomic) NSMutableArray *yearArr; // 年数组
 @property (strong, nonatomic) NSMutableArray *monthArr; // 月数组
 @property (strong, nonatomic) NSMutableArray *dayArr; // 日数组
@@ -358,8 +357,10 @@
                         // 如果选择的日等于当前日，就判断时
                     } else if ([self.day integerValue] == [self.timeArr[2] integerValue]) {
                         // 如果选择的时小于当前时，就刷新到当前时
-                        if ([self.hourArr[row%[self.dataArray[component] count]] integerValue] < [self.timeArr[3] integerValue]) {
-                            [pickerView selectRow:[self.dataArray[component] indexOfObject:self.timeArr[component]] inComponent:component animated:YES];
+                        if (hour_value.integerValue < [self.timeArr[component] integerValue]) {
+                        if (self.isSlide) {
+                            [pickerView selectRow:[self.dataArray[component] indexOfObject:[NSString stringWithFormat:@"%ld时", [self.timeArr[component] integerValue]]] inComponent:component animated:YES];
+                        }
                             // 如果选择的时大于当前时，就直接赋值
                         } else {
                             self.hour = hour_value;
