@@ -419,7 +419,7 @@
     [self InsertDataIntoSqlite];
     
     //[self SavePhotoIntoLibrary:self.imageView1.image];
-    picturePath = [self Savephoto:[self fixOrientation:self.imageView1.image]];
+    picturePath = [self Savephoto:[self fixOrientation:self.food_image[0]]];
     //格式化时间
     NSDateFormatter * formatter = [[NSDateFormatter alloc]init];
     [formatter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
