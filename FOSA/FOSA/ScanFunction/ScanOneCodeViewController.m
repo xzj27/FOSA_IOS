@@ -628,19 +628,19 @@
 {
     if([[mobject type] isEqualToString:AVMetadataObjectTypeQRCode]){//如果是一个可读二维码对象
         self.isGetResult = true;                                    //修改标志，不再自动放大镜头
-            if (self.food_photo == nil){//UIImage对象为空说明并不是在添加食物的过程进行扫码
-                [self performSelectorOnMainThread:@selector(setFocusCursorWithPoint:) withObject:(AVMetadataMachineReadableCodeObject *) mobject waitUntilDone:NO];      //在主线程中标记二维码的位置（还不够准确）
-                if([result hasPrefix:@"http://"]){//若是一个网站，就打开这个链接
-                    if (!isJump) {
-                        [self ScanSuccess:@"ding.wav"];
-                        [self performSelectorOnMainThread:@selector(OpenURL:) withObject:result waitUntilDone:NO];
-                        isJump = true;
-                    }
+            if (self.food_photo.count == 0){//UIImage对象为空说明并不是在添加食物的过程进行扫码
+                    [self performSelectorOnMainThread:@selector(setFocusCursorWithPoint:) withObject:(AVMetadataMachineReadableCodeObject *) mobject waitUntilDone:NO];      //在主线程中标记二维码的位置（还不够准确）
+                    if([result hasPrefix:@"http://"]){//若是一个网站，就打开这个链接
+                        if (!isJump) {
+                            [self ScanSuccess:@"ding.wav"];
+                            [self performSelectorOnMainThread:@selector(OpenURL:) withObject:result waitUntilDone:NO];
+                            isJump = true;
+                        }
                     
-                }else if([result hasPrefix:@"Fosa"]||[result hasPrefix:@"FS9"]||[result hasPrefix:@"FOSASealer"]){
-                    [self ScanSuccess:@"ding.wav"];
-                    [self performSelectorOnMainThread:@selector(showOneMessage:) withObject:result waitUntilDone:NO]; //在主线程中展示这个物品的通知
-                }else if ([result hasPrefix:@"FOSA"]) {
+                    }else if([result hasPrefix:@"Fosa"]||[result hasPrefix:@"FS9"]||[result hasPrefix:@"FOSASealer"]){
+                        [self ScanSuccess:@"ding.wav"];
+                        [self performSelectorOnMainThread:@selector(showOneMessage:) withObject:result waitUntilDone:NO]; //在主线程中展示这个物品的通知
+                    }else if ([result hasPrefix:@"FOSA"]) {
                         FoodInfoViewController *food = [[FoodInfoViewController alloc]init];
                         //分割字符串的测试
                         food.infoArray = [NSArray array];
@@ -651,13 +651,13 @@
                         NSLog(@"%@---%@",food.name,food.deviceID);
                         //food.food_image = [self getPartOfImage:image];
                         [self.navigationController pushViewController:food animated:YES];
-                }else{
-                    if (!isJump) {//当前还没有发生跳转
-                        [self ScanSuccess:@"ding.wav"];
-                        [self performSelectorOnMainThread:@selector(JumpToResult:) withObject:result waitUntilDone:NO];
-                        isJump = true;  //不再处理其他跳转
+                    }else{
+                        if (!isJump) {//当前还没有发生跳转
+                            [self ScanSuccess:@"ding.wav"];
+                            [self performSelectorOnMainThread:@selector(JumpToResult:) withObject:result waitUntilDone:NO];
+                            isJump = true;  //不再处理其他跳转
+                        }
                     }
-                }
             }else{  //UIImage不为空则说明现在正处于添加功能中拍照完成后的扫码阶段
                 if([result hasPrefix:@"FOSASealer"]||[result hasPrefix:@"FS9"]){//判断所扫描的二维码属于fosa产品
                     [self.session stopRunning];
@@ -666,7 +666,6 @@
                         [self ScanSuccess:@"ding.wav"];
                     //标记识别到的二维码
                         [self performSelectorOnMainThread:@selector(JumpToAdd:) withObject:result waitUntilDone:NO];
-                        
                         isJump = true;
                     }
                 }else{
@@ -781,17 +780,18 @@
     CGFloat headerWidth = [UIScreen mainScreen].bounds.size.width-20;
     CGFloat headerheight = [UIScreen mainScreen].bounds.size.height/3;
     
-    add.imageView1 = [[UIImageView alloc]initWithFrame:CGRectMake(15, headerheight/4-5,headerheight*3/4-5,headerheight*3/4-5)];
-    add.imageView1.image = self.food_photo;
-    add.imageView1.backgroundColor = [UIColor redColor];
-    add.food_image = [[UIImage alloc]init];
+//    add.imageView1 = [[UIImageView alloc]initWithFrame:CGRectMake(15, 5,headerWidth-30,headerheight*3/4-5)];
+//    add.imageView1.image = self.food_photo[0];
+//    add.imageView1.contentMode = UIViewContentModeScaleAspectFill;
+//    add.imageView1.clipsToBounds = YES;
+//    add.imageView1.backgroundColor = [UIColor redColor];
+    add.food_image = [[NSMutableArray alloc]init];
     add.food_image = self.food_photo;
-    
     add.deviceName = [[UITextView alloc]initWithFrame:CGRectMake(15, 0,headerWidth/2, headerheight/4-5)];
     add.deviceName.backgroundColor = [UIColor clearColor];
     add.deviceName.textColor = [UIColor blackColor];
     add.deviceName.text = massage;
-    [add.headerView addSubview:add.deviceName];
+    //[add.headerView addSubview:add.deviceName];
     [add.headerView addSubview:add.imageView1];
     
     //add.hidesBottomBarWhenPushed = Yes;

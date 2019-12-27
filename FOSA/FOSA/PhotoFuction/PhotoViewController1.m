@@ -1,17 +1,17 @@
 //
-//  PhotoViewController.m
+//  PhotoViewController1.m
 //  FOSA
 //
-//  Created by hs on 2019/11/11.
+//  Created by hs on 2019/12/27.
 //  Copyright © 2019 hs. All rights reserved.
 //
 
-#import "PhotoViewController.h"
+#import "PhotoViewController1.h"
 #import "ScanOneCodeViewController.h"
 #import <AVFoundation/AVFoundation.h>
 #import <UserNotifications/UserNotifications.h>
 
-@interface PhotoViewController ()
+@interface PhotoViewController1 ()
 
 @property (nonatomic, strong) AVCaptureSession *captureSession;//负责输入和输出设备之间的数据传递
 @property (nonatomic, strong) AVCaptureDeviceInput *captureDeviceInput;//负责从AVCaptureDevice获得输入数据
@@ -21,9 +21,9 @@
 @property (nonatomic, weak) UIView *containerView;//内容视图
 @property (nonatomic, weak) UIView *TakingPhotoView;//拍照与照片缩略图
 @property (nonatomic, weak) UIImageView *focusCursor;//聚焦按钮
-@property (nonatomic, weak) UIImageView *imgView;
-@property (nonatomic, strong) UIButton *shutter,*cancel;
-
+@property (nonatomic, weak) UIImageView *imgView;//拍摄照片
+@property (nonatomic, strong) UIButton *shutter,*cancel1;
+@property (nonatomic, strong) UIImage *image;
 
 //图片放大视图
 @property (nonatomic,strong) UIScrollView *backGround;
@@ -31,7 +31,7 @@
 @property (nonatomic,assign) CGFloat totalScale;
 @end
 
-@implementation PhotoViewController
+@implementation PhotoViewController1
 /** 屏幕高度 */
 #define screen_height [UIScreen mainScreen].bounds.size.height
 /** 屏幕宽度 */
@@ -54,8 +54,13 @@
 #define ToolbarHeight self.navigationController.toolbar.frame.size.height
 - (void)viewDidLoad {
     [super viewDidLoad];
+//    self.navigationItem.title = @"拍照";
+//    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithImage:[UIImage imageNamed:@"icon_scan"] style:UIBarButtonItemStylePlain target:nil action:nil];
+//    self.navigationItem.rightBarButtonItem.target = self;     self.navigationItem.rightBarButtonItem.action = @selector(ScanEvent);
+//    self.view.backgroundColor = [UIColor blackColor];
     //创建控件
     [self creatControl];
+    
 }
 - (void)viewWillAppear:(BOOL)animated
 {
@@ -85,6 +90,7 @@
     //containerView.layer.borderColor = [[UIColor grayColor] CGColor];
     [self.view addSubview:containerView];
     _containerView = containerView;
+
     //拍照控制视图
     UIView *takingPhoto =[[UIView alloc] initWithFrame:CGRectMake(0,containerViewH+marginY, w, 180)];
     takingPhoto.backgroundColor = [UIColor blackColor];
@@ -111,18 +117,30 @@
     [containerView addSubview:focusCursor];
     _focusCursor = focusCursor;
     
-    _pictureView = [[UIImageView alloc]initWithFrame:CGRectMake(0, NavigationHeight, screen_width, screen_height-NavigationHeight-40)];
-    _pictureView.contentMode = UIViewContentModeScaleAspectFill;
-    _pictureView.clipsToBounds = YES;
-    _pictureView.userInteractionEnabled = YES;
+    //拍摄照片容器
+    _pictureView1 = [[UIImageView alloc]initWithFrame:CGRectMake(0, NavigationHeight, screen_width, screen_height-NavigationHeight-40)];
+    _pictureView1.contentMode = UIViewContentModeScaleAspectFill;
+    _pictureView1.clipsToBounds = YES;
+    _pictureView1.userInteractionEnabled = YES;
     //[self.view addSubview:_pictureView1];
-    self.cancel = [[UIButton alloc]initWithFrame:CGRectMake(screen_width/2-20, _pictureView.frame.size.height-50, 40, 40)];
-    [self.cancel setBackgroundImage:[UIImage imageNamed:@"icon_cancel"] forState:UIControlStateNormal];
-    [self.cancel addTarget:self action:@selector(takePictureAgain) forControlEvents:UIControlEventTouchUpInside];
-    [_pictureView addSubview:_cancel];
-    
+    self.cancel1 = [[UIButton alloc]initWithFrame:CGRectMake(screen_width/2-20, _pictureView1.frame.size.height-50, 40, 40)];
+    [self.cancel1 setBackgroundImage:[UIImage imageNamed:@"icon_cancel"] forState:UIControlStateNormal];
+    [self.cancel1 addTarget:self action:@selector(takePictureAgain) forControlEvents:UIControlEventTouchUpInside];
+    [_pictureView1 addSubview:_cancel1];
+//    _image = [[UIImage alloc]init];
+//    UIImageView *imgView = [[UIImageView alloc] initWithFrame:CGRectMake(20, containerViewH+marginY+15,60,60)];
+//    imgView.hidden = NO;
+//    imgView.backgroundColor = [UIColor colorWithRed:80/255 green:80/255 blue:80/255 alpha:1.0];
+//    imgView.layer.borderWidth = 1.f;
+//    imgView.layer.borderColor = [[UIColor grayColor] CGColor];
+//    imgView.contentMode = UIViewContentModeScaleAspectFill;
+//    imgView.clipsToBounds = YES;
+//    imgView.userInteractionEnabled = YES;
+//    //[self.view addSubview:imgView];
+//    UITapGestureRecognizer *clickRevognizer = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(EnlargePhoto)];
+//    [imgView addGestureRecognizer:clickRevognizer];
+//    _imgView = imgView;
 }
- 
 #pragma mark - 进入扫码界面
 -(void)ScanEvent{
     ScanOneCodeViewController *scan = [[ScanOneCodeViewController alloc]init];
@@ -133,7 +151,7 @@
         NSLog(@"停止捕获");
         [self.captureSession stopRunning];
     }
-    [self removeNotification];
+//    [self removeNotification];
     [self.navigationController pushViewController:scan animated:YES];
     [self.navigationController popoverPresentationController];
     
@@ -166,12 +184,6 @@
     //输出设置
     [_captureStillImageOutput setOutputSettings:outputSettings];
     
-    //初始化AvcapturePhotoOutput
-//    self.imageOutput = [[AVCapturePhotoOutput alloc] init];
-//    NSDictionary *setDic = @{AVVideoCodecKey:AVVideoCodecTypeJPEG};
-//    AVCapturePhotoSettings *imageSettings = [AVCapturePhotoSettings photoSettingsWithFormat:setDic];
-//    [self.imageOutput capturePhotoWithSettings:imageSettings delegate:self];
-    
     //将设备输入添加到会话中
     if ([_captureSession canAddInput:_captureDeviceInput]) {
         [_captureSession addInput:_captureDeviceInput];
@@ -180,10 +192,6 @@
     if ([_captureSession canAddOutput:_captureStillImageOutput]) {
         [_captureSession addOutput:_captureStillImageOutput];
     }
-    //将设备输出添加到会话中
-//    if ([_captureSession canAddOutput:_imageOutput]) {
-//        [_captureSession addOutput:_imageOutput];
-//    }
     //创建视频预览层，用于实时展示摄像头状态
     _captureVideoPreviewLayer = [[AVCaptureVideoPreviewLayer alloc] initWithSession:self.captureSession];
     
@@ -200,7 +208,7 @@
     //将视频预览层添加到界面中
     [layer insertSublayer:_captureVideoPreviewLayer below:self.focusCursor.layer];
     [self.captureSession startRunning];
-    [self addNotificationToCaptureDevice:captureDevice];
+//    [self addNotificationToCaptureDevice:captureDevice];
     [self addGenstureRecognizer];
     
      [_captureDeviceInput.device lockForConfiguration:nil];
@@ -224,7 +232,6 @@
        [_captureDeviceInput.device unlockForConfiguration];
     
 }
-
 - (void)btnOnClick:(UIButton *)btn
 {
     [self photoBtnOnClick];
@@ -247,18 +254,16 @@
 //            self.imgView.contentMode = UIViewContentModeScaleAspectFill;
 //            self.imgView.clipsToBounds = YES;
 //            self.imgView.image = self.image;
-            //[self DetectQRcode:self.image];
-            self.pictureView.image = self.image;
-            if (self.imageArray != NULL) {
-                [self.imageArray replaceObjectAtIndex:0 withObject:self.image];
-            }
+//            [self DetectQRcode:self.image];
+            self.pictureView1.image = self.image;
+            [self.imageArray1 replaceObjectAtIndex:1 withObject:self.image];
         }
     }];
-    [self.view insertSubview:self.pictureView atIndex:10];
+    [self.view addSubview:_pictureView1];
     [self.captureSession stopRunning];
 }
 - (void)takePictureAgain{
-    [self.pictureView removeFromSuperview];
+    [self.pictureView1 removeFromSuperview];
     [self.captureSession startRunning];
 }
 //保存照片到本地
@@ -279,74 +284,71 @@
     NSLog(@"=== %@", img);
     return img;
 }
-#pragma mark -  放大缩小图片
-- (void)EnlargePhoto{
-    self.navigationController.navigationBar.hidden = YES;   //隐藏导航栏
-    [UIApplication sharedApplication].statusBarHidden = YES;             //隐藏状态栏
-    //底层视图
-    self.backGround = [[UIScrollView alloc]init];
-    _backGround.backgroundColor = [UIColor blackColor];
-    _backGround.contentSize = CGSizeMake(self.view.frame.size.width, self.view.frame.size.height);
-    _backGround.frame = self.view.frame;
-    _backGround.showsHorizontalScrollIndicator = NO;
-    _backGround.showsVerticalScrollIndicator = NO;
-    _backGround.multipleTouchEnabled = YES;
-    _backGround.maximumZoomScale = 5;
-    _backGround.minimumZoomScale = 1;
-    _backGround.delegate = self;
-
-    self.bigImage = [[UIImageView alloc]init];
-    _bigImage.frame = self.view.frame;
-    _bigImage.image = self.imgView.image;
-    _bigImage.userInteractionEnabled = YES;
-    _bigImage.contentMode = UIViewContentModeScaleToFill;
-    _bigImage.clipsToBounds = YES;
-    UITapGestureRecognizer *shrinkRecognizer = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(shirnkPhoto)];
-    [shrinkRecognizer setNumberOfTapsRequired:1];
-    [_bigImage addGestureRecognizer:shrinkRecognizer];
-    //添加双击事件
-    UITapGestureRecognizer *doubleTapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleDoubleTap:)];
-    [doubleTapGesture setNumberOfTapsRequired:2];
-    [_bigImage addGestureRecognizer:doubleTapGesture];
-    
-    [shrinkRecognizer requireGestureRecognizerToFail:doubleTapGesture];
-    
-    [_backGround addSubview:self.bigImage];
-    [self.view addSubview:self.backGround];
-}
-#pragma mark -  scrollview代理
-- (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView{
-    return self.bigImage;
-}
-//- (void)scrollViewDidZoom:(UIScrollView *)scrollView{
-//    self.bigImage.center = self.view.center;
+//#pragma mark -  放大缩小图片
+//- (void)EnlargePhoto{
+//    self.navigationController.navigationBar.hidden = YES;   //隐藏导航栏
+//    [UIApplication sharedApplication].statusBarHidden = YES;             //隐藏状态栏
+//    //底层视图
+//    self.backGround = [[UIScrollView alloc]init];
+//    _backGround.backgroundColor = [UIColor blackColor];
+//    _backGround.contentSize = CGSizeMake(self.view.frame.size.width, self.view.frame.size.height);
+//    _backGround.frame = self.view.frame;
+//    _backGround.showsHorizontalScrollIndicator = NO;
+//    _backGround.showsVerticalScrollIndicator = NO;
+//    _backGround.multipleTouchEnabled = YES;
+//    _backGround.maximumZoomScale = 5;
+//    _backGround.minimumZoomScale = 1;
+//    _backGround.delegate = self;
+//
+//    self.bigImage = [[UIImageView alloc]init];
+//    _bigImage.frame = self.view.frame;
+//    _bigImage.image = self.imgView.image;
+//    _bigImage.userInteractionEnabled = YES;
+//    _bigImage.contentMode = UIViewContentModeScaleToFill;
+//    _bigImage.clipsToBounds = YES;
+//    UITapGestureRecognizer *shrinkRecognizer = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(shirnkPhoto)];
+//    [shrinkRecognizer setNumberOfTapsRequired:1];
+//    [_bigImage addGestureRecognizer:shrinkRecognizer];
+//    //添加双击事件
+//    UITapGestureRecognizer *doubleTapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleDoubleTap:)];
+//    [doubleTapGesture setNumberOfTapsRequired:2];
+//    [_bigImage addGestureRecognizer:doubleTapGesture];
+//
+//    [shrinkRecognizer requireGestureRecognizerToFail:doubleTapGesture];
+//
+//    [_backGround addSubview:self.bigImage];
+//    [self.view addSubview:self.backGround];
 //}
-
-/**双击定点放大*/
-- (void)handleDoubleTap:(UIGestureRecognizer *)gesture
-{
-    CGFloat zoomScale = self.backGround.zoomScale;
-    NSLog(@"%f",self.backGround.zoomScale);
-    zoomScale = (zoomScale == 1.0) ? 3.0 : 1.0;
-    CGRect zoomRect = [self zoomRectForScale:zoomScale withCenter:[gesture locationInView:gesture.view]];
-    [self.backGround zoomToRect:zoomRect animated:YES];
-}
-
-- (CGRect)zoomRectForScale:(float)scale withCenter:(CGPoint)center
-{
-    CGRect zoomRect;
-    zoomRect.size.height =self.view.frame.size.height / scale;
-    zoomRect.size.width  =self.view.frame.size.width  / scale;
-    zoomRect.origin.x = center.x - (zoomRect.size.width  /2.0);
-    zoomRect.origin.y = center.y - (zoomRect.size.height /2.0);
-    return zoomRect;
-}
-//点击缩小视图
-- (void)shirnkPhoto{
-    [self.backGround removeFromSuperview];
-    self.navigationController.navigationBar.hidden = NO;
-    [UIApplication sharedApplication].statusBarHidden = NO;
-}
+//#pragma mark -  scrollview代理
+//- (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView{
+//    return self.bigImage;
+//}
+//
+///**双击定点放大*/
+//- (void)handleDoubleTap:(UIGestureRecognizer *)gesture
+//{
+//    CGFloat zoomScale = self.backGround.zoomScale;
+//    NSLog(@"%f",self.backGround.zoomScale);
+//    zoomScale = (zoomScale == 1.0) ? 3.0 : 1.0;
+//    CGRect zoomRect = [self zoomRectForScale:zoomScale withCenter:[gesture locationInView:gesture.view]];
+//    [self.backGround zoomToRect:zoomRect animated:YES];
+//}
+//
+//- (CGRect)zoomRectForScale:(float)scale withCenter:(CGPoint)center
+//{
+//    CGRect zoomRect;
+//    zoomRect.size.height =self.view.frame.size.height / scale;
+//    zoomRect.size.width  =self.view.frame.size.width  / scale;
+//    zoomRect.origin.x = center.x - (zoomRect.size.width  /2.0);
+//    zoomRect.origin.y = center.y - (zoomRect.size.height /2.0);
+//    return zoomRect;
+//}
+////点击缩小视图
+//- (void)shirnkPhoto{
+//    [self.backGround removeFromSuperview];
+//    self.navigationController.navigationBar.hidden = NO;
+//    [UIApplication sharedApplication].statusBarHidden = NO;
+//}
 
 
 #pragma mark - <保存到相册>
@@ -384,37 +386,37 @@
 - (void)sendLocalNotification {
 }
 
-#pragma mark - 通知
-//给输入设备添加通知
-- (void)addNotificationToCaptureDevice:(AVCaptureDevice *)captureDevice
-{
-    //注意添加区域改变捕获通知必须首先设置设备允许捕获
-    [self changeDeviceProperty:^(AVCaptureDevice *captureDevice) {
-        captureDevice.subjectAreaChangeMonitoringEnabled = YES;
-    }];
-    //捕获区域发生改变
-//    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(areaChange:) name:AVCaptureDeviceSubjectAreaDidChangeNotification object:captureDevice];
-}
-- (void)removeNotificationFromCaptureDevice:(AVCaptureDevice *)captureDevice
-{
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:AVCaptureDeviceSubjectAreaDidChangeNotification object:captureDevice];
-}
-//移除所有通知
-- (void)removeNotification
-{
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
-}
-//设备连接成功
-- (void)deviceConnected:(NSNotification *)notification
-{
-    NSLog(@"设备已连接...");
-}
-
-//设备连接断开
-- (void)deviceDisconnected:(NSNotification *)notification
-{
-    NSLog(@"设备已断开.");
-}
+//#pragma mark - 通知
+////给输入设备添加通知
+//- (void)addNotificationToCaptureDevice:(AVCaptureDevice *)captureDevice
+//{
+//    //注意添加区域改变捕获通知必须首先设置设备允许捕获
+//    [self changeDeviceProperty:^(AVCaptureDevice *captureDevice) {
+//        captureDevice.subjectAreaChangeMonitoringEnabled = YES;
+//    }];
+//    //捕获区域发生改变
+////    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(areaChange:) name:AVCaptureDeviceSubjectAreaDidChangeNotification object:captureDevice];
+//}
+//- (void)removeNotificationFromCaptureDevice:(AVCaptureDevice *)captureDevice
+//{
+//    [[NSNotificationCenter defaultCenter] removeObserver:self name:AVCaptureDeviceSubjectAreaDidChangeNotification object:captureDevice];
+//}
+////移除所有通知
+//- (void)removeNotification
+//{
+//    [[NSNotificationCenter defaultCenter] removeObserver:self];
+//}
+////设备连接成功
+//- (void)deviceConnected:(NSNotification *)notification
+//{
+//    NSLog(@"设备已连接...");
+//}
+//
+////设备连接断开
+//- (void)deviceDisconnected:(NSNotification *)notification
+//{
+//    NSLog(@"设备已断开.");
+//}
 
 //捕获区域改变
 //- (void)areaChange:(NSNotification *)notification
@@ -434,35 +436,35 @@
     }
     return nil;
 }
-#pragma mark 切换前后摄像头
-- (void)cameraSwitchBtnOnClick
-{
-    AVCaptureDevice *currentDevice = [self.captureDeviceInput device];
-    AVCaptureDevicePosition currentPosition = [currentDevice position];
-    [self removeNotificationFromCaptureDevice:currentDevice];
-    
-    AVCaptureDevice *toChangeDevice;
-    AVCaptureDevicePosition toChangePosition = AVCaptureDevicePositionFront;
-    if (currentPosition == AVCaptureDevicePositionUnspecified || currentPosition == AVCaptureDevicePositionFront) {
-        toChangePosition = AVCaptureDevicePositionBack;
-    }
-    toChangeDevice = [self getCameraDeviceWithPosition:toChangePosition];
-    [self addNotificationToCaptureDevice:toChangeDevice];
-    //获得要调整的设备输入对象
-    AVCaptureDeviceInput *toChangeDeviceInput = [[AVCaptureDeviceInput alloc] initWithDevice:toChangeDevice error:nil];
-    
-    //改变会话的配置前一定要先开启配置，配置完成后提交配置改变
-    [self.captureSession beginConfiguration];
-    //移除原有输入对象
-    [self.captureSession removeInput:self.captureDeviceInput];
-    //添加新的输入对象
-    if ([self.captureSession canAddInput:toChangeDeviceInput]) {
-        [self.captureSession addInput:toChangeDeviceInput];
-        self.captureDeviceInput = toChangeDeviceInput;
-    }
-    //提交会话配置
-    [self.captureSession commitConfiguration];
-}
+//#pragma mark 切换前后摄像头
+//- (void)cameraSwitchBtnOnClick
+//{
+//    AVCaptureDevice *currentDevice = [self.captureDeviceInput device];
+//    AVCaptureDevicePosition currentPosition = [currentDevice position];
+//    [self removeNotificationFromCaptureDevice:currentDevice];
+//
+//    AVCaptureDevice *toChangeDevice;
+//    AVCaptureDevicePosition toChangePosition = AVCaptureDevicePositionFront;
+//    if (currentPosition == AVCaptureDevicePositionUnspecified || currentPosition == AVCaptureDevicePositionFront) {
+//        toChangePosition = AVCaptureDevicePositionBack;
+//    }
+//    toChangeDevice = [self getCameraDeviceWithPosition:toChangePosition];
+//    [self addNotificationToCaptureDevice:toChangeDevice];
+//    //获得要调整的设备输入对象
+//    AVCaptureDeviceInput *toChangeDeviceInput = [[AVCaptureDeviceInput alloc] initWithDevice:toChangeDevice error:nil];
+//
+//    //改变会话的配置前一定要先开启配置，配置完成后提交配置改变
+//    [self.captureSession beginConfiguration];
+//    //移除原有输入对象
+//    [self.captureSession removeInput:self.captureDeviceInput];
+//    //添加新的输入对象
+//    if ([self.captureSession canAddInput:toChangeDeviceInput]) {
+//        [self.captureSession addInput:toChangeDeviceInput];
+//        self.captureDeviceInput = toChangeDeviceInput;
+//    }
+//    //提交会话配置
+//    [self.captureSession commitConfiguration];
+//}
 
 //改变设备属性的统一操作方法
 - (void)changeDeviceProperty:(void (^)(AVCaptureDevice *))propertyChange
@@ -549,34 +551,9 @@
         self.focusCursor.alpha = 0;
     }];
 }
-////拖动视图的方法
-//- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event{
-//    UITouch *touch = [touches anyObject];
-//    // 当前触摸点
-//    CGPoint currentPoint = [touch locationInView:self.bigImage];
-//    // 上一个触摸点
-//    CGPoint previousPoint = [touch previousLocationInView:self.bigImage];
-//    // 当前view的中点
-//    CGPoint center = self.bigImage.center;
-//
-//    center.x += (currentPoint.x - previousPoint.x);
-//    center.y += (currentPoint.y - previousPoint.y);
-//    // 修改当前view的中点(中点改变view的位置就会改变)
-//    self.bigImage.center = center;
+
+//- (void)dealloc
+//{
+//    [self removeNotification];
 //}
-
-- (void)dealloc
-{
-    [self removeNotification];
-}
 @end
-
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/

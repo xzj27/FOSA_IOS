@@ -87,10 +87,7 @@
     [_done addTarget:self action:@selector(finish) forControlEvents:UIControlEventTouchUpInside];
     UIBarButtonItem *rightItem = [[UIBarButtonItem alloc]initWithCustomView:_done];
        self.navigationItem.rightBarButtonItem= rightItem;
-    
-//   self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithImage:[UIImage imageNamed:@"icon_done"] style:UIBarButtonItemStylePlain target:nil action:nil];
-//    self.navigationItem.rightBarButtonItem.target = self;     self.navigationItem.rightBarButtonItem.action = @selector(finish);
-    
+
     self.mainWidth = [UIScreen mainScreen].bounds.size.width;
     self.mainheight = [UIScreen mainScreen].bounds.size.height;
     self.navHeight = self.navigationController.navigationBar.frame.size.height;
@@ -104,7 +101,6 @@
     CGFloat headerWidth = _mainWidth-20;
     CGFloat headerheight = _mainheight/3;
     
-    
     CGRect headerFrame = CGRectMake(10,5,headerWidth, headerheight);
     self.headerView = [[UIView alloc]initWithFrame:headerFrame];
     _headerView.backgroundColor = [UIColor colorWithRed:180/255.0 green:180/255.0 blue:180/255.0 alpha:1.0];
@@ -112,23 +108,44 @@
     [self.rootScrollview addSubview:_headerView];
     
     //添加头部控件,已经在扫码界面初始化
-    [self.headerView addSubview:_imageView1];   //添加图片视图
-    [self.headerView addSubview:_deviceName];
+    //初始化轮播器
+    self.picturePlayer = [[UIScrollView alloc]initWithFrame:CGRectMake(0, 0, headerWidth, headerheight*3/4)];
+    _picturePlayer.pagingEnabled = YES;
+    _picturePlayer.delegate = self;
+    _picturePlayer.showsHorizontalScrollIndicator = NO;
+    _picturePlayer.bounces = NO;
+    _picturePlayer.contentSize = CGSizeMake(headerWidth*3, headerheight*3/4);
+    for (int i = 0; i < 3; i++) {
+        CGRect frame = CGRectMake(i*headerWidth, 0, headerWidth, headerheight*3/4);
+        UIImageView *imgView = [[UIImageView alloc]initWithFrame:frame];
+        imgView.contentMode = UIViewContentModeScaleAspectFill;
+        imgView.clipsToBounds = YES;
+        imgView.image = self.food_image[i];
+        [self.picturePlayer addSubview:imgView];
+    }
+    [self.headerView addSubview:_picturePlayer];
     
-    self.imageView1.contentMode = UIViewContentModeScaleAspectFill;
-    self.imageView1.clipsToBounds = YES;
+    //页面指示器
+    self.pageControl = [[UIPageControl alloc]initWithFrame:CGRectMake(headerWidth/3, headerheight*3/4-30, headerWidth/3, 20)];
+    self.pageControl.currentPage = 0;
+    self.pageControl.numberOfPages = 3;
+    self.pageControl.pageIndicatorTintColor = [UIColor redColor];
+    self.pageControl.currentPageIndicatorTintColor = [UIColor greenColor];
+    [self.headerView addSubview:self.pageControl];
+
+    
     // 添加点击手势
     self.imageView1.userInteractionEnabled = YES;
     UITapGestureRecognizer *clickRecognizer = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(EnlargePhoto)];
     [self.imageView1 addGestureRecognizer:clickRecognizer];
     
-    self.share = [[UIButton alloc]initWithFrame:CGRectMake(headerWidth-45,5,40,40)];
+    self.share = [[UIButton alloc]initWithFrame:CGRectMake(5,headerheight*3/4+5,40,40)];
     [_share setImage:[UIImage imageNamed:@"icon_share"] forState:UIControlStateNormal];
     self.like = [[UIButton alloc]initWithFrame:CGRectMake(headerWidth-45, self.imageView1.frame.origin.y+self.imageView1.frame.size.height-40,40,40)];
     [_like setImage:[UIImage imageNamed:@"icon_like"] forState:UIControlStateNormal];
     
     [self.headerView addSubview:_share];
-    [self.headerView addSubview:_like];
+    //[self.headerView addSubview:_like];
     
     //给对应按钮添加响应
     [_share addTarget:self action:@selector(beginShare) forControlEvents:UIControlEventTouchUpInside];
@@ -287,6 +304,12 @@
         [self.fosaDatePicker show];
     }];
 }
+#pragma mark -- UIScrollerView
+- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView{
+    CGFloat offset = scrollView.contentOffset.x;
+    NSInteger index = offset/self.headerView.frame.size.width;
+    self.pageControl.currentPage = index;
+}
 
 #pragma mark -- FosaDatePickerViewDelegate
 /**
@@ -296,7 +319,6 @@
  */
 - (void)datePickerViewSaveBtnClickDelegate:(NSString *)timer {
     NSLog(@"保存点击");
-   
     if (isRemind) {
         self.remindDate.text = timer;
     }else{

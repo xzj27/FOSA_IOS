@@ -11,7 +11,8 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface ScanOneCodeViewController : UIViewController
-@property (nonatomic,strong) UIImage *food_photo;   //接收拍摄的图片
+//@property (nonatomic,strong) UIImage *food_photo;   //接收拍摄的图片
+@property (nonatomic,strong) NSMutableArray *food_photo;
 @end
 
 NS_ASSUME_NONNULL_END

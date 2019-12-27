@@ -169,7 +169,7 @@
     NSString *hour = self.hour.length == 3 ? [NSString stringWithFormat:@"%ld", self.hour.integerValue] : [NSString stringWithFormat:@"0%ld", self.hour.integerValue];
     NSString *minute = self.minute.length == 3 ? [NSString stringWithFormat:@"%ld", self.minute.integerValue] : [NSString stringWithFormat:@"0%ld", self.minute.integerValue];
     
-    self.selectStr = [NSString stringWithFormat:@"%ld-%@-%@  %@:%@", [self.year integerValue], month, day, hour, minute];
+    self.selectStr = [NSString stringWithFormat:@"%ld/%@/%@/%@:%@", [self.year integerValue], month, day, hour, minute];
     if ([self.delegate respondsToSelector:@selector(datePickerViewSaveBtnClickDelegate:)]) {
         [self.delegate datePickerViewSaveBtnClickDelegate:self.selectStr];
     }
@@ -186,20 +186,15 @@
 - (NSInteger)numberOfComponentsInPickerView:(UIPickerView *)pickerView{
     return self.dataArray.count;
 }
-
 /// UIPickerView返回每组多少条数据
 - (NSInteger)pickerView:(UIPickerView *)pickerView numberOfRowsInComponent:(NSInteger)component{
     return  [self.dataArray[component] count] * 200;
 }
-
 /// UIPickerView选择哪一行
 - (void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component {
-    
     NSInteger time_integerValue = [self.timeArr[component] integerValue];
-
     switch (component) {
         case 0: { // 年
-            
             NSString *year_integerValue = self.yearArr[row%[self.dataArray[component] count]];
             if (!self.isSlide) {
                 self.year = year_integerValue;
@@ -222,16 +217,13 @@
             }
         } break;
         case 1: { // 月
-            
             NSString *month_value = self.monthArr[row%[self.dataArray[component] count]];
-
             if (!self.isSlide) {
                 self.month = month_value;
                 /// 刷新日
                 [self refreshDay];
                 return;
             }
-
             // 如果选择年大于当前年 就直接赋值月
             if ([self.year integerValue] > [self.timeArr[0] integerValue]) {
                 
@@ -272,7 +264,6 @@
                     }
                 }
             }
-
             /// 刷新日
             [self refreshDay];
 

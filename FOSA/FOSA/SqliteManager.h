@@ -20,6 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
 +(int)SelectFromTable:(NSString *)SelectSql database:(sqlite3 *)db stmt:(sqlite3_stmt *)stmt;//选择操作
 +(void)DeleteDataFromTable:(NSString *)DeleteSql database:(sqlite3 *)db;//删除操作
 +(void)UpdataDataFromTable:(NSString *)UpdateSql database:(sqlite3 *)db;//更新操作
++(void)CloseSql:(sqlite3 *)db;
 
 @end
 

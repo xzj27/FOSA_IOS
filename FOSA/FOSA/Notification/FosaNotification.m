@@ -172,7 +172,6 @@ completionHandler(UNNotificationPresentationOptionBadge|UNNotificationPresentati
         UNTextInputNotificationResponse * textResponse = (UNTextInputNotificationResponse*)response;
         NSString * text = textResponse.userText;
         NSLog(@"%@",text);
-        
     }
     else{
         if ([response.actionIdentifier isEqualToString:@"see1"]){
@@ -233,7 +232,7 @@ completionHandler(UNNotificationPresentationOptionBadge|UNNotificationPresentati
     //设置时间间隔的触发器
     //格式化时间
     NSDateFormatter * formatter = [[NSDateFormatter alloc]init];
-    [formatter setDateFormat:@"yyyy-MM-dd HH:mm"];
+    [formatter setDateFormat:@"yyyy/MM/dd/HH:mm"];
     NSDate * date = [formatter dateFromString:mdate];
     NSDateComponents * components = [[NSCalendar currentCalendar]
                                                 components:NSCalendarUnitYear |
@@ -255,7 +254,6 @@ completionHandler(UNNotificationPresentationOptionBadge|UNNotificationPresentati
     }];
     [self Savephoto:img name:photo];
 }
-
 - (void)sendNotification:(NSString *)foodName body:(NSString *)body path:(UIImage *)image deviceName:(NSString *)device {
     NSLog(@"我将发送一个系统通知");
     UNMutableNotificationContent *content = [[UNMutableNotificationContent alloc] init];
@@ -321,6 +319,7 @@ completionHandler(UNNotificationPresentationOptionBadge|UNNotificationPresentati
         }else{
             NSLog(@"查询失败");
         }
+    [SqliteManager CloseSql:database];
 }
 -(NSSet *)createNotificationCategoryActions{
     //定义按钮的交互button action
@@ -335,18 +334,17 @@ completionHandler(UNNotificationPresentationOptionBadge|UNNotificationPresentati
 }
 #pragma mark - <保存到相册>
 -(void)image:(UIImage *)image didFinishSavingWithError:(NSError *)error contextInfo:(void *)contextInfo {
-    NSLog(@"UIImage didFinishSavingWidthError");
     NSString *msg = nil ;
     if(error){
         msg = @"保存图片失败" ;
+        NSLog(@"%@",msg);
     }else{
         msg = @"保存图片成功" ;
-        [self SystemAlert:@"保存通知成功"];
+        [self SystemAlert:msg];
     }
 }
 //保存到沙盒
 -(NSString *)Savephoto:(UIImage *)image name:(NSString *)foodname{
-    NSLog(@"^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
     NSArray *paths =NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask,YES);
     NSString *photoName = [NSString stringWithFormat:@"%@.png",foodname];
     NSString *filePath = [[paths objectAtIndex:0]stringByAppendingPathComponent: photoName];// 保存文件的路径
@@ -355,7 +353,6 @@ completionHandler(UNNotificationPresentationOptionBadge|UNNotificationPresentati
     if(result == YES) {
         NSLog(@"保存成功");
     }
-    NSLog(@"vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv");
     return filePath;
 }
 //弹出系统提示

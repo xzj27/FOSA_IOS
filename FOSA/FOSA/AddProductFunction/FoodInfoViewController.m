@@ -473,9 +473,6 @@
 - (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView{
     return self.bigImage;
 }
-//- (void)scrollViewDidZoom:(UIScrollView *)scrollView{
-//    self.bigImage.center = self.view.center;
-//}
 
 /**双击定点放大*/
 - (void)handleDoubleTap:(UIGestureRecognizer *)gesture

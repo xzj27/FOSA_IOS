@@ -11,7 +11,9 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface PhotoViewController : UIViewController
-
+@property (nonatomic,strong) UIImageView *pictureView;
+@property (nonatomic,strong) UIImage *image; //拍摄照片
+@property (nonatomic,strong) NSMutableArray<UIImage *> *imageArray;
 @end
 
 NS_ASSUME_NONNULL_END

@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic,strong) UIScrollView *CategoryScrollview;
 @property (nonatomic,strong) UICollectionView *StorageItemView;
 @property (nonatomic,strong) UIButton *addView;
-@property (nonatomic,strong) UIButton *QRscan,*Remindbtn;
+@property (nonatomic,strong) UIButton *QRscan,*Remindbtn,*addContentBtn,*sortBtn;
 @property (nonatomic,assign) CGFloat mainWidth,mainHeight,navHeight;
 @end
 

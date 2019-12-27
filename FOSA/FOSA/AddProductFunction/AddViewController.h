@@ -18,7 +18,9 @@ NS_ASSUME_NONNULL_BEGIN
 //顶部控件
 @property (nonatomic,strong) UIView *headerView;
 @property (nonatomic,strong) UIImageView *imageView1,*imageView2,*imageView3,*imageView4;
-@property (nonatomic,strong) UIImage *food_image;
+@property (nonatomic,strong) UIScrollView *picturePlayer;   //图片轮播器
+@property (nonatomic,strong) UIPageControl *pageControl;    //页面指示器
+@property (nonatomic,strong) NSMutableArray<UIImage *> *food_image;
 @property (nonatomic,strong) UIButton *share,*like;
 @property (nonatomic,strong) UITextView *deviceName;
 

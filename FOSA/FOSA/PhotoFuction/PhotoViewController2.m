@@ -1,17 +1,17 @@
 //
-//  PhotoViewController.m
+//  PhotoViewController2.m
 //  FOSA
 //
-//  Created by hs on 2019/11/11.
+//  Created by hs on 2019/12/27.
 //  Copyright © 2019 hs. All rights reserved.
 //
 
-#import "PhotoViewController.h"
+#import "PhotoViewController2.h"
 #import "ScanOneCodeViewController.h"
 #import <AVFoundation/AVFoundation.h>
 #import <UserNotifications/UserNotifications.h>
 
-@interface PhotoViewController ()
+@interface PhotoViewController2 ()
 
 @property (nonatomic, strong) AVCaptureSession *captureSession;//负责输入和输出设备之间的数据传递
 @property (nonatomic, strong) AVCaptureDeviceInput *captureDeviceInput;//负责从AVCaptureDevice获得输入数据
@@ -21,9 +21,9 @@
 @property (nonatomic, weak) UIView *containerView;//内容视图
 @property (nonatomic, weak) UIView *TakingPhotoView;//拍照与照片缩略图
 @property (nonatomic, weak) UIImageView *focusCursor;//聚焦按钮
-@property (nonatomic, weak) UIImageView *imgView;
-@property (nonatomic, strong) UIButton *shutter,*cancel;
-
+@property (nonatomic, weak) UIImageView *imgView;//拍摄照片
+@property (nonatomic, strong) UIButton *shutter,*cancel2;
+@property (nonatomic, strong) UIImage *image;
 
 //图片放大视图
 @property (nonatomic,strong) UIScrollView *backGround;
@@ -31,7 +31,7 @@
 @property (nonatomic,assign) CGFloat totalScale;
 @end
 
-@implementation PhotoViewController
+@implementation PhotoViewController2
 /** 屏幕高度 */
 #define screen_height [UIScreen mainScreen].bounds.size.height
 /** 屏幕宽度 */
@@ -54,8 +54,13 @@
 #define ToolbarHeight self.navigationController.toolbar.frame.size.height
 - (void)viewDidLoad {
     [super viewDidLoad];
+//    self.navigationItem.title = @"拍照";
+//    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithImage:[UIImage imageNamed:@"icon_scan"] style:UIBarButtonItemStylePlain target:nil action:nil];
+//    self.navigationItem.rightBarButtonItem.target = self;     self.navigationItem.rightBarButtonItem.action = @selector(ScanEvent);
+//    self.view.backgroundColor = [UIColor blackColor];
     //创建控件
     [self creatControl];
+  
 }
 - (void)viewWillAppear:(BOOL)animated
 {
@@ -85,6 +90,7 @@
     //containerView.layer.borderColor = [[UIColor grayColor] CGColor];
     [self.view addSubview:containerView];
     _containerView = containerView;
+
     //拍照控制视图
     UIView *takingPhoto =[[UIView alloc] initWithFrame:CGRectMake(0,containerViewH+marginY, w, 180)];
     takingPhoto.backgroundColor = [UIColor blackColor];
@@ -111,18 +117,30 @@
     [containerView addSubview:focusCursor];
     _focusCursor = focusCursor;
     
-    _pictureView = [[UIImageView alloc]initWithFrame:CGRectMake(0, NavigationHeight, screen_width, screen_height-NavigationHeight-40)];
-    _pictureView.contentMode = UIViewContentModeScaleAspectFill;
-    _pictureView.clipsToBounds = YES;
-    _pictureView.userInteractionEnabled = YES;
-    //[self.view addSubview:_pictureView1];
-    self.cancel = [[UIButton alloc]initWithFrame:CGRectMake(screen_width/2-20, _pictureView.frame.size.height-50, 40, 40)];
-    [self.cancel setBackgroundImage:[UIImage imageNamed:@"icon_cancel"] forState:UIControlStateNormal];
-    [self.cancel addTarget:self action:@selector(takePictureAgain) forControlEvents:UIControlEventTouchUpInside];
-    [_pictureView addSubview:_cancel];
-    
+    //拍摄照片容器
+    _pictureView2 = [[UIImageView alloc]initWithFrame:CGRectMake(0, NavigationHeight, screen_width, screen_height-NavigationHeight-40)];
+      _pictureView2.contentMode = UIViewContentModeScaleAspectFill;
+      _pictureView2.clipsToBounds = YES;
+      _pictureView2.userInteractionEnabled = YES;
+      //[self.view addSubview:_pictureView1];
+      self.cancel2 = [[UIButton alloc]initWithFrame:CGRectMake(screen_width/2-20, _pictureView2.frame.size.height-50, 40, 40)];
+      [self.cancel2 setBackgroundImage:[UIImage imageNamed:@"icon_cancel"] forState:UIControlStateNormal];
+      [self.cancel2 addTarget:self action:@selector(takePictureAgain) forControlEvents:UIControlEventTouchUpInside];
+      [_pictureView2 addSubview:_cancel2];
+//    _image = [[UIImage alloc]init];
+//    UIImageView *imgView = [[UIImageView alloc] initWithFrame:CGRectMake(20, containerViewH+marginY+15,60,60)];
+//    imgView.hidden = NO;
+//    imgView.backgroundColor = [UIColor colorWithRed:80/255 green:80/255 blue:80/255 alpha:1.0];
+//    imgView.layer.borderWidth = 1.f;
+//    imgView.layer.borderColor = [[UIColor grayColor] CGColor];
+//    imgView.contentMode = UIViewContentModeScaleAspectFill;
+//    imgView.clipsToBounds = YES;
+//    imgView.userInteractionEnabled = YES;
+//    //[self.view addSubview:imgView];
+//    UITapGestureRecognizer *clickRevognizer = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(EnlargePhoto)];
+//    [imgView addGestureRecognizer:clickRevognizer];
+//    _imgView = imgView;
 }
- 
 #pragma mark - 进入扫码界面
 -(void)ScanEvent{
     ScanOneCodeViewController *scan = [[ScanOneCodeViewController alloc]init];
@@ -247,18 +265,16 @@
 //            self.imgView.contentMode = UIViewContentModeScaleAspectFill;
 //            self.imgView.clipsToBounds = YES;
 //            self.imgView.image = self.image;
-            //[self DetectQRcode:self.image];
-            self.pictureView.image = self.image;
-            if (self.imageArray != NULL) {
-                [self.imageArray replaceObjectAtIndex:0 withObject:self.image];
-            }
+//            [self DetectQRcode:self.image];
+            self.pictureView2.image = self.image;
+            [self.imageArray2 replaceObjectAtIndex:2 withObject:self.image];
         }
     }];
-    [self.view insertSubview:self.pictureView atIndex:10];
+    [self.view addSubview:_pictureView2];
     [self.captureSession stopRunning];
 }
 - (void)takePictureAgain{
-    [self.pictureView removeFromSuperview];
+    [self.pictureView2 removeFromSuperview];
     [self.captureSession startRunning];
 }
 //保存照片到本地
@@ -570,13 +586,3 @@
     [self removeNotification];
 }
 @end
-
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/

@@ -76,5 +76,13 @@
     NSLog(@"%@",filePath);
     return filePath;
 }
++ (void)CloseSql:(sqlite3 *)db{
+    int close = sqlite3_close_v2(db);
+    if (close == SQLITE_OK) {
+            db = nil;
+    }else{
+            NSLog(@"数据库关闭异常");
+    }
+}
 
 @end
