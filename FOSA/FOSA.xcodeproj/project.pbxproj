@@ -13,7 +13,6 @@
 		453C1D8F23960B0F00902B4D /* FoodListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 453C1D8E23960B0F00902B4D /* FoodListViewController.m */; };
 		4551FDA02378EA50007A2EFB /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 4551FD9F2378EA50007A2EFB /* AppDelegate.m */; };
 		4551FDA32378EA50007A2EFB /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 4551FDA22378EA50007A2EFB /* SceneDelegate.m */; };
-		4551FDA92378EA50007A2EFB /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4551FDA72378EA50007A2EFB /* Main.storyboard */; };
 		4551FDAB2378EA51007A2EFB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4551FDAA2378EA51007A2EFB /* Assets.xcassets */; };
 		4551FDAE2378EA51007A2EFB /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4551FDAC2378EA51007A2EFB /* LaunchScreen.storyboard */; };
 		4551FDB12378EA51007A2EFB /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 4551FDB02378EA51007A2EFB /* main.m */; };
@@ -56,6 +55,8 @@
 		459D8382239DE9FF00C8F699 /* NutrientModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 459D8381239DE9FF00C8F699 /* NutrientModel.m */; };
 		459E0089237E43A4006D0E59 /* MyDeviceViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 459E0088237E43A4006D0E59 /* MyDeviceViewController.m */; };
 		459E008C237E43BA006D0E59 /* OtherViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 459E008B237E43BA006D0E59 /* OtherViewController.m */; };
+		45A5070123B854070046FC09 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 45A5070023B854070046FC09 /* Main.storyboard */; };
+		45A5070423B873500046FC09 /* productCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 45A5070323B873500046FC09 /* productCollectionViewCell.m */; };
 		45B38E122399E784004FB56A /* CalorieModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B38E112399E784004FB56A /* CalorieModel.m */; };
 		45B38E15239A499C004FB56A /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B38E14239A499C004FB56A /* ViewController.m */; };
 		45D94513237BD41A000E2550 /* logo.png in Resources */ = {isa = PBXBuildFile; fileRef = 45D94512237BD419000E2550 /* logo.png */; };
@@ -121,7 +122,6 @@
 		4551FD9F2378EA50007A2EFB /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		4551FDA12378EA50007A2EFB /* SceneDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SceneDelegate.h; sourceTree = "<group>"; };
 		4551FDA22378EA50007A2EFB /* SceneDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SceneDelegate.m; sourceTree = "<group>"; };
-		4551FDA82378EA50007A2EFB /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		4551FDAA2378EA51007A2EFB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		4551FDAD2378EA51007A2EFB /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		4551FDAF2378EA51007A2EFB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -202,6 +202,10 @@
 		459E0088237E43A4006D0E59 /* MyDeviceViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MyDeviceViewController.m; sourceTree = "<group>"; };
 		459E008A237E43BA006D0E59 /* OtherViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OtherViewController.h; sourceTree = "<group>"; };
 		459E008B237E43BA006D0E59 /* OtherViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OtherViewController.m; sourceTree = "<group>"; };
+		45A5070023B854070046FC09 /* Main.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
+		45A5070223B873500046FC09 /* productCollectionViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = productCollectionViewCell.h; sourceTree = "<group>"; };
+		45A5070323B873500046FC09 /* productCollectionViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = productCollectionViewCell.m; sourceTree = "<group>"; };
+		45A5070523B89BA20046FC09 /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = usr/lib/libsqlite3.tbd; sourceTree = SDKROOT; };
 		45B38E102399E784004FB56A /* CalorieModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CalorieModel.h; sourceTree = "<group>"; };
 		45B38E112399E784004FB56A /* CalorieModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CalorieModel.m; sourceTree = "<group>"; };
 		45B38E13239A499C004FB56A /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
@@ -306,7 +310,6 @@
 				4551FDA22378EA50007A2EFB /* SceneDelegate.m */,
 				45B38E13239A499C004FB56A /* ViewController.h */,
 				45B38E14239A499C004FB56A /* ViewController.m */,
-				4551FDA72378EA50007A2EFB /* Main.storyboard */,
 				4551FDAA2378EA51007A2EFB /* Assets.xcassets */,
 				45E5CD3623A0E21D00244F5B /* FOSALaunchScreen.jpeg */,
 				45F821842383CD8D00F0CD8A /* fosa.jpg */,
@@ -314,6 +317,7 @@
 				45F821802383CA9100F0CD8A /* img_fosa.jpg */,
 				45D94512237BD419000E2550 /* logo.png */,
 				4551FDAC2378EA51007A2EFB /* LaunchScreen.storyboard */,
+				45A5070023B854070046FC09 /* Main.storyboard */,
 				4551FDAF2378EA51007A2EFB /* Info.plist */,
 				4551FDB02378EA51007A2EFB /* main.m */,
 			);
@@ -530,6 +534,8 @@
 				4524655E238522D00034F392 /* FosaScrollview.m */,
 				45246560238524040034F392 /* productView.h */,
 				45246561238524040034F392 /* productView.m */,
+				45A5070223B873500046FC09 /* productCollectionViewCell.h */,
+				45A5070323B873500046FC09 /* productCollectionViewCell.m */,
 			);
 			path = Product;
 			sourceTree = "<group>";
@@ -537,6 +543,7 @@
 		45D944EC237B8AD1000E2550 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				45A5070523B89BA20046FC09 /* libsqlite3.tbd */,
 				45D944ED237B8AD1000E2550 /* UserNotifications.framework */,
 				45D944EF237B8AD1000E2550 /* UserNotificationsUI.framework */,
 			);
@@ -694,11 +701,11 @@
 				45E5CD3723A0E21D00244F5B /* FOSALaunchScreen.jpeg in Resources */,
 				4551FDAE2378EA51007A2EFB /* LaunchScreen.storyboard in Resources */,
 				4551FDAB2378EA51007A2EFB /* Assets.xcassets in Resources */,
+				45A5070123B854070046FC09 /* Main.storyboard in Resources */,
 				45D94513237BD41A000E2550 /* logo.png in Resources */,
 				4551FDFE2378F504007A2EFB /* saoyisao@3x.png in Resources */,
 				4551FDFC2378F4FC007A2EFB /* shanguangdeng-an.png in Resources */,
 				45F821832383CA9900F0CD8A /* img_pound.jpg in Resources */,
-				4551FDA92378EA50007A2EFB /* Main.storyboard in Resources */,
 				45F821852383CD8D00F0CD8A /* fosa.jpg in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -728,6 +735,7 @@
 				4551FDE72378F17E007A2EFB /* Fosa_QRCode_Queue.m in Sources */,
 				45E5CD3223A0A98F00244F5B /* AppsViewController.m in Sources */,
 				4551FE272378FA14007A2EFB /* LoginViewController.m in Sources */,
+				45A5070423B873500046FC09 /* productCollectionViewCell.m in Sources */,
 				4587FF6E238FAAF500DB795E /* SealerCell.m in Sources */,
 				4570579D23978D29006FA588 /* CalorieTableViewCell.m in Sources */,
 				45EBE4E92398D47800A98F05 /* NutrientViewController.m in Sources */,
@@ -812,14 +820,6 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
-		4551FDA72378EA50007A2EFB /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				4551FDA82378EA50007A2EFB /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
 		4551FDAC2378EA51007A2EFB /* LaunchScreen.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (

@@ -138,7 +138,6 @@
     self.like = [[UIButton alloc]initWithFrame:CGRectMake(headerWidth-45, self.imageView1.frame.origin.y+self.imageView1.frame.size.height-40,40,40)];
     [_like setImage:[UIImage imageNamed:@"icon_like"] forState:UIControlStateNormal];
     
-    
     [self.headerView addSubview:_share];
     [self.headerView addSubview:_like];
     [self.headerView addSubview:_takePhoto];

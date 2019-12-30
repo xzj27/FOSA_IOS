@@ -17,7 +17,19 @@
             UIWindowScene *windowScene = (UIWindowScene *)scene;
             self.window = [[UIWindow alloc] initWithWindowScene:windowScene];
             self.window.frame = CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.height);
-            self.window.rootViewController = [RootTabBarViewController new];
+            NSUserDefaults *userDefault = NSUserDefaults.standardUserDefaults;
+            NSString *currentVersion = [NSBundle mainBundle].infoDictionary[@"CFBundleShortVersionString"];
+            NSString *localVersion = [userDefault valueForKey:@"localVersion"];
+            if (![currentVersion isEqualToString:localVersion]) {
+                //新特性界面
+                UIViewController *newVc = [[UIViewController alloc]init];
+                newVc.view.backgroundColor = [UIColor redColor];
+                self.window.rootViewController = newVc;
+                [userDefault setObject:currentVersion forKey:@"localVersion"];
+            }else{
+                //添加根控制器
+                self.window.rootViewController = [RootTabBarViewController new];
+            }
             [self.window makeKeyAndVisible];
         }
 }

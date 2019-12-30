@@ -105,10 +105,10 @@
     [cameraSwitchBtn addTarget:self action:@selector(cameraSwitchBtnOnClick) forControlEvents:UIControlEventTouchUpInside];
     //[self.view addSubview:cameraSwitchBtn];
     //拍摄快门按钮
-    UIButton *shutter = [[UIButton alloc]initWithFrame:CGRectMake([UIScreen mainScreen].bounds.size.width/2-cameraSwitchBtnW/2, containerViewH*4/5, cameraSwitchBtnW, cameraSwitchBtnW)];
-    [shutter setImage:[UIImage imageNamed:@"icon_takePhoto"] forState:UIControlStateNormal];
-    [shutter addTarget:self action:@selector(btnOnClick:) forControlEvents:UIControlEventTouchUpInside];
-    [self.view addSubview:shutter];
+    self.shutter = [[UIButton alloc]initWithFrame:CGRectMake(screen_width/2-cameraSwitchBtnW/2, containerViewH*4/5, cameraSwitchBtnW, cameraSwitchBtnW)];
+    [_shutter setImage:[UIImage imageNamed:@"icon_takePhoto"] forState:UIControlStateNormal];
+    [_shutter addTarget:self action:@selector(btnOnClick:) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:_shutter];
     
     //聚焦图片
     UIImageView *focusCursor = [[UIImageView alloc] initWithFrame:CGRectMake(50, 50, 75, 75)];
@@ -123,38 +123,11 @@
       _pictureView2.clipsToBounds = YES;
       _pictureView2.userInteractionEnabled = YES;
       //[self.view addSubview:_pictureView1];
-      self.cancel2 = [[UIButton alloc]initWithFrame:CGRectMake(screen_width/2-20, _pictureView2.frame.size.height-50, 40, 40)];
+    
+      self.cancel2 = [[UIButton alloc]initWithFrame:CGRectMake(screen_width/2-cameraSwitchBtnW/2, containerViewH*2/3, cameraSwitchBtnW, cameraSwitchBtnW)];
       [self.cancel2 setBackgroundImage:[UIImage imageNamed:@"icon_cancel"] forState:UIControlStateNormal];
       [self.cancel2 addTarget:self action:@selector(takePictureAgain) forControlEvents:UIControlEventTouchUpInside];
       [_pictureView2 addSubview:_cancel2];
-//    _image = [[UIImage alloc]init];
-//    UIImageView *imgView = [[UIImageView alloc] initWithFrame:CGRectMake(20, containerViewH+marginY+15,60,60)];
-//    imgView.hidden = NO;
-//    imgView.backgroundColor = [UIColor colorWithRed:80/255 green:80/255 blue:80/255 alpha:1.0];
-//    imgView.layer.borderWidth = 1.f;
-//    imgView.layer.borderColor = [[UIColor grayColor] CGColor];
-//    imgView.contentMode = UIViewContentModeScaleAspectFill;
-//    imgView.clipsToBounds = YES;
-//    imgView.userInteractionEnabled = YES;
-//    //[self.view addSubview:imgView];
-//    UITapGestureRecognizer *clickRevognizer = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(EnlargePhoto)];
-//    [imgView addGestureRecognizer:clickRevognizer];
-//    _imgView = imgView;
-}
-#pragma mark - 进入扫码界面
--(void)ScanEvent{
-    ScanOneCodeViewController *scan = [[ScanOneCodeViewController alloc]init];
-    scan.food_photo = [[UIImage alloc]init];
-    scan.food_photo = self.image;
-    scan.hidesBottomBarWhenPushed = YES;
-    if (self.captureSession != nil) {
-        NSLog(@"停止捕获");
-        [self.captureSession stopRunning];
-    }
-    [self removeNotification];
-    [self.navigationController pushViewController:scan animated:YES];
-    [self.navigationController popoverPresentationController];
-    
 }
 - (void)initPhotoInfo
 {
@@ -262,20 +235,18 @@
             CGFloat fixelH = CGImageGetHeight(self.image.CGImage);
             NSLog(@"=========%f>>>>>>>>%f",fixelH,fixelW);
            //UIImageWriteToSavedPhotosAlbum(self.image, self,@selector(image:didFinishSavingWithError:contextInfo:),nil);
-//            self.imgView.contentMode = UIViewContentModeScaleAspectFill;
-//            self.imgView.clipsToBounds = YES;
-//            self.imgView.image = self.image;
-//            [self DetectQRcode:self.image];
             self.pictureView2.image = self.image;
             [self.imageArray2 replaceObjectAtIndex:2 withObject:self.image];
         }
     }];
     [self.view addSubview:_pictureView2];
+    self.shutter.hidden = YES;
     [self.captureSession stopRunning];
 }
 - (void)takePictureAgain{
     [self.pictureView2 removeFromSuperview];
     [self.captureSession startRunning];
+    self.shutter.hidden = NO;
 }
 //保存照片到本地
 -(void)Savephoto:(UIImage *)image{

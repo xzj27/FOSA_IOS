@@ -22,10 +22,9 @@
 @property (nonatomic,strong) FosaScrollview *fosaScrollview;
 @property (nonatomic,strong) productView *productContent;
 
-//@property (nonatomic, strong) UIPageViewController *pageViewController;
 @property (nonatomic, strong) NSMutableArray *controllersArr;/// 控制器数组
 @property (nonatomic, strong) NSMutableArray *titleArray; /// 标题数组
-//@property (nonatomic, strong) UICollectionView *titleCollectionView; /// 标题collectionview
+
 
 @end
 

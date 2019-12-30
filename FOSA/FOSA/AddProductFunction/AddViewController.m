@@ -417,8 +417,8 @@
 -(void)finish{
     [self creatOrOpensql];
     [self InsertDataIntoSqlite];
+    //[self SavePhotoArray:self.food_image];
     
-    //[self SavePhotoIntoLibrary:self.imageView1.image];
     picturePath = [self Savephoto:[self fixOrientation:self.food_image[0]]];
     //格式化时间
     NSDateFormatter * formatter = [[NSDateFormatter alloc]init];
@@ -455,6 +455,20 @@
         NSLog(@"保存成功");
     }
     return filePath;
+}
+- (void)SavePhotoArray:(NSMutableArray<UIImage *> *)array{
+    NSArray *paths =NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask,YES);
+    NSString *photoName;
+    NSString *filePath ;// 保存文件的路径
+    for (int i = 0; i < array.count; i++) {
+        photoName = [NSString stringWithFormat:@"%@%d.png",self.foodName.text,i];
+        filePath = [[paths objectAtIndex:0]stringByAppendingPathComponent: photoName];
+        NSLog(@"这个是照片的保存地址:%@",filePath);
+        BOOL result =[UIImagePNGRepresentation(array[i]) writeToFile:filePath  atomically:YES];// 保存成功会返回YES
+           if(result == YES) {
+               NSLog(@"保存成功");
+           }
+    }
 }
 
 - (UIImage *)normalizedImage:(UIImage *)img {

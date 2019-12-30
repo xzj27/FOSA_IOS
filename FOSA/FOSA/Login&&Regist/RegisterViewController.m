@@ -94,6 +94,7 @@
     
     //记住密码
     self.remember = [[UISwitch alloc]initWithFrame:CGRectMake(5,300,60,40)];
+    [_remember addTarget:self action:@selector(switchAction:) forControlEvents:UIControlEventValueChanged];
     [self.view addSubview:self.remember];
     self.memory = [[UILabel alloc]initWithFrame:CGRectMake(60, 300,120,40)];
     self.memory.text = @"记住账号密码";
@@ -110,7 +111,16 @@
     [self.regist addTarget:self action:@selector(creatOrOpensql) forControlEvents:UIControlEventTouchUpInside];
 
 }
-
+-(void)switchAction:(id)sender
+{
+UISwitch *switchButton = (UISwitch*)sender;
+BOOL isButtonOn = [switchButton isOn];
+if (isButtonOn) {
+    NSLog(@"YES");
+}else {
+    NSLog(@"NO");
+    }
+}
 -(void)pwdtextSwitch{
     if (isSecure) {
         NSString *pwd = self.passwordInput.text;

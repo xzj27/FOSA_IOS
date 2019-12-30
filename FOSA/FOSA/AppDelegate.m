@@ -37,15 +37,28 @@
         return YES;
        }else{
        //创建window
-       self.window = [[UIWindow alloc]initWithFrame:[UIScreen mainScreen].bounds];
-       //添加根控制器
-       self.window.rootViewController = [[RootTabBarViewController alloc]init];
-       //显示window
-       [self.window makeKeyAndVisible];
-       //[self InitNutrientDataFromServer];
-       [self UpdateCategoryDataFromServer];
-       [NSThread sleepForTimeInterval:4];
-       return YES;
+           self.window = [[UIWindow alloc]initWithFrame:[UIScreen mainScreen].bounds];
+
+           NSUserDefaults *userDefault = NSUserDefaults.standardUserDefaults;
+           NSString *currentVersion = [NSBundle mainBundle].infoDictionary[@"CFBundleShortVersionString"];
+           NSString *localVersion = [userDefault valueForKey:@"localVersion"];
+           
+           if (![currentVersion isEqualToString:localVersion]) {
+               //新特性界面
+               UIViewController *newVc = [[UIViewController alloc]init];
+               newVc.view.backgroundColor = [UIColor redColor];
+               self.window.rootViewController = newVc;
+               [userDefault setObject:currentVersion forKey:@"localVersion"];
+           }else{
+               //添加根控制器
+               self.window.rootViewController = [[RootTabBarViewController alloc]init];
+           }
+           //显示window
+           [self.window makeKeyAndVisible];
+           //[self InitNutrientDataFromServer];
+           [self UpdateCategoryDataFromServer];
+           [NSThread sleepForTimeInterval:4];
+           return YES;
        }
 }
 //禁止应用屏幕自动旋转

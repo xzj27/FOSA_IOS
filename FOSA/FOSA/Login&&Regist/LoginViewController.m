@@ -19,6 +19,8 @@
 //结果集定义
 @property(nonatomic,assign)sqlite3_stmt *stmt;
 
+@property(nonatomic,strong) NSUserDefaults *userDefaults;
+
 @end
 
 @implementation LoginViewController
@@ -28,12 +30,16 @@
     self.view.backgroundColor = [UIColor colorWithRed:228/255.0 green:228/255.0 blue:228/255.0 alpha:1.0];
     // Do any additional setup after loading the view.
     [self InitView];
+    [self SetUserNameAndPassword];
 }
 -(void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
 }
 -(void)InitView{
+    
+    self.userDefaults = [NSUserDefaults standardUserDefaults];// 初始化
+    
     self.mainWidth = [UIScreen mainScreen].bounds.size.width;
     self.mainHeight = [UIScreen mainScreen].bounds.size.height;
     self.navHeight = self.navigationController.navigationBar.frame.size.height;
@@ -93,6 +99,7 @@
     //记住密码
     self.remember = [[UISwitch alloc]initWithFrame:CGRectMake(5,290, 60, 40)];
     [self.view addSubview:self.remember];
+    [_remember addTarget:self action:@selector(switchAction:) forControlEvents:UIControlEventValueChanged];
     self.memory = [[UILabel alloc]initWithFrame:CGRectMake(60, 290,120,40)];
     self.memory.text = @"记住账号密码";
     self.memory.font = [UIFont systemFontOfSize:15];
@@ -132,6 +139,39 @@
     UIGestureRecognizer *registGestureRecognizer = [[UIGestureRecognizer alloc]initWithTarget:self action:@selector(jumpToRegist)];
     [self.regist addGestureRecognizer:registGestureRecognizer];
 }
+
+//保存用户名和密码
+-(void)switchAction:(id)sender
+{
+UISwitch *switchButton = (UISwitch*)sender;
+BOOL isButtonOn = [switchButton isOn];
+if (isButtonOn) {
+    NSLog(@"YES");
+    NSString *username = self.userNameInput.text;
+    NSString *password = self.passwordInput.text;
+    
+    [self.userDefaults setObject:username forKey:@"username"];
+    [self.userDefaults setObject:password forKey:@"password"];
+    [self.userDefaults setBool:isButtonOn forKey:@"isOn"];
+    [self.userDefaults synchronize];
+    
+}else {
+    NSLog(@"NO");
+    }
+}
+//取出用户名和密码
+- (void)SetUserNameAndPassword{
+    NSString *username = [self.userDefaults valueForKey:@"username"];
+    NSString *password = [self.userDefaults valueForKey:@"password"];
+    Boolean isOn = [self.userDefaults boolForKey:@"isOn"];
+    if (username != NULL && password != NULL) {
+        self.userNameInput.text = username;
+        self.passwordInput.text = password;
+        [self.remember setOn:isOn];
+    }
+}
+
+
 //返回主界面方法
 -(void)goBack{
     [self dismissViewControllerAnimated:YES completion:nil];

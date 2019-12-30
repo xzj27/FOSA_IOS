@@ -102,13 +102,13 @@
     CGFloat cameraSwitchBtnMargin = 10.f;
     UIButton *cameraSwitchBtn = [[UIButton alloc] initWithFrame:CGRectMake(containerView.bounds.size.width - cameraSwitchBtnW - cameraSwitchBtnMargin, containerViewH+marginY+20, cameraSwitchBtnW, cameraSwitchBtnW)];
     [cameraSwitchBtn setBackgroundImage:[UIImage imageNamed:@"camera_switch"] forState:UIControlStateNormal];
-    [cameraSwitchBtn addTarget:self action:@selector(cameraSwitchBtnOnClick) forControlEvents:UIControlEventTouchUpInside];
+    //[cameraSwitchBtn addTarget:self action:@selector(cameraSwitchBtnOnClick) forControlEvents:UIControlEventTouchUpInside];
     //[self.view addSubview:cameraSwitchBtn];
     //拍摄快门按钮
-    UIButton *shutter = [[UIButton alloc]initWithFrame:CGRectMake([UIScreen mainScreen].bounds.size.width/2-cameraSwitchBtnW/2, containerViewH*4/5, cameraSwitchBtnW, cameraSwitchBtnW)];
-    [shutter setImage:[UIImage imageNamed:@"icon_takePhoto"] forState:UIControlStateNormal];
-    [shutter addTarget:self action:@selector(btnOnClick:) forControlEvents:UIControlEventTouchUpInside];
-    [self.view addSubview:shutter];
+    self.shutter = [[UIButton alloc]initWithFrame:CGRectMake(screen_width/2-cameraSwitchBtnW/2, containerViewH*4/5, cameraSwitchBtnW, cameraSwitchBtnW)];
+    [_shutter setImage:[UIImage imageNamed:@"icon_takePhoto"] forState:UIControlStateNormal];
+    [_shutter addTarget:self action:@selector(btnOnClick:) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:_shutter];
     
     //聚焦图片
     UIImageView *focusCursor = [[UIImageView alloc] initWithFrame:CGRectMake(50, 50, 75, 75)];
@@ -123,39 +123,13 @@
     _pictureView1.clipsToBounds = YES;
     _pictureView1.userInteractionEnabled = YES;
     //[self.view addSubview:_pictureView1];
-    self.cancel1 = [[UIButton alloc]initWithFrame:CGRectMake(screen_width/2-20, _pictureView1.frame.size.height-50, 40, 40)];
+    self.cancel1 = [[UIButton alloc]initWithFrame:CGRectMake(screen_width/2-cameraSwitchBtnW/2, containerViewH*2/3, cameraSwitchBtnW, cameraSwitchBtnW)];
     [self.cancel1 setBackgroundImage:[UIImage imageNamed:@"icon_cancel"] forState:UIControlStateNormal];
     [self.cancel1 addTarget:self action:@selector(takePictureAgain) forControlEvents:UIControlEventTouchUpInside];
     [_pictureView1 addSubview:_cancel1];
-//    _image = [[UIImage alloc]init];
-//    UIImageView *imgView = [[UIImageView alloc] initWithFrame:CGRectMake(20, containerViewH+marginY+15,60,60)];
-//    imgView.hidden = NO;
-//    imgView.backgroundColor = [UIColor colorWithRed:80/255 green:80/255 blue:80/255 alpha:1.0];
-//    imgView.layer.borderWidth = 1.f;
-//    imgView.layer.borderColor = [[UIColor grayColor] CGColor];
-//    imgView.contentMode = UIViewContentModeScaleAspectFill;
-//    imgView.clipsToBounds = YES;
-//    imgView.userInteractionEnabled = YES;
-//    //[self.view addSubview:imgView];
-//    UITapGestureRecognizer *clickRevognizer = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(EnlargePhoto)];
-//    [imgView addGestureRecognizer:clickRevognizer];
-//    _imgView = imgView;
+
 }
-#pragma mark - 进入扫码界面
--(void)ScanEvent{
-    ScanOneCodeViewController *scan = [[ScanOneCodeViewController alloc]init];
-    scan.food_photo = [[UIImage alloc]init];
-    scan.food_photo = self.image;
-    scan.hidesBottomBarWhenPushed = YES;
-    if (self.captureSession != nil) {
-        NSLog(@"停止捕获");
-        [self.captureSession stopRunning];
-    }
-//    [self removeNotification];
-    [self.navigationController pushViewController:scan animated:YES];
-    [self.navigationController popoverPresentationController];
-    
-}
+
 - (void)initPhotoInfo
 {
     //初始化会话
@@ -230,7 +204,6 @@
            [_captureDeviceInput.device setExposureMode:AVCaptureExposureModeContinuousAutoExposure];
        }
        [_captureDeviceInput.device unlockForConfiguration];
-    
 }
 - (void)btnOnClick:(UIButton *)btn
 {
@@ -251,177 +224,51 @@
             CGFloat fixelH = CGImageGetHeight(self.image.CGImage);
             NSLog(@"=========%f>>>>>>>>%f",fixelH,fixelW);
            //UIImageWriteToSavedPhotosAlbum(self.image, self,@selector(image:didFinishSavingWithError:contextInfo:),nil);
-//            self.imgView.contentMode = UIViewContentModeScaleAspectFill;
-//            self.imgView.clipsToBounds = YES;
-//            self.imgView.image = self.image;
-//            [self DetectQRcode:self.image];
             self.pictureView1.image = self.image;
             [self.imageArray1 replaceObjectAtIndex:1 withObject:self.image];
         }
     }];
+    self.shutter.hidden = YES;
     [self.view addSubview:_pictureView1];
     [self.captureSession stopRunning];
 }
 - (void)takePictureAgain{
     [self.pictureView1 removeFromSuperview];
     [self.captureSession startRunning];
+    self.shutter.hidden = NO;
 }
-//保存照片到本地
--(void)Savephoto:(UIImage *)image{
-    NSArray *paths =NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask,YES);
-    NSString *filePath = [[paths objectAtIndex:0]stringByAppendingPathComponent:[NSString stringWithFormat:@"demo.png"]];// 保存文件的名称
-    BOOL result =[UIImagePNGRepresentation(image) writeToFile:filePath  atomically:YES];// 保存成功会返回YES
-    if(result == YES) {
-        NSLog(@"保存成功");
-    }
-}
-//取出保存在本地的图片
--(UIImage*)getImage {
-    NSArray *paths =NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask,YES);
-    NSString*filePath = [[paths objectAtIndex:0]stringByAppendingPathComponent:[NSString stringWithFormat:@"demo.png"]];
-// 保存文件的名称
-    UIImage *img = [UIImage imageWithContentsOfFile:filePath];
-    NSLog(@"=== %@", img);
-    return img;
-}
-//#pragma mark -  放大缩小图片
-//- (void)EnlargePhoto{
-//    self.navigationController.navigationBar.hidden = YES;   //隐藏导航栏
-//    [UIApplication sharedApplication].statusBarHidden = YES;             //隐藏状态栏
-//    //底层视图
-//    self.backGround = [[UIScrollView alloc]init];
-//    _backGround.backgroundColor = [UIColor blackColor];
-//    _backGround.contentSize = CGSizeMake(self.view.frame.size.width, self.view.frame.size.height);
-//    _backGround.frame = self.view.frame;
-//    _backGround.showsHorizontalScrollIndicator = NO;
-//    _backGround.showsVerticalScrollIndicator = NO;
-//    _backGround.multipleTouchEnabled = YES;
-//    _backGround.maximumZoomScale = 5;
-//    _backGround.minimumZoomScale = 1;
-//    _backGround.delegate = self;
 //
-//    self.bigImage = [[UIImageView alloc]init];
-//    _bigImage.frame = self.view.frame;
-//    _bigImage.image = self.imgView.image;
-//    _bigImage.userInteractionEnabled = YES;
-//    _bigImage.contentMode = UIViewContentModeScaleToFill;
-//    _bigImage.clipsToBounds = YES;
-//    UITapGestureRecognizer *shrinkRecognizer = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(shirnkPhoto)];
-//    [shrinkRecognizer setNumberOfTapsRequired:1];
-//    [_bigImage addGestureRecognizer:shrinkRecognizer];
-//    //添加双击事件
-//    UITapGestureRecognizer *doubleTapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleDoubleTap:)];
-//    [doubleTapGesture setNumberOfTapsRequired:2];
-//    [_bigImage addGestureRecognizer:doubleTapGesture];
-//
-//    [shrinkRecognizer requireGestureRecognizerToFail:doubleTapGesture];
-//
-//    [_backGround addSubview:self.bigImage];
-//    [self.view addSubview:self.backGround];
-//}
-//#pragma mark -  scrollview代理
-//- (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView{
-//    return self.bigImage;
+//#pragma mark - <保存到相册>
+//-(void)image:(UIImage *)image didFinishSavingWithError:(NSError *)error contextInfo:(void *)contextInfo {
+//    NSString *msg = nil ;
+//    if(error){
+//        msg = @"保存图片失败" ;
+//    }else{
+//        msg = @"保存图片成功" ;
+//    }
 //}
 //
-///**双击定点放大*/
-//- (void)handleDoubleTap:(UIGestureRecognizer *)gesture
-//{
-//    CGFloat zoomScale = self.backGround.zoomScale;
-//    NSLog(@"%f",self.backGround.zoomScale);
-//    zoomScale = (zoomScale == 1.0) ? 3.0 : 1.0;
-//    CGRect zoomRect = [self zoomRectForScale:zoomScale withCenter:[gesture locationInView:gesture.view]];
-//    [self.backGround zoomToRect:zoomRect animated:YES];
-//}
+//#pragma mark - 此方法用于检测画面中是否存在二维码
+//-(void)DetectQRcode:(UIImage *)image{
+//    //创建上下文对象
+//    CIContext *context = [CIContext contextWithOptions:nil];
+//    //创建CIImage对象
+//    CIImage *ciImage  = [[CIImage alloc]initWithImage:image];
+//    //创建探测器
+//    CIDetector *ciDetector = [CIDetector detectorOfType:CIDetectorTypeQRCode context:context options:@{CIDetectorAccuracy:CIDetectorAccuracyHigh}];
+//    // 取得识别结果
+//    NSArray *features = [ciDetector featuresInImage:ciImage];
 //
-//- (CGRect)zoomRectForScale:(float)scale withCenter:(CGPoint)center
-//{
-//    CGRect zoomRect;
-//    zoomRect.size.height =self.view.frame.size.height / scale;
-//    zoomRect.size.width  =self.view.frame.size.width  / scale;
-//    zoomRect.origin.x = center.x - (zoomRect.size.width  /2.0);
-//    zoomRect.origin.y = center.y - (zoomRect.size.height /2.0);
-//    return zoomRect;
-//}
-////点击缩小视图
-//- (void)shirnkPhoto{
-//    [self.backGround removeFromSuperview];
-//    self.navigationController.navigationBar.hidden = NO;
-//    [UIApplication sharedApplication].statusBarHidden = NO;
-//}
-
-
-#pragma mark - <保存到相册>
--(void)image:(UIImage *)image didFinishSavingWithError:(NSError *)error contextInfo:(void *)contextInfo {
-    NSString *msg = nil ;
-    if(error){
-        msg = @"保存图片失败" ;
-    }else{
-        msg = @"保存图片成功" ;
-    }
-}
-
-#pragma mark - 此方法用于检测画面中是否存在二维码
--(void)DetectQRcode:(UIImage *)image{
-    //创建上下文对象
-    CIContext *context = [CIContext contextWithOptions:nil];
-    //创建CIImage对象
-    CIImage *ciImage  = [[CIImage alloc]initWithImage:image];
-    //创建探测器
-    CIDetector *ciDetector = [CIDetector detectorOfType:CIDetectorTypeQRCode context:context options:@{CIDetectorAccuracy:CIDetectorAccuracyHigh}];
-    // 取得识别结果
-    NSArray *features = [ciDetector featuresInImage:ciImage];
-    
-    if (features.count == 0) {
-        NSLog(@"暂未识别出扫描的二维码");
-    }else{
-        for (int index = 0; index < [features count]; index++) {
-            CIQRCodeFeature *feature = [features objectAtIndex:index];
-            NSString *result = feature.messageString;
-            NSLog(@"画面中的二维码的内容是:%@",result);
-            //[self sendLocalNotification];
-        }
-    }
-}
-- (void)sendLocalNotification {
-}
-
-//#pragma mark - 通知
-////给输入设备添加通知
-//- (void)addNotificationToCaptureDevice:(AVCaptureDevice *)captureDevice
-//{
-//    //注意添加区域改变捕获通知必须首先设置设备允许捕获
-//    [self changeDeviceProperty:^(AVCaptureDevice *captureDevice) {
-//        captureDevice.subjectAreaChangeMonitoringEnabled = YES;
-//    }];
-//    //捕获区域发生改变
-////    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(areaChange:) name:AVCaptureDeviceSubjectAreaDidChangeNotification object:captureDevice];
-//}
-//- (void)removeNotificationFromCaptureDevice:(AVCaptureDevice *)captureDevice
-//{
-//    [[NSNotificationCenter defaultCenter] removeObserver:self name:AVCaptureDeviceSubjectAreaDidChangeNotification object:captureDevice];
-//}
-////移除所有通知
-//- (void)removeNotification
-//{
-//    [[NSNotificationCenter defaultCenter] removeObserver:self];
-//}
-////设备连接成功
-//- (void)deviceConnected:(NSNotification *)notification
-//{
-//    NSLog(@"设备已连接...");
-//}
-//
-////设备连接断开
-//- (void)deviceDisconnected:(NSNotification *)notification
-//{
-//    NSLog(@"设备已断开.");
-//}
-
-//捕获区域改变
-//- (void)areaChange:(NSNotification *)notification
-//{
-//    NSLog(@"捕获区域改变...");
+//    if (features.count == 0) {
+//        NSLog(@"暂未识别出扫描的二维码");
+//    }else{
+//        for (int index = 0; index < [features count]; index++) {
+//            CIQRCodeFeature *feature = [features objectAtIndex:index];
+//            NSString *result = feature.messageString;
+//            NSLog(@"画面中的二维码的内容是:%@",result);
+//            //[self sendLocalNotification];
+//        }
+//    }
 //}
 
 #pragma mark - 私有方法
@@ -436,35 +283,6 @@
     }
     return nil;
 }
-//#pragma mark 切换前后摄像头
-//- (void)cameraSwitchBtnOnClick
-//{
-//    AVCaptureDevice *currentDevice = [self.captureDeviceInput device];
-//    AVCaptureDevicePosition currentPosition = [currentDevice position];
-//    [self removeNotificationFromCaptureDevice:currentDevice];
-//
-//    AVCaptureDevice *toChangeDevice;
-//    AVCaptureDevicePosition toChangePosition = AVCaptureDevicePositionFront;
-//    if (currentPosition == AVCaptureDevicePositionUnspecified || currentPosition == AVCaptureDevicePositionFront) {
-//        toChangePosition = AVCaptureDevicePositionBack;
-//    }
-//    toChangeDevice = [self getCameraDeviceWithPosition:toChangePosition];
-//    [self addNotificationToCaptureDevice:toChangeDevice];
-//    //获得要调整的设备输入对象
-//    AVCaptureDeviceInput *toChangeDeviceInput = [[AVCaptureDeviceInput alloc] initWithDevice:toChangeDevice error:nil];
-//
-//    //改变会话的配置前一定要先开启配置，配置完成后提交配置改变
-//    [self.captureSession beginConfiguration];
-//    //移除原有输入对象
-//    [self.captureSession removeInput:self.captureDeviceInput];
-//    //添加新的输入对象
-//    if ([self.captureSession canAddInput:toChangeDeviceInput]) {
-//        [self.captureSession addInput:toChangeDeviceInput];
-//        self.captureDeviceInput = toChangeDeviceInput;
-//    }
-//    //提交会话配置
-//    [self.captureSession commitConfiguration];
-//}
 
 //改变设备属性的统一操作方法
 - (void)changeDeviceProperty:(void (^)(AVCaptureDevice *))propertyChange
@@ -552,8 +370,4 @@
     }];
 }
 
-//- (void)dealloc
-//{
-//    [self removeNotification];
-//}
 @end

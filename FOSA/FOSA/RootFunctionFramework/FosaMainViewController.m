@@ -140,7 +140,7 @@
     _StorageItemView.backgroundColor = [UIColor whiteColor];
     _StorageItemView.showsVerticalScrollIndicator = NO;
     //regist the user-defined collctioncell
-    [_StorageItemView registerClass:[FoodCollectionViewCell class] forCellWithReuseIdentifier:ID];
+    //[_StorageItemView registerClass:[FoodCollectionViewCell class] forCellWithReuseIdentifier:ID];
     
     //给view 添加滑动事件
      UISwipeGestureRecognizer *recognizer;
@@ -396,10 +396,10 @@ NSLog(@"foodName=%@&&&&&&&expireDate=%@",_storageArray[i].foodName,_storageArray
                 const char *remind_date = (const char*)sqlite3_column_text(_stmt,4);
                 const char *expired_date = (const char *)sqlite3_column_text(_stmt,3);
                 const char *photo_path = (const char *)sqlite3_column_text(_stmt,5);
-                NSLog(@"查询到数据%@",[NSString stringWithUTF8String:food_name]);
-                NSLog(@"查询到数据%@",[NSString stringWithUTF8String:expired_date]);
-                NSLog(@"查询到数据%@",[NSString stringWithUTF8String:photo_path]);
-                NSLog(@"********************************");
+//                NSLog(@"查询到数据%@",[NSString stringWithUTF8String:food_name]);
+//                NSLog(@"查询到数据%@",[NSString stringWithUTF8String:expired_date]);
+//                NSLog(@"查询到数据%@",[NSString stringWithUTF8String:photo_path]);
+//                NSLog(@"********************************");
             
         [self CreatFoodViewWithName:[NSString stringWithUTF8String:food_name] fdevice:[NSString stringWithUTF8String:device_name] remindDate:[NSString stringWithUTF8String:remind_date] foodPhoto:[NSString stringWithUTF8String:photo_path]];
             }
@@ -557,6 +557,7 @@ NSLog(@"foodName=%@&&&&&&&expireDate=%@",_storageArray[i].foodName,_storageArray
 }
 //每个cell的具体内容
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:( NSIndexPath *)indexPath {
+
     // 每次先从字典中根据IndexPath取出唯一标识符
     NSString *identifier = [_cellDic objectForKey:[NSString stringWithFormat:@"%@", indexPath]];
  // 如果取出的唯一标示符不存在，则初始化唯一标示符，并将其存入字典中，对应唯一标示符注册Cell
