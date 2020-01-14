@@ -7,6 +7,7 @@
 //
 
 #import "ScanMoreCodeViewController.h"
+#import "ScanUIView.h"
 
 @interface ScanMoreCodeViewController ()
 

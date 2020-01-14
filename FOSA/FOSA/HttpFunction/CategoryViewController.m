@@ -188,5 +188,4 @@
 //        [self InitDataFromServer];
     }
 }
-
 @end

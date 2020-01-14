@@ -45,9 +45,9 @@
         self.backgroundColor = [UIColor whiteColor];
 
         self.timeArr = [NSArray array];
-
         self.dataArray = [NSMutableArray array];
         self.minuteArr = [NSMutableArray array];
+        
         [self.dataArray addObject:self.yearArr];
         [self.dataArray addObject:self.monthArr];
         [self.dataArray addObject:self.dayArr];
@@ -68,7 +68,6 @@
     NSDate *date = [NSDate date];
     NSDateFormatter* dateFormatter = [[NSDateFormatter alloc]init];
     [dateFormatter setDateFormat:@"yyyy-MM-dd HH:mm"];
-
     self.date = [dateFormatter stringFromDate:date];
 }
 
@@ -82,14 +81,19 @@
     [self addSubview:self.toolView];
     
     UIButton *saveBtn = [[UIButton alloc] init];
-    saveBtn.frame = CGRectMake(self.frame.size.width - 50, 2, 40, 40);
-    [saveBtn setImage:[UIImage imageNamed:@"icon_select1"] forState:UIControlStateNormal];
+    saveBtn.frame = CGRectMake(self.frame.size.width - 90, 2, 80, 40);
+    [saveBtn setTitle:@"Save" forState:UIControlStateNormal];
+    [saveBtn setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
+    //[saveBtn setImage:[UIImage imageNamed:@"icon_select1"] forState:UIControlStateNormal];
     [saveBtn addTarget:self action:@selector(saveBtnClick) forControlEvents:UIControlEventTouchUpInside];
     [self.toolView addSubview:saveBtn];
     
     UIButton *cancelBtn = [[UIButton alloc] init];
-    cancelBtn.frame = CGRectMake(10, 2, 40, 40);
-    [cancelBtn setImage:[UIImage imageNamed:@"icon_revocation1"] forState:UIControlStateNormal];
+    cancelBtn.frame = CGRectMake(10, 2, 80, 40);
+    [cancelBtn setTitle:@"Cancel" forState:UIControlStateNormal];
+    [cancelBtn setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
+
+    //[cancelBtn setImage:[UIImage imageNamed:@"icon_revocation1"] forState:UIControlStateNormal];
     [cancelBtn addTarget:self action:@selector(cancelBtnClick) forControlEvents:UIControlEventTouchUpInside];
     [self.toolView addSubview:cancelBtn];
     
@@ -169,7 +173,7 @@
     NSString *hour = self.hour.length == 3 ? [NSString stringWithFormat:@"%ld", self.hour.integerValue] : [NSString stringWithFormat:@"0%ld", self.hour.integerValue];
     NSString *minute = self.minute.length == 3 ? [NSString stringWithFormat:@"%ld", self.minute.integerValue] : [NSString stringWithFormat:@"0%ld", self.minute.integerValue];
     
-    self.selectStr = [NSString stringWithFormat:@"%ld/%@/%@/%@:%@", [self.year integerValue], month, day, hour, minute];
+    self.selectStr = [NSString stringWithFormat:@"%@/%@/%ld  %@:%@", month, day, [self.year integerValue], hour, minute];
     if ([self.delegate respondsToSelector:@selector(datePickerViewSaveBtnClickDelegate:)]) {
         [self.delegate datePickerViewSaveBtnClickDelegate:self.selectStr];
     }

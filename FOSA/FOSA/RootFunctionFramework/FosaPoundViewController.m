@@ -478,6 +478,7 @@
     self.totalcalorieLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, screen_width/3, self.calorieResultView.frame.size.height)];
     _totalcalorieLabel.text = @"卡路里总量(Kcal):";
     _totalcalorieLabel.font = [UIFont systemFontOfSize:14*(screen_width/414.0)];
+
     [_calorieResultView addSubview:_totalcalorieLabel];
     self.Allcalorie = [[UILabel alloc]initWithFrame:CGRectMake(screen_width/3, 5, screen_width*2/3-TabbarHeight, self.calorieResultView.frame.size.height)];
     _Allcalorie.userInteractionEnabled = NO;

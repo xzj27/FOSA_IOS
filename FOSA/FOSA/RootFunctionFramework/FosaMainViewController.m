@@ -175,7 +175,6 @@
     _StorageItemView.delegate = self;
     _StorageItemView.dataSource = self;
     [self.view addSubview:_StorageItemView];
-    _notification = [[FosaNotification alloc]init];
     
     //添加按钮
     self.addContentBtn = [[UIButton alloc]initWithFrame:CGRectMake(screen_width/2-30, screen_height-60-TabbarHeight, 60, 60)];

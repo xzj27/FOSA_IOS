@@ -139,12 +139,13 @@
     UITapGestureRecognizer *clickRecognizer = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(EnlargePhoto)];
     [self.imageView1 addGestureRecognizer:clickRecognizer];
     
-    self.share = [[UIButton alloc]initWithFrame:CGRectMake(5,headerheight*3/4+5,40,40)];
+    self.share = [[UIButton alloc]initWithFrame:CGRectMake(headerWidth-50,headerheight*3/4-50,40,40)];
+    self.share.backgroundColor = [UIColor whiteColor];
     [_share setImage:[UIImage imageNamed:@"icon_share"] forState:UIControlStateNormal];
     self.like = [[UIButton alloc]initWithFrame:CGRectMake(headerWidth-45, self.imageView1.frame.origin.y+self.imageView1.frame.size.height-40,40,40)];
     [_like setImage:[UIImage imageNamed:@"icon_like"] forState:UIControlStateNormal];
     
-    [self.headerView addSubview:_share];
+    [self.headerView insertSubview:_share atIndex:10];
     //[self.headerView addSubview:_like];
     
     //给对应按钮添加响应

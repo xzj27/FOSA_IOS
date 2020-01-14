@@ -93,7 +93,7 @@
     }
     //取消点击cell时显示的背景色
     //cell.selectionStyle = UITableViewCellSelectionStyleNone;
-    cell.textLabel.font = [UIFont systemFontOfSize:14];
+    cell.textLabel.font = [UIFont systemFontOfSize:14*(([UIScreen mainScreen].bounds.size.width/414.0))];
     cell.textLabel.text = arrayData[indexPath.row];
     //返回cell
     return cell;

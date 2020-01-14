@@ -109,7 +109,7 @@
     [_shutter setImage:[UIImage imageNamed:@"icon_takePhoto"] forState:UIControlStateNormal];
     [_shutter addTarget:self action:@selector(btnOnClick:) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:_shutter];
-    
+
     //聚焦图片
     UIImageView *focusCursor = [[UIImageView alloc] initWithFrame:CGRectMake(50, 50, 75, 75)];
     focusCursor.alpha = 0;

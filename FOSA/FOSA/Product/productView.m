@@ -42,7 +42,6 @@ UIPageViewControllerDataSource>
     self.pageController.view.backgroundColor = [UIColor whiteColor];
     [self addSubview:self.pageController.view];
 }
-
 -(void)configParam:(NSMutableArray<UIViewController *> *)controllers index:(NSInteger)index block:(TabSwitchBlcok)tabSwitch{
     if (controllers.count == 0) { return; }
     self.tabSwitch = tabSwitch;
@@ -53,7 +52,6 @@ UIPageViewControllerDataSource>
     //默认展示的第index页面
     [self.pageController setViewControllers:[NSArray arrayWithObject:[self pageControllerAtIndex:index]] direction:UIPageViewControllerNavigationDirectionForward animated:YES completion:nil];
 }
-
 /**
  更新滚动到index页面
  */

@@ -162,7 +162,7 @@
 
 - (void)viewWillDisappear:(BOOL)animated{
     [super viewWillDisappear:animated];
-    self.navigationController.navigationBarHidden = NO;
+    self.navigationController.navigationBar.backgroundColor = [UIColor clearColor];
 }
 /*
 #pragma mark - Navigation

@@ -40,7 +40,6 @@
     [super viewDidLayoutSubviews];
 
     CGFloat productContentY = CGRectGetMaxY(self.fosaScrollview.frame);
-
     self.productContent.frame = CGRectMake(0, productContentY, screen_width, self.view.frame.size.height - productContentY);
 }
 - (void)viewDidLoad {

@@ -179,7 +179,7 @@ if (isButtonOn) {
 -(void) InsertDataIntoSqlite{
     char *erro = 0;
     //查询数据库
-    NSString *insertSql =[NSString stringWithFormat:@"insert into Fosa_User(userName,password)values('%@','%@')",self.userNameInput.text,self.passwordInput.text];
+    NSString *insertSql = [NSString stringWithFormat:@"insert into Fosa_User(userName,password)values('%@','%@')",self.userNameInput.text,self.passwordInput.text];
         int insertResult = sqlite3_exec(self.database, insertSql.UTF8String,NULL, NULL,&erro);
         if(insertResult == SQLITE_OK){
             [self SystemAlert:@"注册成功"];

@@ -44,7 +44,7 @@
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     [defaults setObject:NutrientData[0].content forKey:@"calorieValue"];
     [defaults synchronize];
-    
+
     //返回根界面
     [self.navigationController popToRootViewControllerAnimated:YES];
 }

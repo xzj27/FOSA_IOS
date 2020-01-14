@@ -30,7 +30,7 @@
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>add a new photo to photoLibrary</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>use photo library</string>
+	<string>Privacy - Photo Library Usage Description</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

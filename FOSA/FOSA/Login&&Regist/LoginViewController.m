@@ -154,7 +154,6 @@ if (isButtonOn) {
     [self.userDefaults setObject:password forKey:@"password"];
     [self.userDefaults setBool:isButtonOn forKey:@"isOn"];
     [self.userDefaults synchronize];
-    
 }else {
     NSLog(@"NO");
     }

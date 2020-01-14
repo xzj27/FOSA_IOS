@@ -26,13 +26,10 @@
 //仿照系统通知绘制UIview
 - (UIView *)CreatNotificatonView:(NSString *)title body:(NSString *)body{
     NSLog(@"begin creating");
-    
-    CGFloat scale = [UIScreen mainScreen].scale;
-    NSLog(@"+++++++++++++++++++++++++++%f",scale);
-    
+
     CGFloat mainwidth = [UIScreen mainScreen].bounds.size.width;
     CGFloat mainHeight = [UIScreen mainScreen].bounds.size.height;
-    
+
     UIView *notification = [[UIView alloc]initWithFrame:CGRectMake(0, 0, mainwidth,mainHeight)];
     notification.backgroundColor = [UIColor whiteColor];
 
@@ -55,24 +52,73 @@
     image.image = self.image;
     image.contentMode = UIViewContentModeScaleAspectFill;
     image.clipsToBounds = YES;
-    
+
     InfoCodeView.image = self.codeImage;
     InfoCodeView.backgroundColor = [UIColor redColor];
     InfoCodeView.contentMode = UIViewContentModeScaleAspectFill;
     InfoCodeView.clipsToBounds = YES;
-    
+
     brand.font  = [UIFont systemFontOfSize:10];
     brand.textAlignment = NSTextAlignmentCenter;
     brand.text  = @"FOSA";
-    
+
     Ntitle.font  = [UIFont systemFontOfSize:12];
     Ntitle.textColor = [UIColor redColor];
     Ntitle.text = title;
-    
+
     Nbody.font   = [UIFont systemFontOfSize:12];
     Nbody.text = body;
-    
+
     return notification;
+//    
+//    NSLog(@"begin creating");
+//    
+//    int mainwidth = screen_width;
+//    int mainHeight = screen_height;
+//    
+//    UIView *notification = [[UIView alloc]initWithFrame:CGRectMake(0, 0, mainwidth,mainHeight)];
+//    notification.backgroundColor = [UIColor whiteColor];
+//
+//    //食物图片
+//    UIImageView *image = [[UIImageView alloc]initWithFrame:CGRectMake(0,mainHeight/8, mainwidth, mainHeight/2)];
+//    
+//    //FOSA的logo
+//    UIImageView *logo = [[UIImageView alloc]initWithFrame:CGRectMake(mainwidth*2/5, mainHeight-mainwidth*3/10, mainwidth/5, mainwidth/5)];
+//    
+//    //FOSA
+//    UILabel *brand = [[UILabel alloc]initWithFrame:CGRectMake(mainwidth/15, mainHeight*11/16, mainwidth/4, mainHeight/16)];
+//    
+//    //食物信息二维码
+//    UIImageView *InfoCodeView = [[UIImageView alloc]initWithFrame:CGRectMake(mainwidth*4/5-20, mainHeight*11/16, mainwidth/5, mainwidth/5)];
+//
+//    //提醒内容
+//    UITextView *Nbody = [[UITextView alloc]initWithFrame:CGRectMake(mainwidth/15, mainHeight*3/4+5, mainwidth*3/5, mainwidth/5)];
+//    Nbody.userInteractionEnabled = NO;
+//
+//    [notification addSubview:logo];
+//    [notification addSubview:brand];
+//    [notification addSubview:InfoCodeView];
+//    [notification addSubview:image];
+//    [notification addSubview:Nbody];
+//
+//    logo.image  = [UIImage imageNamed:@"icon_logoHL"];
+//    NSLog(@"食物图片被添加到分享视图上:%@",self.image);
+//    image.image = self.image;
+//    image.contentMode = UIViewContentModeScaleAspectFill;
+//    image.clipsToBounds = YES;
+//    InfoCodeView.image = self.codeImage;
+//    InfoCodeView.backgroundColor = [UIColor redColor];
+//    InfoCodeView.contentMode = UIViewContentModeScaleAspectFill;
+//    InfoCodeView.clipsToBounds = YES;
+//    
+//    brand.font  = [UIFont systemFontOfSize:15];
+//    brand.textAlignment = NSTextAlignmentCenter;
+//    brand.text  = @"FOSA";
+//    
+//    Nbody.font   = [UIFont systemFontOfSize:12];
+//    Nbody.text = body;
+//    
+//    return notification;
 }
 
 //将UIView转化为图片并保存在相册

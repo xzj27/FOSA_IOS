@@ -18,6 +18,7 @@
 #import "Fosa_NSString_queue.h"
 #import "SqliteManager.h"
 #import "FoodInfoViewController.h"
+
 @interface ScanOneCodeViewController ()<AVCaptureMetadataOutputObjectsDelegate,UINavigationControllerDelegate,AVCaptureVideoDataOutputSampleBufferDelegate,UIImagePickerControllerDelegate,UIScrollViewDelegate>{
     //用于初始化数据模型的数据
     NSString *food,*fdevice,*expire,*remind,*photoPath;
@@ -623,6 +624,7 @@
     }
 }
 
+
 //扫一个二维码的处理
 - (void)OperationOfOneCode:(NSString *)result code:(AVMetadataMachineReadableCodeObject *)mobject
 {
@@ -780,11 +782,6 @@
     CGFloat headerWidth = [UIScreen mainScreen].bounds.size.width-20;
     CGFloat headerheight = [UIScreen mainScreen].bounds.size.height/3;
     
-//    add.imageView1 = [[UIImageView alloc]initWithFrame:CGRectMake(15, 5,headerWidth-30,headerheight*3/4-5)];
-//    add.imageView1.image = self.food_photo[0];
-//    add.imageView1.contentMode = UIViewContentModeScaleAspectFill;
-//    add.imageView1.clipsToBounds = YES;
-//    add.imageView1.backgroundColor = [UIColor redColor];
     add.food_image = [[NSMutableArray alloc]init];
     add.food_image = self.food_photo;
     add.deviceName = [[UITextView alloc]initWithFrame:CGRectMake(15, 0,headerWidth/2, headerheight/4-5)];
