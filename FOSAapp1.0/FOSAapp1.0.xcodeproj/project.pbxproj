@@ -46,7 +46,7 @@
 		4513DD5223BF31410005A1E2 /* FoodViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4513DD5123BF31410005A1E2 /* FoodViewController.m */; };
 		4513DD5923BF38D20005A1E2 /* ScanInfoView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4513DD5823BF38D20005A1E2 /* ScanInfoView.m */; };
 		4513DD5E23BF3BC00005A1E2 /* FosaNotification.m in Sources */ = {isa = PBXBuildFile; fileRef = 4513DD5D23BF3BC00005A1E2 /* FosaNotification.m */; };
-		45184AB223CDBD98005E987B /* FosaDatePickerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 45184AB123CDBD98005E987B /* FosaDatePickerView.m */; };
+		45184AB523CDBEAE005E987B /* FosaDatePickerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 45184AB423CDBEAE005E987B /* FosaDatePickerView.m */; };
 		4528AAEF23BD7DF100957279 /* scanLine_Horizontal.png in Resources */ = {isa = PBXBuildFile; fileRef = 4528AAEE23BD7DF100957279 /* scanLine_Horizontal.png */; };
 		4528AAF123BD7DF800957279 /* scanLine_Vertical.png in Resources */ = {isa = PBXBuildFile; fileRef = 4528AAF023BD7DF800957279 /* scanLine_Vertical.png */; };
 		4528AAF423BDE12800957279 /* icon_flashOff.png in Resources */ = {isa = PBXBuildFile; fileRef = 4528AAF223BDE12700957279 /* icon_flashOff.png */; };
@@ -193,8 +193,8 @@
 		4513DD5823BF38D20005A1E2 /* ScanInfoView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ScanInfoView.m; sourceTree = "<group>"; };
 		4513DD5C23BF3BC00005A1E2 /* FosaNotification.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FosaNotification.h; sourceTree = "<group>"; };
 		4513DD5D23BF3BC00005A1E2 /* FosaNotification.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FosaNotification.m; sourceTree = "<group>"; };
-		45184AB023CDBD8D005E987B /* FosaDatePickerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FosaDatePickerView.h; path = ../../../../FOSA/FOSA/FosaView/FosaDatePicker/FosaDatePickerView.h; sourceTree = "<group>"; };
-		45184AB123CDBD98005E987B /* FosaDatePickerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FosaDatePickerView.m; path = ../../../../FOSA/FOSA/FosaView/FosaDatePicker/FosaDatePickerView.m; sourceTree = "<group>"; };
+		45184AB323CDBEAE005E987B /* FosaDatePickerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FosaDatePickerView.h; sourceTree = "<group>"; };
+		45184AB423CDBEAE005E987B /* FosaDatePickerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FosaDatePickerView.m; sourceTree = "<group>"; };
 		4528AAEE23BD7DF100957279 /* scanLine_Horizontal.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = scanLine_Horizontal.png; sourceTree = "<group>"; };
 		4528AAF023BD7DF800957279 /* scanLine_Vertical.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = scanLine_Vertical.png; sourceTree = "<group>"; };
 		4528AAF223BDE12700957279 /* icon_flashOff.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon_flashOff.png; sourceTree = "<group>"; };
@@ -457,8 +457,8 @@
 		45184AAF23CDBD65005E987B /* FosaDatePicker */ = {
 			isa = PBXGroup;
 			children = (
-				45184AB023CDBD8D005E987B /* FosaDatePickerView.h */,
-				45184AB123CDBD98005E987B /* FosaDatePickerView.m */,
+				45184AB323CDBEAE005E987B /* FosaDatePickerView.h */,
+				45184AB423CDBEAE005E987B /* FosaDatePickerView.m */,
 			);
 			path = FosaDatePicker;
 			sourceTree = "<group>";
@@ -964,7 +964,7 @@
 				4590C81C23B9A58700691461 /* FoodModel.m in Sources */,
 				4500E13E23BB248A002EB9FE /* Fosa_QRCode_Queue.m in Sources */,
 				453938D123C00F7B0006474E /* CategoryViewController.m in Sources */,
-				45184AB223CDBD98005E987B /* FosaDatePickerView.m in Sources */,
+				45184AB523CDBEAE005E987B /* FosaDatePickerView.m in Sources */,
 				4500E12323BAEB14002EB9FE /* NSMutableAttributedString+AvoidCrash.m in Sources */,
 				4500E12123BAEB14002EB9FE /* NSObject+AvoidCrash.m in Sources */,
 				45D3747B23C075BA00192014 /* UIActivityIndicatorView+AFNetworking.m in Sources */,
